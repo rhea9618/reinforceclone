@@ -9,6 +9,8 @@ import { UserProfileComponent } from './ui/user-profile/user-profile.component';
 import { HomePageComponent } from './ui/home-page/home-page.component';
 import { TasksPageComponent } from './tasks/tasks-page.component';
 import { UploadPageComponent } from './uploads/upload-page/upload-page.component';
+import { JoinTeamPageComponent } from './ui/join-team-page/join-team-page.component';
+import { TeamPageComponent } from './ui/team-page/team-page.component';
 
 
 const routes: Routes = [
@@ -18,6 +20,8 @@ const routes: Routes = [
   { path: 'tasks', component: TasksPageComponent, canActivate: [AuthGuard] },
   { path: 'quests', component: PlayerQuestComponent, canActivate: [AuthGuard] },
   { path: 'admin', component: AdminPageComponent, canActivate: [AuthGuard] },
+  { path: 'register', component: JoinTeamPageComponent, canActivate: [AuthGuard] },
+  { path: 'team', component: TeamPageComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

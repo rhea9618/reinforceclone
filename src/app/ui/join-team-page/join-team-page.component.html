@@ -1,0 +1,9 @@
+
+<ul>
+  <li *ngFor="let team of teams">
+    {{ team.name }}
+    <button  *ngIf="membership === undefined;" (click)="joinTeam($event, team.id)">Join</button>
+  </li>
+</ul>
+
+<button  *ngIf="membership !== undefined;" (click)="cancelApplication($event)">Cancel Application</button>
