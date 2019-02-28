@@ -18,11 +18,10 @@ export class SubmitQuestDialogComponent implements OnInit{
   ) {}
 
   ngOnInit() {
-    console.log(this.data);
     this.form = new FormGroup({
       questId: new FormControl(this.data.id, []),
       completed:  new FormControl(this.currentDate, [ Validators.required ]),
-      completionProof: new FormControl('', [Validators.required, Validators.pattern(this.urlPatternRegex)]])
+      completionProof: new FormControl('', [Validators.required, Validators.pattern(this.urlPatternRegex)])
     });
   }
 
