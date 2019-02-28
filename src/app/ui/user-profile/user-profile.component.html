@@ -22,6 +22,14 @@
     <!-- template will replace this div -->
   </div>
 
+  <div class="box" *ngIf="user.isLead && !player">
+    <mat-card class="example-card">
+      <mat-card-actions>
+        <button mat-stroked-button color="primary" (click)="viewUserProfile('N2ZkNDhiODctYjBkMy00ODVmLWFlMjktZjI1MGZlNDBiNDI3.NDU3ZDU2ODUtMDQ2Ny00ZDA1LWIyM2ItOGY4MTdhZGRhNDdj')">View Profile</button> 
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
   <div class="box" *ngIf="user.isLead && player">
     <mat-card class="example-card">
       <mat-card-actions>
