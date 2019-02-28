@@ -20,7 +20,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private season: Season;
   private seasonSub: any;
 
-  constructor(private auth: AuthService,
+  constructor(public auth: AuthService,
     private route: ActivatedRoute,
     private userService: UserService,
     private dialog: MatDialog,

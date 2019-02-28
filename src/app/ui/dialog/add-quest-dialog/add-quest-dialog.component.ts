@@ -20,10 +20,10 @@ const CategoryList = [
   styleUrls: ['./add-quest-dialog.component.scss']
 })
 export class AddQuestDialogComponent implements OnInit {
-  private categoryList: Array<String>;
-  private categories: QuestCategories;
-  private playerQuest: PlayerQuest;
-  private user: User;
+  public categoryList: Array<String>;
+  public categories: QuestCategories;
+  public playerQuest: PlayerQuest;
+  public user: User;
   private season: Season;
 
   constructor(@Inject(MAT_DIALOG_DATA) private data: any,
