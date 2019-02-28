@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { empty, from, Observable } from 'rxjs';
+import { EMPTY, from, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { PlayerQuestService } from '../player-quest/player-quest.service';
@@ -54,7 +54,7 @@ export class MembersQuestApprovalComponent implements OnInit {
           return this.playerQuest.rejectQuest(quest);
         }
 
-        return empty();
+        return EMPTY;
       }),
       flatMap(() => {
         const status = action === 'approved' ? 'success' : 'error';
