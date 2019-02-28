@@ -48,7 +48,7 @@ export class PlayerQuestListComponent implements OnInit {
         this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
           .then(() => {
             this.emailService.sendEmail(playerQuest.teamLeadEmail,
-              'Player Quest Submitted',
+              'Leader Board: Player Quest Submitted',
               `Player ${playerQuest.playerName} has completed the quest '${playerQuest.questName}'. Kindly validate the quest completion.`
             ).subscribe(() => {
               this.notifyService.update(`Your quest has been submitted to your team lead for validation.`, 'success');
