@@ -46,13 +46,15 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       this.playerQuestService.assignPlayerQuest(this.playerQuest).then((docRef: DocumentReference) => {
         docRef.get().then((data) => {
           if (data.exists) {
+            const reqString = this.playerQuest.required ? 'Required' : 'Additional';
             this.emailService.sendEmail(this.user.email, 'Leader Board: New Quest Assigned',
               'Quest Name: ' + this.playerQuest.questName + '\n' +
               'Quest Category: ' + this.playerQuest.category + '\n' +
               'Quest Source: ' + this.playerQuest.source + '\n' +
-              'Quest Type: ' + this.playerQuest.required ? 'Required' : 'Additional').subscribe((data) => {
-                console.log(data);
+              'Quest Type: ' + reqString).subscribe((res) => {
+                console.log(res);
                 this.notifyService.update('Assign quest successful!', 'success');
+                this.dialogRef.close();
               });
           } else {
             this.notifyService.update('Assign quest failed!', 'error');
