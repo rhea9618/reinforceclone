@@ -51,6 +51,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
               'Quest Category: ' + this.playerQuest.category + '\n' +
               'Quest Source: ' + this.playerQuest.source + '\n' +
               'Quest Type: ' + this.playerQuest.required ? 'Required' : 'Additional').subscribe((data) => {
+                console.log(data);
                 this.notifyService.update('Assign quest successful!', 'success');
               });
           } else {
