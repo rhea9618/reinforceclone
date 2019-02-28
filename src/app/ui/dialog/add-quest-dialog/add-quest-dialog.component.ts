@@ -22,6 +22,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   ];
   public playerQuest: PlayerQuest;
   public user: User;
+  private lead: User;
   private seasonSub: any;
 
   constructor(@Inject(MAT_DIALOG_DATA) private data: any,
@@ -31,6 +32,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     private emailService: EmailService,
     private seasonService: SeasonService) {
     this.user = data.user;
+    this.lead = data.lead;
   }
 
   adjustQuestType(required: boolean) {
@@ -72,7 +74,8 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       teamId: this.user.team.id,
       status: 'todo',
       xp: 10,
-      playerEmail: this.user.email
+      playerEmail: this.user.email,
+      teamLeadEmail: this.lead.email
     } as PlayerQuest;
   }
 

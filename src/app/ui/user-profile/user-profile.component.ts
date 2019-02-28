@@ -42,7 +42,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   openDialog() {
     this.dialog.open(AddQuestDialogComponent, {
       data: {
-        user: this.player
+        user: this.player,
+        lead: this.user
       }
     });
   }

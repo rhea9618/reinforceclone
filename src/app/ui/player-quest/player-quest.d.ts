@@ -20,6 +20,7 @@ interface PlayerQuest {
   playerEmail: string;
   teamId: string;
   status: QuestStatus;
+  teamLeadEmail: string;
   created?: firebase.firestore.Timestamp;
   updated?: firebase.firestore.Timestamp;
   submitted?: firebase.firestore.Timestamp;
