@@ -68,12 +68,12 @@ import { SubmitQuestDialogComponent } from './player-quest-list/submit-quest-dia
     PlayerQuestComponent,
     MembersQuestApprovalComponent,
     QuestApprovalDialogComponent,
-	PlayerQuestListComponent,
+  	PlayerQuestListComponent,
     SubmitQuestDialogComponent,
   ],
   entryComponents: [
     QuestApprovalDialogComponent,
-	SubmitQuestDialogComponent
+  	SubmitQuestDialogComponent
   ],
   exports: [
     LoadingSpinnerComponent,

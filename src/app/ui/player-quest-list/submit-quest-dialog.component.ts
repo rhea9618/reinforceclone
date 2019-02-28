@@ -8,7 +8,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   templateUrl: 'submit-quest-dialog.component.html',
   styleUrls: ['submit-quest-dialog.component.scss']
 })
-export class SubmitQuestDialogComponent implements OnInit{
+export class SubmitQuestDialogComponent implements OnInit {
   form: FormGroup;
   currentDate = new Date();
   private urlPatternRegex = /^(http|https):\/\/[^ "]+$/gi;
@@ -30,7 +30,7 @@ export class SubmitQuestDialogComponent implements OnInit{
   }
 
   submitQuest() {
-    if(this.form.valid) {
+    if (this.form.valid) {
       this.dialogRef.close(this.form.value);
     }
   }

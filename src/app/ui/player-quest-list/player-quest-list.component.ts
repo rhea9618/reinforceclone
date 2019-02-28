@@ -33,9 +33,9 @@ export class PlayerQuestListComponent implements OnInit {
     private playerQuestService: PlayerQuestService,
     private season: SeasonService) {}
 
-  async ngOnInit(){
+  async ngOnInit() {
     const seasonId = await this.season.getEnabledSeasonId().toPromise();
-    if(this.user && this.user.team) {
+    if (this.user && this.user.team) {
       const teamId = this.user.team.id;
       this.questList = this.playerQuestService.getMemberQuests(seasonId, teamId, this.user.uid);
     }
@@ -44,9 +44,9 @@ export class PlayerQuestListComponent implements OnInit {
   public openSubmitQuestDialog(playerQuest: PlayerQuest) {
     const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent, { data: playerQuest, width: '600px'});
     submitQuestDialog.afterClosed().subscribe( data => {
-      if(data && data.questId) {
+      if (data && data.questId) {
         this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
-          .then(()=>{
+          .then(() => {
             this.emailService.sendEmail(playerQuest.teamLeadEmail,
               'Player Quest Submitted',
               `Player ${playerQuest.playerName} has completed the quest '${playerQuest.questName}'. Kindly validate the quest completion.`
@@ -59,6 +59,6 @@ export class PlayerQuestListComponent implements OnInit {
             this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
           });
       }
-    }); 
+    });
   }
 }

@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>
-  Quests
+  Submit Quest for Completion
 </h1>
 
 <form [formGroup]="form">
@@ -20,7 +20,7 @@
           <input matInput [matDatepicker]="picker" required [max]="currentDate" placeholder="Date Completed" formControlName="completed"/>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="hasError('completed','pattern')">Completion date is a required field</mat-error>
+          <mat-error *ngIf="hasError('completed','required')">Completion date is a required field</mat-error>
         </mat-form-field>
         <br />
         <mat-form-field>
