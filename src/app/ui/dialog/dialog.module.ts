@@ -3,9 +3,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AddQuestDialogComponent } from './add-quest-dialog/add-quest-dialog.component';
 
-import { 
-  MatCardModule, 
-  MatIconModule, 
+import {
+  MatCardModule,
+  MatIconModule,
   MatGridListModule,
   MatDialogModule,
   MatFormFieldModule,

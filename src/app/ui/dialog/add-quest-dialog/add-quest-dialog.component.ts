@@ -11,8 +11,8 @@ const CategoryList = [
   'Core  - Soft Skill',
   'Product Specific Technical',
   'Product Specific Functional',
-  'Certification ' 
-]
+  'Certification '
+];
 
 @Component({
   selector: 'add-quest-dialog',
@@ -48,19 +48,19 @@ export class AddQuestDialogComponent implements OnInit {
 
   adjustQuestType(required: boolean) {
     this.playerQuest.required = required;
-    this.playerQuest.xp = required? 10: 5;
+    this.playerQuest.xp = required ? 10 : 5;
   }
 
   assignQuest() {
     this.dialogRef.close();
     this.playerQuestService.assignPlayerQuest(this.playerQuest).then((docRef: DocumentReference) => {
       docRef.get().then((data) => {
-        if(data.exists) {
-          this.emailService.sendEmail(this.user.email, 'Leader Board: New Quest Assigned', 
+        if (data.exists) {
+          this.emailService.sendEmail(this.user.email, 'Leader Board: New Quest Assigned',
             'Quest Name: ' + this.playerQuest.questName + '\n' +
             'Quest Category: ' + this.playerQuest.category + '\n' +
             'Quest Source: ' + this.playerQuest.source + '\n' +
-            'Quest Type: ' + this.playerQuest.required? 'Required': 'Additional');
+            'Quest Type: ' + this.playerQuest.required ? 'Required' : 'Additional');
           this.notifyService.update('Assign quest successful!', 'success');
         } else {
           this.notifyService.update('Assign quest failed!', 'error');

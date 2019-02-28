@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../../core/user.service';
@@ -11,7 +11,7 @@ import { SeasonService } from '../../core/season.service';
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss'],
 })
-export class UserProfileComponent {
+export class UserProfileComponent implements OnInit, OnDestroy {
   private player: User;
   private userServiceSub: any;
   private routeSub: any;
@@ -20,7 +20,7 @@ export class UserProfileComponent {
   private season: Season;
   private seasonSub: any;
 
-  constructor(private auth: AuthService, 
+  constructor(private auth: AuthService,
     private route: ActivatedRoute,
     private userService: UserService,
     private dialog: MatDialog,
@@ -31,19 +31,19 @@ export class UserProfileComponent {
   }
 
   ngOnInit() {
-    //get the logged-in user data
+    // get the logged-in user data
     this.userSub = this.auth.user.subscribe((user: User) => {
       this.user = user;
 
-      //check if the logged-in user is a team lead 
-      if(this.user.isLead) {
-        //get the player id from the path
+      // check if the logged-in user is a team lead
+      if (this.user.isLead) {
+        // get the player id from the path
         this.routeSub = this.route.params.subscribe(param => {
-          var playerId = param['playerId'];
+          const playerId = param['playerId'];
 
-          //this will tell us if the logged-in user is viewing his own data, or is viewing someone else's
-          if(playerId) {
-            //get the details of the player being viewed by the logged-in user
+          // this will tell us if the logged-in user is viewing his own data, or is viewing someone else's
+          if (playerId) {
+            // get the details of the player being viewed by the logged-in user
             this.userServiceSub = this.userService.getUser(playerId).subscribe((player: User) => {
               this.player = player;
 
@@ -68,7 +68,7 @@ export class UserProfileComponent {
 
   ngOnDestroy() {
     this.userSub.unsubscribe();
-    if(this.user.isLead && this.player) {
+    if (this.user.isLead && this.player) {
       this.routeSub.unsubscribe();
       this.userServiceSub.unsubscribe();
     }
