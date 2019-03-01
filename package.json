@@ -31,9 +31,6 @@
     "@angular/router": "^7.2.7",
     "@angular/service-worker": "^7.2.7",
     "@azure/msal-angular": "^0.1.2",
-    "@nguniversal/module-map-ngfactory-loader": "^7.1.0",
-    "@schematics/angular": "^7.3.3",
-    "buffer": "^5.2.1",
     "core-js": "^2.6.5",
     "firebase": "^5.8.4",
     "hammerjs": "^2.0.8",
@@ -70,17 +67,5 @@
     "webpack-cli": "^2.1.5",
     "ws": "^5.2.2",
     "xmlhttprequest": "^1.8.0"
-  },
-  "browser": {
-    "zlib": false,
-    "http": false,
-    "https": false,
-    "net": false,
-    "path": false,
-    "stream": false,
-    "tls": false,
-    "fs": false,
-    "crypto": false,
-    "global": false
   }
 }

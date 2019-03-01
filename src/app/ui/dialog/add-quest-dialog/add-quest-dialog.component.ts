@@ -30,10 +30,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     private dialogRef: MatDialogRef<AddQuestDialogComponent>,
     private notifyService: NotifyService,
     private emailService: EmailService,
-    private seasonService: SeasonService) {
-    this.user = data.user;
-    this.lead = data.lead;
-  }
+    private seasonService: SeasonService) {}
 
   adjustQuestType(required: boolean) {
     this.playerQuest.required = required;
@@ -46,27 +43,25 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       this.playerQuest.seasonId = season.id;
 
       this.playerQuestService.assignPlayerQuest(this.playerQuest).then((docRef: DocumentReference) => {
-        docRef.get().then((data) => {
-          if (data.exists) {
-            const reqString = this.playerQuest.required ? 'Required' : 'Additional';
-            this.emailService.sendEmail(this.user.email, 'Leader Board: New Quest Assigned',
-              'Quest Name: ' + this.playerQuest.questName + '\n' +
-              'Quest Category: ' + this.playerQuest.category + '\n' +
-              'Quest Source: ' + this.playerQuest.source + '\n' +
-              'Quest Type: ' + reqString).subscribe((res) => {
-                console.log(res);
-                this.notifyService.update('Assign quest successful!', 'success');
-                this.dialogRef.close();
-              });
-          } else {
-            this.notifyService.update('Assign quest failed!', 'error');
-          }
-        });
+        const reqString = this.playerQuest.required ? 'Required' : 'Additional';
+        this.emailService.sendEmail(this.user.email, 'Leader Board: New Quest Assigned',
+          '<strong>Quest Name:</strong> ' + this.playerQuest.questName + '<br />' +
+          '<strong>Quest Category:</strong> ' + this.playerQuest.category + '<br />' +
+          '<strong>Quest Source:</strong> ' + this.playerQuest.source + '<br />' +
+          '<strong>Quest Type:</strong> ' + reqString + '<bt />', 'HTML').subscribe((res) => {
+            console.log(res);
+            this.notifyService.update('Assign quest successful!', 'success');
+            this.dialogRef.close();
+          });
+      }).catch(()=> {
+        this.notifyService.update('Assign quest failed!', 'error');
       });
     });
   }
 
   ngOnInit() {
+    this.user = this.data.user;
+    this.lead = this.data.lead;
     this.playerQuest = {
       playerId: this.user.uid,
       required: true,
