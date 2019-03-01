@@ -8,7 +8,6 @@ interface User {
   displayName: string;
   photoURL?: string;
   team?: Team;
-  isLead?: boolean;
   isMicrosoft?: boolean;
 }
 
