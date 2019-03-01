@@ -43,6 +43,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-"sendgrid.env" 
 .vscode/tasks.json
 package-lock.json
+.vs/slnx.sqlite-journal
+.vs/slnx.sqlite
