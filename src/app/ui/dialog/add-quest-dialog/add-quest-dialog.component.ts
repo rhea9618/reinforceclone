@@ -53,7 +53,8 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
             this.notifyService.update('Assign quest successful!', 'success');
             this.dialogRef.close();
           });
-      }).catch(()=> {
+      }).catch((err) => {
+        console.log(err);
         this.notifyService.update('Assign quest failed!', 'error');
       });
     });
