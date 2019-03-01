@@ -45,3 +45,4 @@ testem.log
 Thumbs.db
 "sendgrid.env" 
 .vscode/tasks.json
+package-lock.json
