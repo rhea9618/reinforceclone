@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, DocumentChangeAction } from '@angular/fire/firestore';
-import { Membership } from 'src/app/teams/membership';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class TeamsService {
@@ -15,12 +15,14 @@ export class TeamsService {
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(uid: string, teamId: string) {
+  addMembership(uid: string, displayName: string, email:string, teamId: string) {
     this.membersCollection.doc<Membership>(uid).set({
       uid: uid,
       isApproved: false,
       isLead: false,
-      teamId: teamId
+      teamId: teamId,
+      displayName: displayName,
+      email: email
     });
   }
   
@@ -35,13 +37,13 @@ export class TeamsService {
   }
 
   getTeams(): Observable<Team[]> {
-    return this.teamsCollection.snapshotChanges().map(
+    return this.teamsCollection.snapshotChanges().pipe(map(
       (actions) => {
         return actions.map((a) => {
           const data = a.payload.doc.data();
           return { id: a.payload.doc.id, ...data };
         });
-      });
+      }));
   }
 
   getTeamMembers(teamId: string) {
@@ -62,9 +64,15 @@ export class TeamsService {
   }
 
   isLead(uid: string): Observable<boolean> {
-    return this.membersCollection.doc<Membership>(uid).valueChanges().map(membership => {
+    return this.membersCollection.doc<Membership>(uid).valueChanges().pipe(map(membership => {
       return membership.isLead;
-    })
+    }));
+  }
+
+  setAsLead(uid: string, isLead: boolean) {
+    this.membersCollection.doc<Membership>(uid).update({
+      isLead: isLead
+    });
   }
 
   removeTeamMember(uid: string) {

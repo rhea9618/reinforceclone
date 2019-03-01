@@ -12,8 +12,9 @@ import { MatTableDataSource } from '@angular/material';
 })
 export class TeamPageComponent implements OnInit {
 
+  isLead: boolean;
   currentUser : User;
-  teamMembers: User[];
+  teamMembers: Membership[];
   teamApplications: User[];
 
   // Table stuff
@@ -23,8 +24,7 @@ export class TeamPageComponent implements OnInit {
   teamApplicationDataSource: MatTableDataSource<User>;
   
   constructor(public auth: AuthService, 
-    private teamsService: TeamsService, 
-    private userService: UsersService) { }
+    private teamsService: TeamsService) { }
 
   ngOnInit() {
     this.auth.user.subscribe((user: User) => {
@@ -34,71 +34,52 @@ export class TeamPageComponent implements OnInit {
       this.currentUser = user;
       this.teamMemberDataSource = new MatTableDataSource<User>(this.teamMembers);
       this.teamApplicationDataSource = new MatTableDataSource<User>(this.teamApplications);
-      this.loadTeamMembers(user);
+
+      this.loadTeamMembers();
+      this.loadLeadAbilities();
     });
   }
 
-  addTeamMember(event, uid) {
+  addTeamMember(uid) {
     this.teamsService.addToTeam(uid);
+  }
+
+  kickButtonisVisible(uid: string) {
+    return this.isLead && (uid != this.currentUser.uid);
   }
 
   rejectApplication(user: User) {
     this.teamsService.removeTeamMember(user.uid);
   }
 
-  removeTeamMember(event, uid) {
+  removeTeamMember(uid) {
     this.teamsService.removeTeamMember(uid);
   }
 
-  private loadTeamMembers(user: User) {
+  private loadTeamMembers() {
     this.teamsService.getObservableTeamId(this.currentUser.uid).subscribe(teamId => {
-      this.teamsService.getTeamMembers(teamId).subscribe(arr => {
-        this.loadUsersToTeam(arr);
+      this.teamsService.getTeamMembers(teamId).subscribe((arr: DocumentChangeAction<Membership>[]) => {
+        this.teamMembers = this.mapMembershipDocument(arr);
+        this.teamMemberDataSource = new MatTableDataSource<User>(this.teamMembers);
       });
 
-      this.teamsService.getTeamMembersForApproval(teamId).subscribe(arr => {
-        this.loadUsersToApplication(arr);
+      this.teamsService.getTeamMembersForApproval(teamId).subscribe((arr: DocumentChangeAction<Membership>[]) => {
+        this.teamApplications = this.mapMembershipDocument(arr);
+        this.teamApplicationDataSource = new MatTableDataSource<User>(this.teamApplications);
       });
     });
   }
 
-  private loadUsersToTeam(arr: DocumentChangeAction<{}>[] ) {
-    this.teamMembers = arr.map(item => {
-      const uid = item.payload.doc.id;
-      let user: User;
-      this.userService.getUser(uid).subscribe((user_: User) => {
-        let index = this.teamMembers.findIndex(element => {
-          return element.uid === uid;
-        })
-        this.teamMembers[index] = {...user_};
-        this.teamMemberDataSource.data = this.teamMembers;
-        console.log("m" + user_.displayName);
-      });
-      
-      return {
-        uid: uid,
-        ...user
-      } as User;
-    });
+  private loadLeadAbilities() {
+    this.teamsService.isLead(this.currentUser.uid).subscribe(lead => { this.isLead = lead; });
   }
 
-  private loadUsersToApplication(arr: DocumentChangeAction<{}>[] ) {
-    this.teamApplications = arr.map(item => {
-      const uid = item.payload.doc.id;
-      let user: User;
-      this.userService.getUser(uid).subscribe((user_: User) => {
-        let index = this.teamApplications.findIndex(element => {
-          return element.uid === uid;
-        })
-        this.teamApplications[index] = {...user_};
-        this.teamApplicationDataSource.data = this.teamApplications;
-        console.log(user_);
-      });
-
+  private mapMembershipDocument(arr: DocumentChangeAction<Membership>[]) {
+    return arr.map(item => {
+      const data = item.payload.doc.data();
       return {
-        uid: uid,
-        ...user
-      } as User;
+        ...data
+      } as Membership;
     });
   }
 }

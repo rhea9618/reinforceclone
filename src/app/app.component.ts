@@ -14,7 +14,6 @@ import { AuthService } from './core/auth.service';
 import { NotifyService } from './core/notify.service';
 import { environment } from '../environments/environment';
 import { TeamsService } from './teams/teams.service';
-import { Membership } from './teams/membership';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -88,14 +87,7 @@ export class AppComponent implements OnInit, OnDestroy {
       }
 
       this.teamsService.getMembership(user.uid).subscribe( member => {
-        this.membership = new Membership();
-        if(member) {
-          this.membership.isApproved = member.isApproved;
-          this.membership.isLead = member.isLead;
-          this.membership.teamId = member.teamId;
-          this.membership.uid = user.uid;
-        }
-
+        this.membership = member;
         this.isTeamMember();
       });
       

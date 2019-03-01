@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { TeamsService } from 'src/app/teams/teams.service';
-import { Membership } from 'src/app/teams/membership';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'join-team-page',
@@ -14,7 +14,7 @@ export class JoinTeamPageComponent implements OnInit {
   membership: Membership;
   teams: Team[];
 
-  constructor(public auth: AuthService, private teamsService: TeamsService) { }
+  constructor(private route: ActivatedRoute, public auth: AuthService, private teamsService: TeamsService) { }
 
   ngOnInit() {
     this.auth.user.subscribe((user: User) => {
@@ -29,14 +29,10 @@ export class JoinTeamPageComponent implements OnInit {
   }
 
   applyForTeam(teamId: string) {
-    this.teamsService.addMembership(this.currentUser.uid, teamId);
+    this.teamsService.addMembership(this.currentUser.uid, this.currentUser.displayName, this.currentUser.email, teamId);
   }
 
-  joinTeam(event, teamId: string) {
-    this.applyForTeam(teamId);
-  }
-
-  cancelApplication(event) {
+  cancelApplication() {
     this.teamsService.removeTeamMember(this.currentUser.uid);
   }
 
