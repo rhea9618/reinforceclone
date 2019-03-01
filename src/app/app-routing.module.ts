@@ -14,7 +14,6 @@ import { UploadPageComponent } from './uploads/upload-page/upload-page.component
 const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'login', component: UserLoginComponent },
-  { path: 'profile/:playerId', component: UserProfileComponent, canActivate: [AuthGuard]},
   { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
   { path: 'tasks', component: TasksPageComponent, canActivate: [AuthGuard] },
   { path: 'quests', component: PlayerQuestComponent, canActivate: [AuthGuard] },
