@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'add-quest-dialog',
@@ -18,7 +17,6 @@ export class AddQuestDialogComponent implements OnInit {
   ];
   public playerQuest: PlayerQuest;
   public user: User;
-  private lead: User;
 
   constructor(@Inject(MAT_DIALOG_DATA) private data: any,
     private dialogRef: MatDialogRef<AddQuestDialogComponent>) {}
@@ -33,7 +31,8 @@ export class AddQuestDialogComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.data.user;
-    this.lead = this.data.lead;
+    const lead = this.data.lead;
+
     this.playerQuest = {
       playerId: this.user.uid,
       required: true,
@@ -41,7 +40,7 @@ export class AddQuestDialogComponent implements OnInit {
       teamId: this.user.team.id,
       status: 'todo',
       playerEmail: this.user.email,
-      teamLeadEmail: this.lead.email
+      teamLeadEmail: lead.email
     } as PlayerQuest;
   }
 }

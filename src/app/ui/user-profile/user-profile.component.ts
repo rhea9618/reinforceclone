@@ -39,17 +39,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     // get the logged-in user data
     this.userSub = this.auth.user.subscribe((user: User) => {
       this.user = user;
-      if (this.user.team.lead === this.user.uid) {
-        // get the player to be loaded
-        this.route.queryParams.subscribe(params => {
-          const playerId = params['uid'];
-          if (playerId) {
-            this.userServiceSub = this.userService.getUser(playerId).subscribe((player: User) => {
-              this.player = player;
-            });
-          }
-        });
-      }
+      // get the player to be loaded
+      this.route.queryParams.subscribe(params => {
+        const playerId = params['uid'];
+        if (playerId) {
+          this.userServiceSub = this.userService.getUser(playerId).subscribe((player: User) => {
+            this.player = player;
+          });
+        }
+      });
     });
   }
 

@@ -44,6 +44,5 @@ testem.log
 .DS_Store
 Thumbs.db
 .vscode/tasks.json
-package-lock.json
 .vs/slnx.sqlite-journal
 .vs/slnx.sqlite
