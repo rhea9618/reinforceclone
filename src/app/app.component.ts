@@ -38,7 +38,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private updates: SwUpdate,
     private teamsService: TeamsService
   ) {
-    
   }
 
   ngOnInit() {
@@ -79,7 +78,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.auth.signOut();
   }
 
-  
   private getMembership(): void {
     this.auth.user.subscribe((user: User) => {
       if (!user) {
@@ -90,7 +88,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.membership = member;
         this.isTeamMember();
       });
-      
     });
   }
 

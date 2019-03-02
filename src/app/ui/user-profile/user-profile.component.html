@@ -68,6 +68,8 @@
   <span *ngIf="user.team && user.team?.lead != user.uid">
     <player-quest-list [user]="user" class="content"></player-quest-list>
   </span>
+
+  <team-members></team-members>
 </ng-template>
 
 <!-- template for spinner -->

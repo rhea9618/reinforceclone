@@ -1,0 +1,36 @@
+<h1>Team Members</h1>
+<table mat-table [dataSource]="teamMemberDataSource" class="mat-elevation-z8">
+  <ng-container matColumnDef="displayName">
+    <th mat-header-cell *matHeaderCellDef> Name </th>
+    <td mat-cell *matCellDef="let user">
+      <mat-icon *ngIf="user.uid == currentUser.uid" class="icon">grade</mat-icon>
+      {{ user.displayName }}
+      </td>
+  </ng-container>
+
+  <ng-container matColumnDef="exp">
+    <th mat-header-cell *matHeaderCellDef> EXP </th>
+    <td mat-cell *matCellDef="let user"> {{ user.exp }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="careerRank">
+    <th mat-header-cell *matHeaderCellDef> Career Rank </th>
+    <td mat-cell *matCellDef="let user"> {{ user.careerRank }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="seasonRank">
+    <th mat-header-cell *matHeaderCellDef> Level </th>
+    <td mat-cell *matCellDef="let user"> {{ user.seasonRank }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="kickButton">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let user">
+        <button mat-button *ngIf="kickButtonisVisible(user.uid)" (click)="removeTeamMember(user.uid)">Kick</button>
+        <button mat-button *ngIf="user.uid == currentUser.uid" (click)="removeTeamMember(user.uid)">Quit Team</button>
+      </td>
+  </ng-container>
+  
+  <tr mat-header-row *matHeaderRowDef="memberColumns"></tr>
+  <tr mat-row *matRowDef="let myRowData; columns: memberColumns"></tr>
+</table>

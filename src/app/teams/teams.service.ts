@@ -15,7 +15,7 @@ export class TeamsService {
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(uid: string, displayName: string, email:string, teamId: string) {
+  addMembership(uid: string, displayName: string, email: string, teamId: string) {
     this.membersCollection.doc<Membership>(uid).set({
       uid: uid,
       isApproved: false,
@@ -25,7 +25,7 @@ export class TeamsService {
       email: email
     });
   }
-  
+
   addToTeam(uid: string) {
     this.membersCollection.doc<Membership>(uid).update({
       isApproved: true
@@ -54,10 +54,14 @@ export class TeamsService {
     return this.afs.collection('membership', ref => ref.where('teamId', '==', teamId).where('isApproved', '==', false)).snapshotChanges();
   }
 
-  getObservableTeamId(uid: string) {
+  getTeamId(uid: string): Observable<string> {
     const membership = this.getMembership(uid);
     const teamId = membership.map( member => {
-      return member.teamId;
+      if (member) {
+        return member.teamId;
+      } else {
+        return undefined;
+      }
     });
 
     return teamId;
@@ -65,7 +69,11 @@ export class TeamsService {
 
   isLead(uid: string): Observable<boolean> {
     return this.membersCollection.doc<Membership>(uid).valueChanges().pipe(map(membership => {
-      return membership.isLead;
+      if (membership) {
+        return membership.isLead;
+      } else {
+        return undefined;
+      }
     }));
   }
 
