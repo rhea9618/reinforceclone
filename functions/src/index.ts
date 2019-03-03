@@ -5,7 +5,6 @@ import * as admin from 'firebase-admin';
 // // https://firebase.google.com/docs/functions/typescript
 
 admin.initializeApp();
-
 export const createFirebaseToken = functions.https.onCall(async(data, context) => {
   const uid = data.uid;
 
