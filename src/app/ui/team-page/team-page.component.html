@@ -1,4 +1,4 @@
-<div class="container" *ngIf="hasTeam else noTeam;">
+<div class="container" *ngIf="hasTeam; else noTeam;">
   <team-members [currentUser]="currentUser" [isLead]="isLead"></team-members>
   <team-applications [currentUser]="currentUser" *ngIf="isLead;"></team-applications>
 </div>
