@@ -43,7 +43,7 @@ export class JoinTeamPageComponent implements OnInit {
   }
 
   private loadMembership() {
-    this.teamsService.getMembership(this.currentUser.uid).subscribe(membership =>{
+    this.teamsService.getMembership(this.currentUser.uid).subscribe(membership => {
       this.membership = membership;
     });
   }
