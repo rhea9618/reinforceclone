@@ -34,6 +34,10 @@ export class TeamApplicationsComponent implements OnInit {
     }
   }
 
+  addTeamMember(uid) {
+    this.teamsService.addToTeam(uid);
+  }
+
   private init() {
     this.teamApplicationDataSource = new MatTableDataSource<Membership>(this.teamApplications);
     this.teamsService.getTeamId(this.currentUser.uid).subscribe(teamId => {
