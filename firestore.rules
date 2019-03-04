@@ -92,10 +92,6 @@ service cloud.firestore {
       );
     }
 
-    function isTeamMember() {
-      return getUserData(currentUser().uid).team.id == existingData().tid;
-    }
-
     function getAdminData(userId) {
       return get(/databases/$(database)/documents/adminUsers/$(userId)).data;
     }
