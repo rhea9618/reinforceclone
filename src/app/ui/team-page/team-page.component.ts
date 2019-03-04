@@ -25,6 +25,7 @@ export class TeamPageComponent implements OnInit {
       this.currentUser = user;
       this.teamsService.isLead(this.currentUser.uid).subscribe(lead => { this.isLead = lead; });
       this.checkMembership(user.uid);
+
     });
   }
 

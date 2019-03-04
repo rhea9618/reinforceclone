@@ -14,6 +14,7 @@ export class TeamMembersComponent implements OnInit {
   @Input() isLead: boolean;
   @Input() currentUser: User;
 
+  // get your user ids here then make a query from user collection using the id(s)
   teamMembers: Membership[];
 
   // Table stuff
