@@ -32,12 +32,12 @@ export class AddQuestDialogComponent implements OnInit {
   ngOnInit() {
     this.user = this.data.user;
     const lead = this.data.lead;
-
+    // will need to recoordinate team id, we get it now from membership collection
     this.playerQuest = {
       playerId: this.user.uid,
       required: true,
       playerName: this.user.displayName,
-      teamId: this.user.team.id,
+      teamId: 'todo',
       status: 'todo',
       playerEmail: this.user.email,
       teamLeadEmail: lead.email

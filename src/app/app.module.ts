@@ -29,6 +29,11 @@ import { UiModule } from './ui/ui.module';
 import { NotesModule } from './notes/notes.module';
 import { TasksModule } from './tasks/tasks.module';
 
+import { functions } from 'firebase';
+import { TeamsModule } from './teams/teams.module';
+
+// IMPORTANT
+// Add your own project credentials to environments/*.ts
 
 @NgModule({
   declarations: [AppComponent],
@@ -52,6 +57,7 @@ import { TasksModule } from './tasks/tasks.module';
     MsalModule.forRoot({ clientID: '9fc78166-b1bb-4cc6-bb92-a2425705410a' }),
     NotesModule,
     TasksModule,
+    TeamsModule,
     UiModule,
     UploadsModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {

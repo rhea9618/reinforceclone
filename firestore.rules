@@ -30,6 +30,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /membership/{id} {
+      allow read: if true;
+      allow write: if true; // temporarily until we get team leads sorted out
+    }
+
     /// Functions ///
 
     // Current DB record of document being requested
@@ -58,8 +63,17 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/teams/$(teamId)).data;
     }
 
+    function getMembershipData(uid) {
+      return get(/databases/$(database)/documents/membership/$(uid)).data;
+    }
+
     function isOwner(userId) {
       return currentUser().uid == userId;
+    }
+
+    function isTeamMember() {
+      return getMembershipData(currentUser().uid).teamId &&
+        getMembershipData(currentUser().uid).isApproved;
     }
 
     function isTeamLead(teamId) {

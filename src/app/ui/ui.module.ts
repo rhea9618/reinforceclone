@@ -35,6 +35,10 @@ import { MembersQuestApprovalComponent } from './members-quest-approval/members-
 import { QuestApprovalDialogComponent } from './members-quest-approval/quest-approval-dialog.component';
 import { PlayerQuestListComponent } from './player-quest-list/player-quest-list.component';
 import { SubmitQuestDialogComponent } from './player-quest-list/submit-quest-dialog.component';
+import { JoinTeamPageComponent } from './join-team-page/join-team-page.component';
+import { TeamPageComponent } from './team-page/team-page.component';
+import { TeamApplicationsComponent } from './team-page/team-applications/team-applications.component';
+import { TeamMembersComponent } from './team-page/team-members/team-members.component';
 
 @NgModule({
   imports: [
@@ -70,9 +74,13 @@ import { SubmitQuestDialogComponent } from './player-quest-list/submit-quest-dia
     AdminPageComponent,
     PlayerQuestComponent,
     MembersQuestApprovalComponent,
+    JoinTeamPageComponent,
+    TeamPageComponent,
     QuestApprovalDialogComponent,
     PlayerQuestListComponent,
     SubmitQuestDialogComponent,
+    TeamApplicationsComponent,
+    TeamMembersComponent,
   ],
   entryComponents: [
     QuestApprovalDialogComponent,

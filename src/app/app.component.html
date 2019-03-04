@@ -34,8 +34,8 @@
           routerLink="/profile">
           <mat-icon class="icon">person</mat-icon>Profile
         </a>
-        <a mat-list-item [routerLinkActive]="['active-menu']"
-          routerLink="/tasks">
+        <a *ngIf="isApprovedMember; else isNotMember" mat-list-item [routerLinkActive]="['active-menu']"
+          routerLink="/team">
           <mat-icon class="icon">group</mat-icon>Team
         </a>
         <a mat-list-item [routerLinkActive]="['active-menu']"
@@ -60,5 +60,12 @@
   <a mat-button routerLink="/login">
     <mat-icon class="icon">person</mat-icon>
     Login
+  </a>
+</ng-template>
+
+<ng-template #isNotMember>
+  <a mat-list-item [routerLinkActive]="['active-menu']"
+      routerLink="/register">
+      <mat-icon class="icon">group</mat-icon>Join a Team
   </a>
 </ng-template>

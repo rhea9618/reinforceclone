@@ -13,6 +13,8 @@ import { first, flatMap } from 'rxjs/operators';
 import { AuthService } from './core/auth.service';
 import { NotifyService } from './core/notify.service';
 import { environment } from '../environments/environment';
+import { TeamsService } from './teams/teams.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +25,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private mobileQueryListener: () => void;
   mobileQuery: MediaQueryList;
+  membershipObs: Observable<Membership>;
+  membership: Membership;
+  isApprovedMember: boolean;
 
   constructor(
     public auth: AuthService,
@@ -30,13 +35,18 @@ export class AppComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private media: MediaMatcher,
     private notify: NotifyService,
-    private updates: SwUpdate
-  ) {}
+    private updates: SwUpdate,
+    private teamsService: TeamsService
+  ) {
+  }
 
   ngOnInit() {
     this.mobileQuery = this.media.matchMedia('(max-width: 600px)');
     this.mobileQueryListener = () => this.changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this.mobileQueryListener);
+
+    // If membership isn't approve, show the "Join a Team" option
+    this.getMembership();
 
     if (!environment.production) {
       return;
@@ -66,5 +76,22 @@ export class AppComponent implements OnInit, OnDestroy {
 
   logout() {
     this.auth.signOut();
+  }
+
+  private getMembership(): void {
+    this.auth.user.subscribe((user: User) => {
+      if (!user) {
+        return false;
+      }
+
+      this.teamsService.getMembership(user.uid).subscribe( member => {
+        this.membership = member;
+        this.isTeamMember();
+      });
+    });
+  }
+
+  private isTeamMember(): void {
+    this.isApprovedMember = this.membership && (this.membership.isApproved || this.membership.isLead);
   }
 }

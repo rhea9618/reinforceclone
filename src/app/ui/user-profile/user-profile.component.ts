@@ -9,6 +9,7 @@ import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { SeasonService } from 'src/app/core/season.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
+import { TeamsService } from 'src/app/teams/teams.service';
 
 @Component({
   selector: 'user-profile',
@@ -22,6 +23,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private userSub: Subscription;
   private seasonSub: Subscription;
 
+  isLead: boolean;
+  private playerTeam: Membership;
+
   constructor(public auth: AuthService,
     private userService: UserService,
     private dialog: MatDialog,
@@ -29,7 +33,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private playerQuestService: PlayerQuestService,
     private seasonService: SeasonService,
     private emailService: EmailService,
-    private notifyService: NotifyService) { }
+    private notifyService: NotifyService,
+    private teamsService: TeamsService) { }
 
   logout() {
     this.auth.signOut();
@@ -39,15 +44,19 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     // get the logged-in user data
     this.userSub = this.auth.user.subscribe((user: User) => {
       this.user = user;
+      // By default, you view yourself
+      this.player = user;
       // get the player to be loaded
       this.route.queryParams.subscribe(params => {
         const playerId = params['uid'];
         if (playerId) {
           this.userServiceSub = this.userService.getUser(playerId).subscribe((player: User) => {
             this.player = player;
+            this.teamsService.getMembership(this.player.uid).subscribe(team => { this.playerTeam = team; });
           });
         }
       });
+      this.teamsService.isLead(this.user.uid).subscribe(lead => { this.isLead = lead; });
     });
   }
 
@@ -62,7 +71,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     assignQuestDialog.afterClosed().subscribe((playerQuest: PlayerQuest) => {
       this.seasonSub = this.seasonService.getEnabledSeason().subscribe((season: Season) => {
         // set season id
-        playerQuest.seasonId = season.id;
+        if (playerQuest) {
+          playerQuest.seasonId = season.id;
+        }
 
         this.playerQuestService.assignPlayerQuest(playerQuest).then(docRef => {
           const reqString = playerQuest.required ? 'Required' : 'Additional';

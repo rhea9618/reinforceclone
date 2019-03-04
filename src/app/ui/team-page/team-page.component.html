@@ -1,0 +1,8 @@
+<div class="container" *ngIf="hasTeam; else noTeam;">
+  <team-members [currentUser]="currentUser" [isLead]="isLead"></team-members>
+  <team-applications [currentUser]="currentUser" *ngIf="isLead;"></team-applications>
+</div>
+
+<ng-template #noTeam>
+  <join-team-page></join-team-page>
+</ng-template>
