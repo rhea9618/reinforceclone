@@ -43,5 +43,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+.vscode/tasks.json
 .vs/slnx.sqlite-journal
 .vs/slnx.sqlite

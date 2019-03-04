@@ -19,6 +19,7 @@ import {
   MatToolbarModule
 } from '@angular/material';
 
+import { DialogModule } from './dialog/dialog.module';
 import { AdminPageComponent } from './admin-page/admin-page.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { HomePageComponent } from './home-page/home-page.component';
@@ -55,6 +56,8 @@ import { SubmitQuestDialogComponent } from './player-quest-list/submit-quest-dia
     MatStepperModule,
     MatTableModule,
     MatToolbarModule,
+    MatDialogModule,
+    DialogModule,
   ],
   declarations: [
     UserLoginComponent,
