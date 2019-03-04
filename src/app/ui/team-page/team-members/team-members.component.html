@@ -5,7 +5,8 @@
     <td mat-cell *matCellDef="let user">
       <mat-icon *ngIf="user.uid == currentUser.uid" class="icon">grade</mat-icon>
       {{ user.displayName }}
-      </td>
+      <button mat-stroked-button color="primary"><a routerLink="/profile" [queryParams]="{uid: user.uid}">View Profile</a></button> 
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="exp">

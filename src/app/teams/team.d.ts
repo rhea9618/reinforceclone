@@ -7,6 +7,7 @@ interface Team {
 interface Membership {
   uid: string;
   teamId: string;
+  teamName: string;
   isApproved: boolean;
   isLead: boolean;
   displayName: string,

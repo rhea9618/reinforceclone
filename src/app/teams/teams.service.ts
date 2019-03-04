@@ -16,13 +16,17 @@ export class TeamsService {
   }
 
   addMembership(uid: string, displayName: string, email: string, teamId: string) {
-    this.membersCollection.doc<Membership>(uid).set({
-      uid: uid,
-      isApproved: false,
-      isLead: false,
-      teamId: teamId,
-      displayName: displayName,
-      email: email
+    this.teamsCollection.doc<Team>(teamId).valueChanges().subscribe(team => {
+      console.log(team.name);
+      this.membersCollection.doc<Membership>(uid).set({
+        uid: uid,
+        isApproved: false,
+        isLead: false,
+        teamId: teamId,
+        teamName: team.name,
+        displayName: displayName,
+        email: email
+      });
     });
   }
 

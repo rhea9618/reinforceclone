@@ -24,15 +24,16 @@
     <!-- template will replace this div -->
   </div>
 
-  <div class="box" *ngIf="user.team?.lead === this.user.uid && !player">
+  <div class="box" *ngIf="this.user.uid === player.uid || isLead">
     <mat-card class="example-card">
       <mat-card-actions>
-        <button mat-stroked-button color="primary"><a routerLink="/profile" [queryParams]="{uid: 'Y2FlYmU0YmItMTkyYi00NGQwLTljYmQtYjEyODJmNjVjZTdl.NDU3ZDU2ODUtMDQ2Ny00ZDA1LWIyM2ItOGY4MTdhZGRhNDdj'}">View Profile</a></button> 
+        <button *ngIf="isLead" mat-stroked-button color="primary"><a routerLink="/profile" [queryParams]="{uid: 'player.uid'}">View Profile</a></button> 
+        <button mat-stroked-button color="primary">Other Functionality</button>
       </mat-card-actions>
     </mat-card>
   </div>
 
-  <div class="box" *ngIf="user.team?.lead === this.user.uid && player">
+  <div class="box" *ngIf="isLead && player">
     <mat-card class="example-card">
       <mat-card-actions>
         <button mat-stroked-button color="primary" (click)="openDialog()">Add Quest</button> 
@@ -44,13 +45,15 @@
 <!-- Team Lead Viewing Player -->
 <ng-template #profile>
   <div class="box" >
-    <mat-card class="example-card" *ngIf="(!(user.team?.lead === this.user.uid && player)? user: player) as viewedProfile">
+    <!--<mat-card class="example-card" *ngIf="(!(isLead === this.user.uid && player)? user: player) as viewedProfile">-->
+    <mat-card class="example-card" *ngIf="player as viewedProfile">
+      {{ player.displayName }}
       <mat-card-header>
         <div mat-card-avatar>
           <img [src]="viewedProfile.photoURL || 'https://api.adorable.io/avatars/109/fire.png'" class="avatar">
         </div>
         <mat-card-title>{{ viewedProfile.displayName }}</mat-card-title>
-        <mat-card-subtitle>{{ viewedProfile.team?.name || 'Team Unknown' }}</mat-card-subtitle>
+        <mat-card-subtitle>{{ playerTeam?.teamName || 'Team Unknown' }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <h3 *ngIf="auth.isAdmin | async">Admin</h3>
@@ -68,9 +71,11 @@
   <span *ngIf="user.team && user.team?.lead != user.uid">
     <player-quest-list [user]="user" class="content"></player-quest-list>
   </span>
-
-  <team-members></team-members>
 </ng-template>
+
+<div class="content">
+    <team-members *ngIf="isLead"></team-members>
+</div>
 
 <!-- template for spinner -->
 <ng-template #loading>
