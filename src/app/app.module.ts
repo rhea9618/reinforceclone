@@ -31,7 +31,6 @@ import { TasksModule } from './tasks/tasks.module';
 
 import { functions } from 'firebase';
 import { TeamsModule } from './teams/teams.module';
-import { UsersModule } from './users/users.module';
 
 // IMPORTANT
 // Add your own project credentials to environments/*.ts
@@ -61,7 +60,6 @@ import { UsersModule } from './users/users.module';
     TeamsModule,
     UiModule,
     UploadsModule,
-    UsersModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {
       enabled: environment.production
     }),
