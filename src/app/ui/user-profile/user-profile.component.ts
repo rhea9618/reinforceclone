@@ -23,7 +23,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private userSub: Subscription;
   private seasonSub: Subscription;
 
-  private isLead: boolean;
+  isLead: boolean;
   private playerTeam: Membership;
 
   constructor(public auth: AuthService,
