@@ -38,6 +38,10 @@ export class TeamApplicationsComponent implements OnInit {
     this.teamsService.addToTeam(uid);
   }
 
+  removeTeamMember(uid) {
+    this.teamsService.removeTeamMember(uid);
+  }
+
   private init() {
     this.teamApplicationDataSource = new MatTableDataSource<Membership>(this.teamApplications);
     this.teamsService.getTeamId(this.currentUser.uid).subscribe(teamId => {
