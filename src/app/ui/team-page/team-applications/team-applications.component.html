@@ -16,7 +16,7 @@
     <ng-container matColumnDef="kickButton">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let user">
-          <button mat-button (click)="removeTeamMember($event, user.uid)">Reject</button>
+          <button mat-button (click)="removeTeamMember(user.uid)">Reject</button>
         </td>
     </ng-container>
     
