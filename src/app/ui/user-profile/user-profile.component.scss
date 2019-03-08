@@ -1,7 +1,11 @@
+.content {
+  width: 100%;
+  padding: 20px;
+}
+
 .box {
-    width: 300px;
-    margin: 15px;
-    border: 1px solid #bbb;
+  width: 300px;
+  border: 1px solid #bbb;
 }
 
 .avatar {
@@ -18,7 +22,6 @@ mat-icon, b {
 	margin-right: 5px;
 }
 
-.content {
-  width: 100%;
-  padding: 0 20px;
+player-quest-list {
+  margin-top: 20px;
 }

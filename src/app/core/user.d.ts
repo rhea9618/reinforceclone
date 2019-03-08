@@ -7,8 +7,9 @@ interface User {
   email: string | null;
   displayName: string;
   photoURL?: string;
-  team?: Team;
   isMicrosoft?: boolean;
+  isAdmin?: boolean;
+  membership?: Membership;
 }
 
 interface UserScore {

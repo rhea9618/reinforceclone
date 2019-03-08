@@ -4,8 +4,10 @@ import {
   ChangeDetectorRef,
   Component,
   OnDestroy,
-  OnInit
+  OnInit,
+  ViewChild
 } from '@angular/core';
+import { MatSidenav } from '@angular/material';
 import { SwUpdate } from '@angular/service-worker';
 import { concat, interval, from } from 'rxjs';
 import { first, flatMap } from 'rxjs/operators';
@@ -13,7 +15,6 @@ import { first, flatMap } from 'rxjs/operators';
 import { AuthService } from './core/auth.service';
 import { NotifyService } from './core/notify.service';
 import { environment } from '../environments/environment';
-import { TeamsService } from './teams/teams.service';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -22,6 +23,8 @@ import { Observable } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
+
+  @ViewChild(MatSidenav) sideNav: MatSidenav;
 
   private mobileQueryListener: () => void;
   mobileQuery: MediaQueryList;
@@ -35,18 +38,17 @@ export class AppComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private media: MediaMatcher,
     private notify: NotifyService,
-    private updates: SwUpdate,
-    private teamsService: TeamsService
-  ) {
-  }
+    private updates: SwUpdate
+  ) {}
 
   ngOnInit() {
     this.mobileQuery = this.media.matchMedia('(max-width: 600px)');
-    this.mobileQueryListener = () => this.changeDetectorRef.detectChanges();
+    this.mobileQueryListener = () => {
+      // keep sidnav open when width changes
+      this.sideNav.open();
+      this.changeDetectorRef.detectChanges()
+    };
     this.mobileQuery.addListener(this.mobileQueryListener);
-
-    // If membership isn't approve, show the "Join a Team" option
-    this.getMembership();
 
     if (!environment.production) {
       return;
@@ -58,12 +60,13 @@ export class AppComponent implements OnInit, OnDestroy {
     concat(appIsStable$, interval15Mins$).subscribe(() => this.updates.checkForUpdate());
 
     // Notify & reload when updates occurs
-    this.updates.available.subscribe(event => {
-      const message = 'A new version of this App is available. App needs to reload.';
-      this.notify.update(message, 'info').pipe(
-        flatMap(() => from(this.updates.activateUpdate()))
-      ).subscribe(() => location.reload());
-    });
+    this.updates.available.pipe(
+      flatMap(() => {
+        const message = 'A new version is available. App needs to reload.';
+        return this.notify.update(message, 'info');
+      }),
+      flatMap(() => from(this.updates.activateUpdate()))
+    ).subscribe(() => location.reload());
   }
 
   ngOnDestroy() {
@@ -74,24 +77,9 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.mobileQuery.matches ? 'over' : 'side';
   }
 
-  logout() {
-    this.auth.signOut();
-  }
-
-  private getMembership(): void {
-    this.auth.user.subscribe((user: User) => {
-      if (!user) {
-        return false;
-      }
-
-      this.teamsService.getMembership(user.uid).subscribe( member => {
-        this.membership = member;
-        this.isTeamMember();
-      });
-    });
-  }
-
-  private isTeamMember(): void {
-    this.isApprovedMember = this.membership && (this.membership.isApproved || this.membership.isLead);
+  closeSideNav() {
+    if (this.mobileQuery.matches) {
+      this.sideNav.close();
+    }
   }
 }

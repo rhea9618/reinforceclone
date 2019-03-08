@@ -1,25 +1,25 @@
 <div class="container">
-  <h1>Applications</h1>
-  <table mat-table [dataSource]="teamApplicationDataSource" class="mat-elevation-z8">
+  <h3>Applications</h3>
+  <table mat-table [dataSource]="teamApplications$ | async" class="mat-elevation-z8">
     <ng-container matColumnDef="displayName">
       <th mat-header-cell *matHeaderCellDef> Name </th>
-      <td mat-cell *matCellDef="let user"> {{ user.displayName }}</td>
+      <td mat-cell *matCellDef="let applicant"> {{ applicant.displayName }}</td>
     </ng-container>
-  
+
     <ng-container matColumnDef="acceptButton">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let user">
-          <button mat-button (click)="addTeamMember(user.uid)">Accept</button>
+        <td mat-cell *matCellDef="let applicant">
+          <button mat-button (click)="addTeamMember(applicant.uid)">Accept</button>
         </td>
     </ng-container>
 
     <ng-container matColumnDef="kickButton">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let user">
-          <button mat-button (click)="removeTeamMember(user.uid)">Reject</button>
+        <td mat-cell *matCellDef="let applicant">
+          <button mat-button (click)="removeTeamMember(applicant.uid)">Reject</button>
         </td>
     </ng-container>
-    
+
     <tr mat-header-row *matHeaderRowDef="applicationColumns"></tr>
     <tr mat-row *matRowDef="let myRowData; columns: applicationColumns"></tr>
   </table>

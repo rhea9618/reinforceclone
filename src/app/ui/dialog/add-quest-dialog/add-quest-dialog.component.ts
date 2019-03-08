@@ -18,7 +18,7 @@ export class AddQuestDialogComponent implements OnInit {
   public playerQuest: PlayerQuest;
   public user: User;
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: any,
+  constructor(@Inject(MAT_DIALOG_DATA) private data: { user: User, lead: User },
     private dialogRef: MatDialogRef<AddQuestDialogComponent>) {}
 
   adjustQuestType(required: boolean) {
@@ -37,7 +37,7 @@ export class AddQuestDialogComponent implements OnInit {
       playerId: this.user.uid,
       required: true,
       playerName: this.user.displayName,
-      teamId: 'todo',
+      teamId: this.user.membership.teamId,
       status: 'todo',
       playerEmail: this.user.email,
       teamLeadEmail: lead.email

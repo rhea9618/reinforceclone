@@ -1,5 +1,5 @@
 <h4>Submitted Quests for your Approval:</h4>
-<table mat-table [dataSource]="memberSubmittedQuests$ | async">
+<table mat-table [dataSource]="questsForApproval$ | async">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef> Quest Name </th>
     <td mat-cell *matCellDef="let quest"> {{quest.questName}} </td>

@@ -1,7 +1,7 @@
 <div class="container" [class.is-mobile]="mobileQuery.matches">
   <mat-toolbar class="toolbar" color="primary">
     <mat-toolbar-row>
-      <button mat-icon-button (click)="snav.toggle()" matTooltip="Menu">
+      <button mat-icon-button (click)="sideNav.toggle()" matTooltip="Menu">
         <mat-icon>menu</mat-icon>
       </button>
       <span class="spacer"></span>
@@ -10,16 +10,20 @@
         LeaderBoard
       </a>
       <span class="spacer"></span>
-      <a mat-button (click)="logout()" matTooltip="Logout"
-        *ngIf="auth.user | async; else authenticated">
-        <mat-icon class="icon">exit_to_app</mat-icon>
-      </a>
+      <div *ngIf="auth.user$ | async as user; else login" class="nickname">
+        <span matTooltip="{{user.displayName}}">
+          {{user.displayName | nickname}}
+        </span>
+        <a mat-button (click)="auth.signOut()" matTooltip="Logout">
+          <mat-icon class="icon">exit_to_app</mat-icon>
+        </a>
+      </div>
     </mat-toolbar-row>
   </mat-toolbar>
 
   <mat-sidenav-container class="content"
     [class.fix-content-top]="mobileQuery.matches">
-    <mat-sidenav #snav
+    <mat-sidenav #sideNav
       [mode]="mode"
       [fixedInViewport]="mobileQuery.matches"
       fixedTopGap="56"
@@ -27,26 +31,34 @@
       <mat-nav-list>
         <a mat-list-item [routerLinkActive]="['active-menu']"
           [routerLinkActiveOptions]="{exact: true}"
-          routerLink="/">
+          routerLink="/"
+          (click)="closeSideNav()">
           <mat-icon class="icon">home</mat-icon>Home
         </a>
         <a mat-list-item [routerLinkActive]="['active-menu']"
-          routerLink="/profile">
+          routerLink="/profile"
+          (click)="closeSideNav()">
           <mat-icon class="icon">person</mat-icon>Profile
         </a>
-        <a *ngIf="isApprovedMember; else isNotMember" mat-list-item [routerLinkActive]="['active-menu']"
-          routerLink="/team">
-          <mat-icon class="icon">group</mat-icon>Team
-        </a>
         <a mat-list-item [routerLinkActive]="['active-menu']"
-          routerLink="/quests">
-          <mat-icon class="icon">dashboard</mat-icon>Quests
+          routerLink="/quests"
+          (click)="closeSideNav()">
+          <mat-icon class="icon">dashboard</mat-icon>Quests for Approval
         </a>
-        <a mat-list-item *ngIf="auth.isAdmin | async"
-          [routerLinkActive]="['active-menu']"
-          routerLink="/admin">
-          <mat-icon class="icon">whatshot</mat-icon>Administrator
-        </a>
+        <div *ngIf="auth.user$ | async as user">
+          <a mat-list-item *ngIf="user.membership; else isNotMember"
+            [routerLinkActive]="['active-menu']"
+            routerLink="/team"
+            (click)="closeSideNav()">
+            <mat-icon class="icon">group</mat-icon>Team Management
+          </a>
+          <a mat-list-item *ngIf="user.isAdmin"
+            [routerLinkActive]="['active-menu']"
+            routerLink="/admin"
+            (click)="closeSideNav()">
+            <mat-icon class="icon">whatshot</mat-icon>Administrator
+          </a>
+        </div>
       </mat-nav-list>
     </mat-sidenav>
 
@@ -56,8 +68,8 @@
   </mat-sidenav-container>
 </div>
 
-<ng-template #authenticated>
-  <a mat-button routerLink="/login">
+<ng-template #login>
+  <a mat-button routerLink="/login" matTooltip="Click to Login">
     <mat-icon class="icon">person</mat-icon>
     Login
   </a>

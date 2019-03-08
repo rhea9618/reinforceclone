@@ -41,44 +41,33 @@ export class TeamsService {
   }
 
   getTeams(): Observable<Team[]> {
-    return this.teamsCollection.snapshotChanges().pipe(map(
-      (actions) => {
-        return actions.map((a) => {
+    return this.teamsCollection.snapshotChanges().pipe(
+      map((teams) => teams.map((a) => {
           const data = a.payload.doc.data();
           return { id: a.payload.doc.id, ...data };
-        });
-      }));
+        })
+      )
+    );
   }
 
-  getTeamMembers(teamId: string) {
-    return this.afs.collection('membership', ref => ref.where('teamId', '==', teamId).where('isApproved', '==', true)).snapshotChanges();
-  }
-
-  getTeamMembersForApproval(teamId: string) {
-    return this.afs.collection('membership', ref => ref.where('teamId', '==', teamId).where('isApproved', '==', false)).snapshotChanges();
+  getTeamMembers(teamId: string, isApproved = true): Observable<Membership[]> {
+    this.membersCollection = this.afs.collection('membership', ref =>
+      ref.where('teamId', '==', teamId).where('isApproved', '==', isApproved));
+    return this.membersCollection.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data()))
+    );
   }
 
   getTeamId(uid: string): Observable<string> {
-    const membership = this.getMembership(uid);
-    const teamId = membership.map( member => {
-      if (member) {
-        return member.teamId;
-      } else {
-        return undefined;
-      }
-    });
-
-    return teamId;
+    return this.getMembership(uid).pipe(
+      map((membership: Membership) => membership ? membership.teamId: null)
+    );
   }
 
   isLead(uid: string): Observable<boolean> {
-    return this.membersCollection.doc<Membership>(uid).valueChanges().pipe(map(membership => {
-      if (membership) {
-        return membership.isLead;
-      } else {
-        return undefined;
-      }
-    }));
+    return this.membersCollection.doc<Membership>(uid).valueChanges().pipe(
+      map((membership: Membership) => membership ? membership.isLead : false)
+    );
   }
 
   setAsLead(uid: string, isLead: boolean) {
@@ -90,6 +79,4 @@ export class TeamsService {
   removeTeamMember(uid: string) {
     this.membersCollection.doc<Membership>(uid).delete();
   }
-
-
 }

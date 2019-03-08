@@ -1,8 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
-import { AuthService } from 'src/app/core/auth.service';
+import { Observable } from 'rxjs';
+
 import { TeamsService } from 'src/app/teams/teams.service';
-import { DocumentChangeAction } from '@angular/fire/firestore';
 
 @Component({
   selector: 'team-members',
@@ -11,30 +10,22 @@ import { DocumentChangeAction } from '@angular/fire/firestore';
 })
 export class TeamMembersComponent implements OnInit {
 
-  @Input() isLead: boolean;
   @Input() currentUser: User;
+  teamMembers$: Observable<Membership[]>;
+  title: string;
 
-  // get your user ids here then make a query from user collection using the id(s)
-  teamMembers: Membership[];
+  readonly memberColumns = ['displayName', 'exp', 'careerRank', 'seasonRank', 'kickButton'];
 
-  // Table stuff
-  memberColumns = ['displayName', 'exp', 'careerRank', 'seasonRank', 'kickButton'];
-  teamMemberDataSource: MatTableDataSource<User>;
-
-  constructor(public auth: AuthService,
-    private teamsService: TeamsService) { }
+  constructor(private teamsService: TeamsService) {}
 
   ngOnInit() {
-    if (!this.currentUser) {
-      this.auth.user.subscribe((user: User) => {
-        if (!user) {
-          return;
-        }
-        this.currentUser = user;
-        this.init();
-      });
-    } else {
-      this.init();
+    if (this.currentUser && this.currentUser.membership) {
+      this.title = this.currentUser.membership.isLead ?
+        'Team Members' :
+        'Team Leaderboard';
+
+      this.teamMembers$ =
+        this.teamsService.getTeamMembers(this.currentUser.membership.teamId);
     }
   }
 
@@ -43,46 +34,10 @@ export class TeamMembersComponent implements OnInit {
   }
 
   kickButtonisVisible(uid: string) {
-    return this.isLead && (uid !== this.currentUser.uid);
+    return this.currentUser.membership.isLead && (uid !== this.currentUser.uid);
   }
 
   removeTeamMember(uid) {
     this.teamsService.removeTeamMember(uid);
   }
-
-
-  private init() {
-    this.teamMemberDataSource = new MatTableDataSource<User>(this.teamMembers);
-
-    this.loadTeamMembers();
-    this.loadLeadAbilities();
-  }
-
-  private loadTeamMembers() {
-    this.teamsService.getTeamId(this.currentUser.uid).subscribe(teamId => {
-      if (teamId === undefined) {
-        return;
-      }
-      this.teamsService.getTeamMembers(teamId).subscribe((arr: DocumentChangeAction<Membership>[]) => {
-        this.teamMembers = this.mapMembershipDocument(arr);
-        this.teamMemberDataSource = new MatTableDataSource<User>(this.teamMembers);
-      });
-    });
-  }
-
-  private loadLeadAbilities() {
-    if (!this.isLead) {
-      this.teamsService.isLead(this.currentUser.uid).subscribe(lead => { this.isLead = lead; });
-    }
-  }
-
-  private mapMembershipDocument(arr: DocumentChangeAction<Membership>[]) {
-    return arr.map(item => {
-      const data = item.payload.doc.data();
-      return {
-        ...data
-      } as Membership;
-    });
-  }
-
 }

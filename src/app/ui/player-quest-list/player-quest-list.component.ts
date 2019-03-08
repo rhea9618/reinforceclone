@@ -4,9 +4,9 @@ import { empty, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { PlayerQuestService } from '../player-quest/player-quest.service';
-import { EmailService } from '../../core/email.service';
-import { NotifyService } from '../../core/notify.service';
-import { SeasonService } from '../../core/season.service';
+import { EmailService } from 'src/app/core/email.service';
+import { NotifyService } from 'src/app/core/notify.service';
+import { SeasonService } from 'src/app/core/season.service';
 
 import { SubmitQuestDialogComponent } from './submit-quest-dialog.component';
 
@@ -24,8 +24,11 @@ export class PlayerQuestListComponent implements OnInit {
     'completed',
     'xp'
   ];
+
   @Input() user: User;
-  public questList: Observable<PlayerQuest[]>;
+  @Input() isOwner: boolean;
+  questList: Observable<PlayerQuest[]>;
+
   constructor(
     private emailService: EmailService,
     private dialog: MatDialog,
@@ -35,8 +38,9 @@ export class PlayerQuestListComponent implements OnInit {
 
   async ngOnInit() {
     const seasonId = await this.season.getEnabledSeasonId().toPromise();
-    if (this.user && this.user.team) {
-      const teamId = this.user.team.id;
+
+    if (this.user && this.user.membership) {
+      const teamId = this.user.membership.teamId;
       this.questList = this.playerQuestService.getMemberQuests(seasonId, teamId, this.user.uid);
     }
   }

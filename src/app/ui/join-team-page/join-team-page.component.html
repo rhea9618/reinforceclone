@@ -1,7 +1,11 @@
-<ul>
-  <li *ngFor="let team of teams">
+<ul *ngIf="auth.user | async as user">
+  <li *ngFor="let team of teams$ | async">
     {{ team.name }}
-    <button  *ngIf="membership === undefined;" (click)="applyForTeam(team.id)">Join</button>
-    <button  *ngIf="membership !== undefined && membership.teamId === team.id;" (click)="cancelApplication()">Cancel Application</button>
+    <button *ngIf="!user.membership" (click)="applyForTeam(team.id)">
+      Join
+    </button>
+    <button *ngIf="user.membership?.teamId === team.id;" (click)="cancelApplication()">
+      Cancel Application
+    </button>
   </li>
 </ul>

@@ -4,8 +4,8 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { MsalService} from '@azure/msal-angular';
 import { firebase } from '@firebase/app';
 import { auth, functions } from 'firebase';
-import { empty, forkJoin, Observable, of } from 'rxjs';
-import { flatMap, map, switchMap, startWith, tap } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import {
   AngularFirestore,
   AngularFirestoreDocument
@@ -14,12 +14,13 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 
 import { NotifyService } from './notify.service';
 import { AdminService } from './admin.service';
+import { UserService } from './user.service';
+import { TeamsService } from '../teams/teams.service';
 
 @Injectable()
 export class AuthService {
-  user: Observable<User | null>;
-  isAdmin: Observable<boolean>;
-  loggingIn = false;
+  user$: Observable<User>;
+  isLoggingIn = false;
 
   constructor(
     private adminService: AdminService,
@@ -28,24 +29,31 @@ export class AuthService {
     private afFunctions: AngularFireFunctions,
     private msalService: MsalService,
     private router: Router,
+    private teamsService: TeamsService,
     private notify: NotifyService,
+    private userService: UserService
   ) {
-    this.user = this.afAuth.authState.pipe(
+    this.user$ = this.afAuth.authState.pipe(
       switchMap(user => {
-        if (user) {
-          return this.afs.doc<User>(`users/${user.uid}`).valueChanges();
-        }
-        return of(null);
-      }),
-      tap((user: User) => {
-        if (!user) {
-          return;
-        }
+        if (user)
+          return this.getAllUserInfo(user.uid);
 
-        if (!this.isAdmin) {
-          this.isAdmin = this.adminService.isAdmin(user.uid);
-        }
+        return of(null);
       })
+    );
+  }
+
+  private getAllUserInfo(uid: string): Observable<User> {
+    const user$ = this.userService.getUser(uid);
+    const isAdmin$ = this.adminService.isAdmin(uid);
+    const membership$ = this.teamsService.getMembership(uid);
+
+    return combineLatest(user$, isAdmin$, membership$).pipe(
+      map(([user, isAdmin, membership]) => ({
+        ...user,
+        isAdmin,
+        membership
+      }))
     );
   }
 
@@ -128,7 +136,7 @@ export class AuthService {
   }
 
   async microsoftSignIn() {
-    this.loggingIn = true;
+    this.isLoggingIn = true;
 
     await this.msalService.loginPopup(['user.read', 'mail.send']);
 
@@ -143,7 +151,7 @@ export class AuthService {
     return this.afAuth.auth
       .signInWithCustomToken(result.token)
       .then(credential => {
-        this.loggingIn = false;
+        this.isLoggingIn = false;
         this.notify.update(`Welcome ${credential.user.displayName}!`, 'success');
         return this.setUserDoc({
           uid: credential.user.uid,
@@ -171,7 +179,7 @@ export class AuthService {
 
   // If error, console log and notify user
   private handleError(error: Error) {
-    this.loggingIn = false;
+    this.isLoggingIn = false;
     console.error(error);
     this.notify.update(error.message, 'error');
   }

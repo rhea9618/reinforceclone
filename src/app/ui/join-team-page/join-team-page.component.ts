@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+
 import { AuthService } from '../../core/auth.service';
 import { TeamsService } from 'src/app/teams/teams.service';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'join-team-page',
@@ -10,42 +11,19 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class JoinTeamPageComponent implements OnInit {
 
-  currentUser: User;
-  membership: Membership;
-  teams: Team[];
+  teams$: Observable<Team[]>;
 
-  constructor(private route: ActivatedRoute, public auth: AuthService, private teamsService: TeamsService) { }
+  constructor(public auth: AuthService, private teamsService: TeamsService) {}
 
   ngOnInit() {
-    this.auth.user.subscribe((user: User) => {
-      if (!user) {
-        return;
-      }
-      this.currentUser = user;
-
-      this.loadTeams();
-      this.loadMembership();
-    });
+    this.teams$ = this.teamsService.getTeams();
   }
 
-  applyForTeam(teamId: string) {
-    this.teamsService.addMembership(this.currentUser.uid, this.currentUser.displayName, this.currentUser.email, teamId);
+  applyForTeam(user: User, teamId: string) {
+    this.teamsService.addMembership(user.uid, user.displayName, user.email, teamId);
   }
 
-  cancelApplication() {
-    this.teamsService.removeTeamMember(this.currentUser.uid);
+  cancelApplication(user: User) {
+    this.teamsService.removeTeamMember(user.uid);
   }
-
-  private loadTeams() {
-    this.teamsService.getTeams().subscribe(team => {
-      this.teams = team;
-    });
-  }
-
-  private loadMembership() {
-    this.teamsService.getMembership(this.currentUser.uid).subscribe(membership => {
-      this.membership = membership;
-    });
-  }
-
 }

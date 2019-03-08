@@ -4,6 +4,7 @@ interface Team {
   lead?: string;
   memberCount: number;
 }
+
 interface Membership {
   uid: string;
   teamId: string;

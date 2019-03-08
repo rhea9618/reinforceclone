@@ -21,7 +21,7 @@ export class AdminPageComponent implements OnInit {
     'action',
   ];
 
-  seasons: Observable<Season[]>;
+  seasons$: Observable<Season[]>;
   newSeason = new FormControl('', [ Validators.required ]);
   loading = false;
 
@@ -31,7 +31,7 @@ export class AdminPageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.seasons = this.seasonService.getData();
+    this.seasons$ = this.seasonService.getData();
   }
 
   addSeason(user: User) {

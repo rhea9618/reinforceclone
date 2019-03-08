@@ -1,5 +1,5 @@
 <div class="login">
-  <div *ngIf="!(auth.user | async); else alreadyLoggedIn">
+  <div *ngIf="!(auth.user$ | async); else alreadyLoggedIn">
     <h3>Login using your Microsoft Account.</h3>
 
     <!-- <button mat-raised-button color="primary" (click)="signInWithGoogle()">
@@ -7,12 +7,13 @@
     </button> -->
 
     <button mat-raised-button color="primary"
-      [disabled]="auth.loggingIn"
+      [disabled]="auth.isLoggingIn"
       (click)="signInWithMicrosoft()">
       Connect Microsoft
     </button>
 
     <div *ngIf="auth.loggingIn" class="loader">
+      <span>Logging in...</span>
       <mat-spinner diameter="100"></mat-spinner>
     </div>
   </div>

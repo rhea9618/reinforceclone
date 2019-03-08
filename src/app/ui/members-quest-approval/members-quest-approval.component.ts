@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { EMPTY, from, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
+import { EmailService } from 'src/app/core/email.service';
+import { NotifyService } from 'src/app/core/notify.service';
+import { SeasonService } from 'src/app/core/season.service';
 import { PlayerQuestService } from '../player-quest/player-quest.service';
-import { EmailService } from '../../core/email.service';
-import { NotifyService } from '../../core/notify.service';
-import { SeasonService } from '../../core/season.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
 
 @Component({
@@ -16,7 +16,8 @@ import { QuestApprovalDialogComponent } from './quest-approval-dialog.component'
 })
 export class MembersQuestApprovalComponent implements OnInit {
 
-  memberSubmittedQuests$: Observable<PlayerQuest[]>;
+  @Input() user: User;
+  questsForApproval$: Observable<PlayerQuest[]>;
 
   readonly displayedColumns = [
     'name',
@@ -33,10 +34,11 @@ export class MembersQuestApprovalComponent implements OnInit {
     private season: SeasonService) {}
 
   async ngOnInit() {
-    const seasonId = await this.season.getEnabledSeasonId().toPromise();
-    // todo: replace with fetching the id from teams service
-    const teamId = 'puNEPCHmYcPCHjObMg6H';
-    this.memberSubmittedQuests$ = this.playerQuest.getAllMemberSubmittedQuests(seasonId, teamId);
+    if (this.user && this.user.membership)  {
+      const teamId = this.user.membership.teamId;
+      const seasonId = await this.season.getEnabledSeasonId().toPromise();
+      this.questsForApproval$ = this.playerQuest.getAllMemberSubmittedQuests(seasonId, teamId);
+    }
   }
 
   openDialog(quest: PlayerQuest) {

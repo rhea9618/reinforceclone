@@ -39,6 +39,7 @@ import { JoinTeamPageComponent } from './join-team-page/join-team-page.component
 import { TeamPageComponent } from './team-page/team-page.component';
 import { TeamApplicationsComponent } from './team-page/team-applications/team-applications.component';
 import { TeamMembersComponent } from './team-page/team-members/team-members.component';
+import { NicknamePipe } from './nickname.pipe';
 
 @NgModule({
   imports: [
@@ -81,6 +82,7 @@ import { TeamMembersComponent } from './team-page/team-members/team-members.comp
     SubmitQuestDialogComponent,
     TeamApplicationsComponent,
     TeamMembersComponent,
+    NicknamePipe,
   ],
   entryComponents: [
     QuestApprovalDialogComponent,
@@ -89,7 +91,8 @@ import { TeamMembersComponent } from './team-page/team-members/team-members.comp
   exports: [
     LoadingSpinnerComponent,
     UserProfileComponent,
-    UserFormComponent
+    UserFormComponent,
+    NicknamePipe,
   ],
   providers: [
     LeaderboardService,

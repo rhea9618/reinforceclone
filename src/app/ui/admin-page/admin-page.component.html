@@ -1,4 +1,4 @@
-<div class="content" *ngIf="auth.user | async as user">
+<div class="content" *ngIf="auth.user$ | async as user">
   <form>
     <h4>Create New Season:</h4>
     <mat-form-field class="season-name">
@@ -15,7 +15,7 @@
   <hr/>
 
   <h3>Seasons:</h3>
-  <table mat-table [dataSource]="seasons | async">
+  <table mat-table [dataSource]="seasons$ | async">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef> Name </th>
       <td mat-cell *matCellDef="let season" class="season"> {{season.name}} </td>

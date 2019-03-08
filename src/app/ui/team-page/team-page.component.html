@@ -1,6 +1,8 @@
-<div class="container" *ngIf="hasTeam; else noTeam;">
-  <team-members [currentUser]="currentUser" [isLead]="isLead"></team-members>
-  <team-applications [currentUser]="currentUser" *ngIf="isLead;"></team-applications>
+<div class="container" *ngIf="auth.user$ | async as user">
+  <div *ngIf="user.membership?.isApproved; else noTeam">
+    <team-members [currentUser]="user"></team-members>
+    <team-applications [currentUser]="user"></team-applications>
+  </div>
 </div>
 
 <ng-template #noTeam>

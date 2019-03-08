@@ -16,6 +16,12 @@
   margin-top: 0;
 }
 
+.nickname {
+  display: flex;
+  align-items: center;
+  font-size: medium;
+}
+
 .sidenav {
   border-right: 1px solid $gray;
   width: 175px;
