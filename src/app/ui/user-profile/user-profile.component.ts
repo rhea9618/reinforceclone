@@ -42,8 +42,9 @@ export class UserProfileComponent implements OnInit {
     this.otherUser$ = this.route.queryParams.pipe(
       switchMap((params) => {
         const playerId = params['uid'] as string;
-        if (playerId)
+        if (playerId) {
           return this.getPlayerInfo(playerId);
+        }
 
         return of(null);
       })

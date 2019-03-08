@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.mobileQueryListener = () => {
       // keep sidnav open when width changes
       this.sideNav.open();
-      this.changeDetectorRef.detectChanges()
+      this.changeDetectorRef.detectChanges();
     };
     this.mobileQuery.addListener(this.mobileQueryListener);
 

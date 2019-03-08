@@ -60,7 +60,7 @@ export class TeamsService {
 
   getTeamId(uid: string): Observable<string> {
     return this.getMembership(uid).pipe(
-      map((membership: Membership) => membership ? membership.teamId: null)
+      map((membership: Membership) => membership ? membership.teamId : null)
     );
   }
 

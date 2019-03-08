@@ -35,8 +35,9 @@ export class AuthService {
   ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap(user => {
-        if (user)
+        if (user) {
           return this.getAllUserInfo(user.uid);
+        }
 
         return of(null);
       })
