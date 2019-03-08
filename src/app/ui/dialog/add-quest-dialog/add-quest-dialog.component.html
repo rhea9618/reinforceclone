@@ -6,17 +6,17 @@
             <img [src]="user.photoURL || 'https://api.adorable.io/avatars/109/fire.png'" class="avatar">
           </div>
           <mat-card-title>{{ user.displayName }}</mat-card-title>
-          <mat-card-subtitle>{{ user.team?.name || 'Team Unknown' }}</mat-card-subtitle>
+          <mat-card-subtitle>{{ user.membership?.teamName || 'Team Unknown' }}</mat-card-subtitle>
         </mat-card-header>
       </mat-card>
   </div>
-  
+
   <div class="form-table">
     <form>
       <mat-form-field>
         <input matInput placeholder="Quest Name" [(ngModel)]="playerQuest.questName" name="questName" />
       </mat-form-field>
-    
+
       <mat-form-field>
         <mat-select placeholder="Quest Category" [(ngModel)]="playerQuest.category" name="category">
           <mat-option *ngFor="let category of categoryList" [value]="category">

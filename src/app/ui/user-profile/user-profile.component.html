@@ -1,5 +1,5 @@
 <div class="content" >
-  <div *ngIf="auth.user$ | async as user; else loading">
+  <div *ngIf="auth.user$ | async as user">
     <!-- My Own Profile -->
     <div *ngIf="!(otherUser$ | async)">
       <!-- My Own Info -->
