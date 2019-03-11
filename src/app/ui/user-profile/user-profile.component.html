@@ -12,21 +12,33 @@
           <mat-card-subtitle>{{ user.membership?.teamName || 'No Team Yet' }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <span *ngIf="user.isAdmin">
-            <mat-icon class="icon">whatshot</mat-icon>
-            <b>Admin</b>
-          </span>
-          <span *ngIf="user.membership?.isLead">
-            <mat-icon>work</mat-icon>
-            <b>Team Lead</b>
-          </span>
-          <span *ngIf="!user.membership?.isLead && !user.isAdmin">
-            <mat-icon>account_circle</mat-icon>
-            <b>Player</b>
-          </span>
-          <span>
-            <mat-icon>email</mat-icon> {{ user.email }}
-          </span>
+          <div class="player-info">
+            <div class="basic-info">
+              <span *ngIf="user.isAdmin">
+                <mat-icon class="icon">whatshot</mat-icon>
+                <b>Admin</b>
+              </span>
+              <span *ngIf="user.membership?.isLead">
+                <mat-icon>work</mat-icon>
+                <b>Team Lead</b>
+              </span>
+              <span *ngIf="!user.membership?.isLead && !user.isAdmin">
+                <mat-icon>account_circle</mat-icon>
+                <b>Player</b>
+              </span>
+              <span>
+                <mat-icon>email</mat-icon> {{ user.email }}
+              </span>
+            </div>
+            <div class="player-stats">
+              <span class="exp-pts">
+                {{ user.seasonExp }}
+              </span>
+              <span class="exp-label">
+                <b>XP</b>
+              </span>
+            </div>
+          </div>
         </mat-card-content>
 
         <!-- Enable Add Own Quest in debug mode -->
@@ -45,23 +57,34 @@
     <div *ngIf="otherUser$ | async as otherUser">
       <span *ngIf="otherUser.error">{{ otherUser.error }}</span>
       <div *ngIf="!otherUser.error">
-        <!-- Profile Box -->
-        <mat-card class="box">
-          <mat-card-header>
-            <div mat-card-avatar>
-              <img [src]="otherUser.photoURL || 'https://api.adorable.io/avatars/109/fire.png'" class="avatar">
+      <!-- Profile Box -->
+      <mat-card class="box">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <img [src]="otherUser.photoURL || 'https://api.adorable.io/avatars/109/fire.png'" class="avatar">
+          </div>
+          <mat-card-title>{{ otherUser.displayName }}'s Profile</mat-card-title>
+          <mat-card-subtitle>{{ otherUser.membership?.teamName || 'No Team Yet' }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="player-info">
+            <div class="basic-info">
+              <span *ngIf="otherUser.membership?.isLead">
+                <mat-icon>work</mat-icon>
+                <b>Team Lead</b>
+              </span>
+              <span><mat-icon>email</mat-icon> {{ otherUser.email }}</span>
             </div>
-            <mat-card-title>{{ otherUser.displayName }}</mat-card-title>
-            <mat-card-subtitle>{{ otherUser.membership?.teamName || 'No Team Yet' }}</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <span *ngIf="otherUser.membership?.isLead">
-              <mat-icon>work</mat-icon>
-              <b>Team Lead</b>
-            </span>
-            <span><mat-icon>email</mat-icon> {{ otherUser.email }}</span>
-          </mat-card-content>
-
+            <div class="player-stats">
+              <span class="exp-pts">
+                {{ otherUser.seasonExp }}
+              </span>
+              <span class="exp-label">
+                <b>EXP</b>
+              </span>
+            </div>
+          </div>
+        </mat-card-content>
           <mat-card-actions>
             <button mat-stroked-button color="primary" (click)="addQuest(otherUser, user)">
               Add Quest

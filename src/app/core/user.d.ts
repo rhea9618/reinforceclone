@@ -10,6 +10,8 @@ interface User {
   isMicrosoft?: boolean;
   isAdmin?: boolean;
   membership?: Membership;
+  totalExp?: number;
+  seasonExp?: number
 }
 
 interface UserScore {

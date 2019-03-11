@@ -17,9 +17,12 @@ import { EmailService } from './email.service';
 import { NotifyService } from './notify.service';
 import { UserService } from './user.service';
 import { TeamsService } from '../teams/teams.service';
+import { PlayerPointsService } from '../ui/player-quest/player-points.service';
 
 @Injectable()
 export class AuthService {
+  PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
+
   user$: Observable<User>;
   isLoggingIn = false;
 
@@ -33,7 +36,8 @@ export class AuthService {
     private email: EmailService,
     private notify: NotifyService,
     private user: UserService,
-    private teams: TeamsService
+    private teams: TeamsService,
+    private playerPointsService: PlayerPointsService
   ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((firebaseUser: firebase.User) => {
@@ -58,9 +62,11 @@ export class AuthService {
     const user$ = this.user.getUser(uid);
     const isAdmin$ = this.admin.isAdmin(uid);
     const membership$ = this.teams.getMembership(uid);
+    const totalExp$ = this.playerPointsService.getTotalExp(uid);
+    const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.PLACEHOLDER_SEASON);
 
-    return combineLatest(user$, isAdmin$, membership$).pipe(
-      map(([user, isAdmin, membership]) => {
+    return combineLatest(user$, isAdmin$, membership$, totalExp$, seasonExp$).pipe(
+      map(([user, isAdmin, membership, totalExp, seasonExp]) => {
         if (user.isMicrosoft) {
           this.checkMicrosoftState();
         }
@@ -68,7 +74,9 @@ export class AuthService {
         return {
           ...user,
           isAdmin,
-          membership
+          membership,
+          totalExp,
+          seasonExp
         };
       })
     );

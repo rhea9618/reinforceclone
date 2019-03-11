@@ -3,12 +3,32 @@
 }
 
 .box {
-  width: 300px;
+  width: 320px;
   border: 1px solid #bbb;
 }
 
 .avatar {
 	width: 50px;
+}
+
+.player-info {
+  display: flex;
+  justify-content: space-between;
+  
+  .player-stats {
+    display: flex;
+    flex-direction: column;
+
+    .exp-pts {
+      font-size: 60px;
+      margin: -12px 0 0 0;
+    }
+
+    .exp-label {
+      justify-content: center;
+      margin: 0;
+    }
+  }
 }
 
 span {
@@ -19,6 +39,10 @@ span {
 
 mat-icon, b {
 	margin-right: 5px;
+}
+
+mat-card-content {
+  margin-bottom: 5px;
 }
 
 player-quest-list {

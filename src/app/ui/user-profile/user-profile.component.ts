@@ -13,6 +13,7 @@ import { TeamsService } from 'src/app/teams/teams.service';
 import { environment } from 'src/environments/environment';
 import { AddQuestDialogComponent } from '../dialog/add-quest-dialog/add-quest-dialog.component';
 import { PlayerQuestService } from '../player-quest/player-quest.service';
+import { PlayerPointsService } from '../player-quest/player-points.service';
 
 @Component({
   selector: 'user-profile',
@@ -21,8 +22,12 @@ import { PlayerQuestService } from '../player-quest/player-quest.service';
 })
 export class UserProfileComponent implements OnInit {
 
+  PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
+
   debugMode: boolean;
   otherUser$: Observable<User|UserError>;
+  ownExp: number;
+  playerExp: number;
 
   constructor(public auth: AuthService,
     private userService: UserService,
@@ -32,7 +37,8 @@ export class UserProfileComponent implements OnInit {
     private seasonService: SeasonService,
     private emailService: EmailService,
     private notifyService: NotifyService,
-    private teamsService: TeamsService) {}
+    private teamsService: TeamsService,
+    private playerPointsService: PlayerPointsService) {}
 
   ngOnInit() {
     // debug mode true if locally run
@@ -55,13 +61,14 @@ export class UserProfileComponent implements OnInit {
     const error = 'Sorry, You are not allowed to view this user\'s profile';
     const user$ = this.userService.getUser(playerId);
     const membership$ = this.teamsService.getMembership(playerId);
+    const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.PLACEHOLDER_SEASON); // till we get seasonService handled
 
-    return combineLatest(user$, membership$).pipe(
-      map(([user, membership]) => ({ ...user, membership })),
-      catchError((err) => {
-        console.log(err);
-        return of({ error });
-      })
+    return combineLatest(user$, membership$, seasonExp$).pipe(
+      map(([user, membership, seasonExp]) => ({ ...user, membership, seasonExp })),
+        catchError((err) => {
+          console.log(err);
+          return of({ error });
+        })
     );
   }
 

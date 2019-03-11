@@ -12,5 +12,7 @@ interface Membership {
   isApproved: boolean;
   isLead: boolean;
   displayName: string,
-  email: string
+  email: string,
+  totalExp?: number,
+  seasonExp?: number
 }

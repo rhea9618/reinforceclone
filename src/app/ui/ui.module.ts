@@ -29,7 +29,6 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserFormComponent } from './user-form/user-form.component';
 import { SsrPageComponent } from './ssr-page/ssr-page.component';
 
-import { FirestoreDatePipe } from './firestore-date.pipe';
 import { LeaderboardService } from './home-page/leaderboard.service';
 import { PlayerQuestComponent } from './player-quest/player-quest.component';
 import { MembersQuestApprovalComponent } from './members-quest-approval/members-quest-approval.component';
@@ -40,7 +39,9 @@ import { JoinTeamPageComponent } from './join-team-page/join-team-page.component
 import { TeamPageComponent } from './team-page/team-page.component';
 import { TeamApplicationsComponent } from './team-page/team-applications/team-applications.component';
 import { TeamMembersComponent } from './team-page/team-members/team-members.component';
+import { FirestoreDatePipe } from './firestore-date.pipe';
 import { NicknamePipe } from './nickname.pipe';
+import { SeasonRankPipe } from './seasonRank.pipe';
 
 @NgModule({
   imports: [
@@ -84,6 +85,7 @@ import { NicknamePipe } from './nickname.pipe';
     TeamApplicationsComponent,
     TeamMembersComponent,
     NicknamePipe,
+    SeasonRankPipe
   ],
   entryComponents: [
     QuestApprovalDialogComponent,
