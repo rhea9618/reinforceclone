@@ -1,7 +1,7 @@
 service cloud.firestore {
   match /databases/{database}/documents {
     match /adminUsers/{userId} {
-      allow read: if isSignedIn() && isOwner(userId);
+      allow read: if isOwner(userId);
       allow write: if false;
     }
 
@@ -11,13 +11,13 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isSignedIn();
+      allow read: if isUserReadAllowed(userId);
       allow write: if isOwner(userId);
     }
 
     match /playerQuests/{id} {
-      allow read: if isOwnerOrTeamLead();
-      allow write: if isQuestWriteAllowed();
+      allow read: if isPlayerQuestReadAllowed();
+      allow write: if isPlayerQuestWriteAllowed();
     }
 
     match /playerPoints/{id} {
@@ -25,17 +25,13 @@ service cloud.firestore {
       allow write: if isTeamLead(incomingData().teamId);
     }
 
-    match /teams/{id} {
-      allow read: if isSignedIn();
-      allow write: if false;
-    }
-
-    match /membership/{id} {
+    match /membership/{userId} {
       allow read: if true;
-      allow write: if true; // temporarily until we get team leads sorted out
+      allow create: if isOwner(userId) && incomingData().isApproved == false;
+      allow update, delete: if isTeamLead(incomingData().teamId);
     }
 
-    /// Functions ///
+    /// Utility Functions ///
 
     // Current DB record of document being requested
     function existingData() {
@@ -47,6 +43,7 @@ service cloud.firestore {
       return request.resource.data;
     }
 
+    // Current Logged in User
     function currentUser() {
       return request.auth;
     }
@@ -67,24 +64,39 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/membership/$(uid)).data;
     }
 
+    /// Condition Checkers ///
+
     function isOwner(userId) {
       return currentUser().uid == userId;
     }
 
-    function isTeamMember() {
-      return getMembershipData(currentUser().uid).teamId &&
+    function isTeamMember(teamId) {
+      return teamId == getMembershipData(currentUser().uid).teamId &&
         getMembershipData(currentUser().uid).isApproved;
     }
 
     function isTeamLead(teamId) {
-      return getTeamData(teamId).lead == currentUser().uid;
+      return teamId == getMembershipData(currentUser().uid).teamId &&
+        getMembershipData(currentUser().uid).isLead;
     }
 
-    function isOwnerOrTeamLead() {
-      return isOwner(existingData().playerId) || isTeamLead(existingData().teamId);
+    // Allow user read for both Owner and Team Lead only
+    function isUserReadAllowed(userId) {
+      return isOwner(userId) ||
+        isTeamLead(getMembershipData(userId).teamId);
     }
 
-    function isQuestWriteAllowed() {
+    // Allow playerQuest read for both Owner and Team Lead only
+    function isPlayerQuestReadAllowed() {
+      return isTeamLead(existingData().teamId) ||
+        isOwner(existingData().playerId);
+    }
+
+    // Allow playerQuest write under the ff conditions:
+    // Team Lead: allow writes to all fields without restriction
+    // Owner: allow write only when status is going to 'pending'
+    //   limited to fields: status, submitted, completed, completionProof
+    function isPlayerQuestWriteAllowed() {
       return isTeamLead(incomingData().teamId) || (
         isOwner(existingData().playerId) &&
         incomingData().keys().hasOnly(['status', 'submitted', 'completed', 'completionProof']) &&
