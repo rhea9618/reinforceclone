@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, Observable, of } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 
 import { AuthService } from 'src/app/core/auth.service';
 import { UserService } from 'src/app/core/user.service';
@@ -22,7 +22,7 @@ import { PlayerQuestService } from '../player-quest/player-quest.service';
 export class UserProfileComponent implements OnInit {
 
   debugMode: boolean;
-  otherUser$: Observable<User>;
+  otherUser$: Observable<User|UserError>;
 
   constructor(public auth: AuthService,
     private userService: UserService,
@@ -51,12 +51,17 @@ export class UserProfileComponent implements OnInit {
     );
   }
 
-  private getPlayerInfo(playerId: string): Observable<User> {
+  private getPlayerInfo(playerId: string): Observable<User|UserError> {
+    const error = 'Sorry, You are not allowed to view this user\'s profile';
     const user$ = this.userService.getUser(playerId);
     const membership$ = this.teamsService.getMembership(playerId);
 
     return combineLatest(user$, membership$).pipe(
-      map(([user, membership]) => ({ ...user, membership }))
+      map(([user, membership]) => ({ ...user, membership })),
+      catchError((err) => {
+        console.log(err);
+        return of({ error });
+      })
     );
   }
 

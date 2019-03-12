@@ -39,31 +39,34 @@
 
     <!-- Other User's Profile -->
     <div *ngIf="otherUser$ | async as otherUser">
-      <!-- Profile Box -->
-      <mat-card class="box">
-        <mat-card-header>
-          <div mat-card-avatar>
-            <img [src]="otherUser.photoURL || 'https://api.adorable.io/avatars/109/fire.png'" class="avatar">
-          </div>
-          <mat-card-title>{{ otherUser.displayName }}'s Profile</mat-card-title>
-          <mat-card-subtitle>{{ otherUser.membership?.teamName || 'No Team Yet' }}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <span *ngIf="otherUser.membership?.isLead">
-            <mat-icon>work</mat-icon>
-            <b>Team Lead</b>
-          </span>
-          <span><mat-icon>email</mat-icon> {{ otherUser.email }}</span>
-        </mat-card-content>
+      <span *ngIf="otherUser.error">{{ otherUser.error }}</span>
+      <div *ngIf="!otherUser.error">
+        <!-- Profile Box -->
+        <mat-card class="box">
+          <mat-card-header>
+            <div mat-card-avatar>
+              <img [src]="otherUser.photoURL || 'https://api.adorable.io/avatars/109/fire.png'" class="avatar">
+            </div>
+            <mat-card-title>{{ otherUser.displayName }}'s Profile</mat-card-title>
+            <mat-card-subtitle>{{ otherUser.membership?.teamName || 'No Team Yet' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <span *ngIf="otherUser.membership?.isLead">
+              <mat-icon>work</mat-icon>
+              <b>Team Lead</b>
+            </span>
+            <span><mat-icon>email</mat-icon> {{ otherUser.email }}</span>
+          </mat-card-content>
 
-        <mat-card-actions>
-          <button mat-stroked-button color="primary" (click)="addQuest(otherUser, user)">
-            Add Quest
-          </button>
-        </mat-card-actions>
-      </mat-card>
-      <!-- Player Quests -->
-      <player-quest-list [user]="otherUser"></player-quest-list>
+          <mat-card-actions>
+            <button mat-stroked-button color="primary" (click)="addQuest(otherUser, user)">
+              Add Quest
+            </button>
+          </mat-card-actions>
+        </mat-card>
+        <!-- Player Quests -->
+        <player-quest-list [user]="otherUser"></player-quest-list>
+      </div>
     </div>
   </div>
 </div>

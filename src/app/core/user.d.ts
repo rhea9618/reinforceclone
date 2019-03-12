@@ -22,3 +22,7 @@ interface UserScore {
   totalTasks: number;
   updated: firebase.firestore.FieldValue;
 }
+
+interface UserError {
+  error: string;
+}

@@ -28,7 +28,7 @@ service cloud.firestore {
     match /membership/{userId} {
       allow read: if true;
       allow create: if isOwner(userId) && incomingData().isApproved == false;
-      allow update, delete: if isTeamLead(incomingData().teamId);
+      allow update, delete: if isTeamLead(existingData().teamId);
     }
 
     /// Utility Functions ///
