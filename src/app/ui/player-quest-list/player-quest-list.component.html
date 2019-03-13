@@ -1,42 +1,39 @@
-<div>
-  <h2>QUESTS</h2>
-  <table mat-table [dataSource]="questList | async">
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef> Type </th>
-      <td mat-cell *matCellDef="let quest" class="quest"> {{quest.required ? 'Required' : 'Additional'}} </td>
-    </ng-container>
-    <ng-container matColumnDef="category">
-      <th mat-header-cell *matHeaderCellDef> Category </th>
-      <td mat-cell *matCellDef="let quest" class="quest"> {{quest.category}} </td>
-    </ng-container>
-    <ng-container matColumnDef="questName">
-      <th mat-header-cell *matHeaderCellDef> Quest Name </th>
-      <td mat-cell *matCellDef="let quest" class="quest"> {{quest.questName}} </td>
-    </ng-container>
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef> Status </th>
-      <td mat-cell *matCellDef="let quest" class="quest">
-        <span *ngIf="quest.status === 'completed'">
-          Completed
-        </span>
-        <span *ngIf="quest.status === 'pending'">
-          For Validation
-        </span>
-        <button *ngIf="isOwner && quest.status === 'todo'"
-          mat-raised-button color="primary" (click)="openSubmitQuestDialog(quest)">
-          Submit for Completion
-        </button>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="completed">
-      <th mat-header-cell *matHeaderCellDef> Date Completed </th>
-      <td mat-cell *matCellDef="let quest" class="quest"> {{quest.completed  | firestoreDate}} </td>
-    </ng-container>
-    <ng-container matColumnDef="xp">
-      <th mat-header-cell *matHeaderCellDef> XP </th>
-      <td mat-cell *matCellDef="let quest" class="quest"> {{quest.required ? 10 : 5}} XP </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</div>
+<table mat-table [dataSource]="questList | async">
+  <ng-container matColumnDef="type">
+    <th mat-header-cell *matHeaderCellDef> Type </th>
+    <td mat-cell *matCellDef="let quest" class="quest"> {{quest.required ? 'Required' : 'Additional'}} </td>
+  </ng-container>
+  <ng-container matColumnDef="category">
+    <th mat-header-cell *matHeaderCellDef> Category </th>
+    <td mat-cell *matCellDef="let quest" class="quest"> {{quest.category}} </td>
+  </ng-container>
+  <ng-container matColumnDef="questName">
+    <th mat-header-cell *matHeaderCellDef> Quest Name </th>
+    <td mat-cell *matCellDef="let quest" class="quest"> {{quest.questName}} </td>
+  </ng-container>
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef> Status </th>
+    <td mat-cell *matCellDef="let quest" class="quest">
+      <span *ngIf="quest.status === 'completed'">
+        Completed
+      </span>
+      <span *ngIf="quest.status === 'pending'">
+        For Validation
+      </span>
+      <button *ngIf="isOwner && quest.status === 'todo'"
+        mat-raised-button color="primary" (click)="openSubmitQuestDialog(quest)">
+        Submit for Completion
+      </button>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="completed">
+    <th mat-header-cell *matHeaderCellDef> Date Completed </th>
+    <td mat-cell *matCellDef="let quest" class="quest"> {{quest.completed  | firestoreDate}} </td>
+  </ng-container>
+  <ng-container matColumnDef="xp">
+    <th mat-header-cell *matHeaderCellDef> XP </th>
+    <td mat-cell *matCellDef="let quest" class="quest"> {{quest.required ? 10 : 5}} XP </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

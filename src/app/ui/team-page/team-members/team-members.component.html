@@ -1,11 +1,15 @@
-<h2>{{ title }}</h2>
+<h3>{{ title }}</h3>
 <table mat-table [dataSource]="teamMembers$ | async" class="mat-elevation-z8">
   <ng-container matColumnDef="displayName">
     <th mat-header-cell *matHeaderCellDef> Name </th>
     <td mat-cell *matCellDef="let user">
-      <a routerLink="/profile" [queryParams]="{uid: user.uid}">
+      <span *ngIf="!currentUser.membership.isLead || user.uid === currentUser.uid">
         {{ user.displayName }}
-        <mat-icon *ngIf="user.uid == currentUser.uid" class="icon">grade</mat-icon>
+        <mat-icon *ngIf="user.uid === currentUser.uid">grade</mat-icon>
+      </span>
+      <a *ngIf="currentUser.membership.isLead && user.uid !== currentUser.uid"
+        routerLink="/profile" [queryParams]="{uid: user.uid}">
+        {{ user.displayName }}
       </a>
     </td>
   </ng-container>
@@ -28,7 +32,8 @@
   <ng-container matColumnDef="kickButton">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let user">
-        <button mat-button *ngIf="kickButtonisVisible(user.uid)" (click)="removeTeamMember(user.uid)">Kick</button>
+        <button mat-button *ngIf="kickButtonisVisible(user.uid)"
+          (click)="removeTeamMember(user.uid)">Kick</button>
       </td>
   </ng-container>
 

@@ -36,21 +36,25 @@
           <mat-icon class="icon">home</mat-icon>Home
         </a>
         <a mat-list-item [routerLinkActive]="['active-menu']"
+          [routerLinkActiveOptions]="{exact: true}"
           routerLink="/profile"
           (click)="closeSideNav()">
           <mat-icon class="icon">person</mat-icon>My Profile
         </a>
-        <a mat-list-item [routerLinkActive]="['active-menu']"
-          routerLink="/quests"
-          (click)="closeSideNav()">
-          <mat-icon class="icon">dashboard</mat-icon>Quests for Approval
-        </a>
         <div *ngIf="auth.user$ | async as user">
-          <a mat-list-item *ngIf="user.membership; else isNotMember"
+          <a mat-list-item *ngIf="user.membership?.isLead"
+            [routerLinkActive]="['active-menu']"
+            routerLink="/quests"
+            (click)="closeSideNav()">
+            <mat-icon class="icon">dashboard</mat-icon>Manage Quests
+          </a>
+          <a mat-list-item *ngIf="user.membership?.isApproved; else isNotMember"
             [routerLinkActive]="['active-menu']"
             routerLink="/team"
             (click)="closeSideNav()">
-            <mat-icon class="icon">group</mat-icon>Team Management
+            <mat-icon class="icon">group</mat-icon>
+            <span *ngIf="user.membership.isLead">Manage Team</span>
+            <span *ngIf="!user.membership.isLead">My Team</span>
           </a>
           <a mat-list-item *ngIf="user.isAdmin"
             [routerLinkActive]="['active-menu']"
@@ -77,7 +81,7 @@
 
 <ng-template #isNotMember>
   <a mat-list-item [routerLinkActive]="['active-menu']"
-      routerLink="/register">
-      <mat-icon class="icon">group</mat-icon>Join a Team
+    routerLink="/register">
+    <mat-icon class="icon">group</mat-icon>Join a Team
   </a>
 </ng-template>
