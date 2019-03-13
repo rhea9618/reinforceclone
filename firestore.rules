@@ -31,6 +31,11 @@ service cloud.firestore {
       allow update, delete: if isTeamLead(existingData().teamId);
     }
 
+    match /teams/{id} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
     /// Utility Functions ///
 
     // Current DB record of document being requested
