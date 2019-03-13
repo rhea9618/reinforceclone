@@ -12,8 +12,9 @@ import {
 } from '@angular/fire/firestore';
 import { AngularFireFunctions } from '@angular/fire/functions';
 
-import { NotifyService } from './notify.service';
 import { AdminService } from './admin.service';
+import { EmailService } from './email.service';
+import { NotifyService } from './notify.service';
 import { UserService } from './user.service';
 import { TeamsService } from '../teams/teams.service';
 
@@ -23,15 +24,16 @@ export class AuthService {
   isLoggingIn = false;
 
   constructor(
-    private adminService: AdminService,
     private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
     private afFunctions: AngularFireFunctions,
-    private msalService: MsalService,
+    private msal: MsalService,
     private router: Router,
-    private teamsService: TeamsService,
+    private admin: AdminService,
+    private email: EmailService,
     private notify: NotifyService,
-    private userService: UserService
+    private user: UserService,
+    private teams: TeamsService
   ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap(user => {
@@ -44,17 +46,31 @@ export class AuthService {
     );
   }
 
+  private checkMicrosoftState() {
+    // Signout if there's an error getting MS token
+    this.email.getToken().subscribe(null, (error) => {
+      console.log(error);
+      this.signOut();
+    });
+  }
+
   private getAllUserInfo(uid: string): Observable<User> {
-    const user$ = this.userService.getUser(uid);
-    const isAdmin$ = this.adminService.isAdmin(uid);
-    const membership$ = this.teamsService.getMembership(uid);
+    const user$ = this.user.getUser(uid);
+    const isAdmin$ = this.admin.isAdmin(uid);
+    const membership$ = this.teams.getMembership(uid);
 
     return combineLatest(user$, isAdmin$, membership$).pipe(
-      map(([user, isAdmin, membership]) => ({
-        ...user,
-        isAdmin,
-        membership
-      }))
+      map(([user, isAdmin, membership]) => {
+        if (user.isMicrosoft) {
+          this.checkMicrosoftState();
+        }
+
+        return {
+          ...user,
+          isAdmin,
+          membership
+        };
+      })
     );
   }
 
@@ -139,9 +155,9 @@ export class AuthService {
   async microsoftSignIn() {
     this.isLoggingIn = true;
 
-    await this.msalService.loginPopup(['user.read', 'mail.send']);
+    await this.msal.loginPopup(['user.read', 'mail.send']);
 
-    const user = this.msalService.getUser();
+    const user = this.msal.getUser();
     const createFirebaseToken = this.afFunctions.httpsCallable('createFirebaseToken');
     const result = await createFirebaseToken({
       uid: user.userIdentifier,
@@ -165,11 +181,11 @@ export class AuthService {
   }
 
   microsoftSignOut() {
-    this.msalService.logout();
+    this.msal.logout();
   }
 
   signOut() {
-    if (this.msalService.getUser()) {
+    if (this.msal.getUser()) {
       this.microsoftSignOut();
     }
 

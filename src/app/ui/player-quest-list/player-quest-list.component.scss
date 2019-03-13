@@ -1,0 +1,18 @@
+@import "variables.scss";
+
+.quest {
+  display: flex;
+  flex-direction: column;
+
+  > span {
+    font-size: smaller;
+  }
+}
+
+.questXP {
+  color: $green;
+}
+
+.notAwardedXP {
+  color: $orange;
+}

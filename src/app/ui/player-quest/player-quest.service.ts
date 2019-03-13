@@ -74,7 +74,9 @@ export class PlayerQuestService {
       this.afs.collection('playerQuests', ref => ref
         .where('seasonId', '==', seasonId)
         .where('teamId', '==', teamId)
-        .where('playerId', '==', playerId));
+        .where('playerId', '==', playerId)
+        .orderBy('created', 'desc')
+        .limit(20));
 
     return this.playerQuestsCollection.snapshotChanges().pipe(
       map((actions) => this.mapPlayerQuestData(actions))
@@ -92,7 +94,9 @@ export class PlayerQuestService {
       this.afs.collection('playerQuests', ref => ref
         .where('seasonId', '==', seasonId)
         .where('teamId', '==', teamId)
-        .where('status', '==', QuestStatus.PENDING_APPROVAL));
+        .where('status', '==', QuestStatus.PENDING_APPROVAL)
+        .orderBy('submitted', 'asc')
+        .limit(20));
 
     return this.playerQuestsCollection.snapshotChanges().pipe(
       map((actions) => this.mapPlayerQuestData(actions))

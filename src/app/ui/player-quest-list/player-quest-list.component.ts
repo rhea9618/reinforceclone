@@ -18,10 +18,8 @@ import { SubmitQuestDialogComponent } from './submit-quest-dialog.component';
 export class PlayerQuestListComponent implements OnInit {
   readonly displayedColumns = [
     'type',
-    'category',
     'questName',
     'status',
-    'completed',
     'xp'
   ];
 

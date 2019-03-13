@@ -16,7 +16,8 @@ import {
   MatProgressSpinnerModule,
   MatStepperModule,
   MatTableModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import { DialogModule } from './dialog/dialog.module';
@@ -61,7 +62,7 @@ import { NicknamePipe } from './nickname.pipe';
     MatStepperModule,
     MatTableModule,
     MatToolbarModule,
-    MatDialogModule,
+    MatTooltipModule,
     DialogModule,
   ],
   declarations: [

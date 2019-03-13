@@ -24,14 +24,14 @@
         </mat-form-field>
         <br />
         <mat-form-field>
-          <textarea matInput required placeholder="Proof of Completion" formControlName="completionProof"></textarea>
-          <mat-error *ngIf="hasError('completionProof','required')">Proof of completion is a required field</mat-error>
+          <textarea matInput placeholder="Proof of Completion" formControlName="completionProof"></textarea>
           <mat-error *ngIf="hasError('completionProof','pattern')">Please enter a valid link/url</mat-error>
           <mat-hint>Enter link to the proof of quest completion</mat-hint>
         </mat-form-field>
   </div>
 
   <div mat-dialog-actions align="end">
+    <button mat-raised-button mat-dialog-close>Cancel</button>
     <button mat-raised-button color="primary" (click)="submitQuest()">Submit</button>
   </div>
 </form>

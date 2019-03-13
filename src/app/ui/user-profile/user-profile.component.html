@@ -20,7 +20,13 @@
             <mat-icon>work</mat-icon>
             <b>Team Lead</b>
           </span>
-          <span><mat-icon>email</mat-icon> {{ user.email }}</span>
+          <span *ngIf="!user.membership?.isLead && !user.isAdmin">
+            <mat-icon>account_circle</mat-icon>
+            <b>Player</b>
+          </span>
+          <span>
+            <mat-icon>email</mat-icon> {{ user.email }}
+          </span>
         </mat-card-content>
 
         <!-- Enable Add Own Quest in debug mode -->
@@ -32,10 +38,7 @@
       </mat-card>
       <!-- My Quests -->
       <h3>My Quests</h3>
-      <player-quest-list [user]="user"></player-quest-list>
-      <!-- Team Members -->
-      <team-members [currentUser]="user" isOwner="true">
-      </team-members>
+      <player-quest-list [user]="user" isOwner="true"></player-quest-list>
     </div>
 
     <!-- Other User's Profile -->

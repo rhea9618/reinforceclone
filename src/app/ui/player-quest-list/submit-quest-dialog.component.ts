@@ -11,7 +11,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export class SubmitQuestDialogComponent implements OnInit {
   form: FormGroup;
   currentDate = new Date();
-  private urlPatternRegex = /^(http|https):\/\/[^ "]+$/gi;
+
   constructor(
     private dialogRef: MatDialogRef<SubmitQuestDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: PlayerQuest
@@ -19,9 +19,9 @@ export class SubmitQuestDialogComponent implements OnInit {
 
   ngOnInit() {
     this.form = new FormGroup({
-      questId: new FormControl(this.data.id, []),
+      questId: new FormControl(this.data.id, [ Validators.required ]),
       completed:  new FormControl(this.currentDate, [ Validators.required ]),
-      completionProof: new FormControl('', [Validators.required, Validators.pattern(this.urlPatternRegex)])
+      completionProof: new FormControl(null, [ Validators.pattern('(http|https)://[^ "]+') ])
     });
   }
 

@@ -11,8 +11,9 @@ $app-cyan: mat-palette($mat-cyan);
 $app-teal: mat-palette($mat-teal);
 $app-light-blue: mat-palette($mat-light-blue);
 $app-amber: mat-palette($mat-amber);
+$app-orange: mat-palette($mat-orange);
 
-// Create your Sass color vars (will be available in all the project)
+// Usable Colors
 $primary: mat-color($app-primary);
 $accent: mat-color($app-accent);
 $warn: mat-color($app-warn);
@@ -22,3 +23,4 @@ $cyan: mat-color($app-cyan);
 $teal: mat-color($app-teal);
 $light-blue: mat-color($app-light-blue);
 $amber: mat-color($app-amber);
+$orange: mat-color($app-orange);
