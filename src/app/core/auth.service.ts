@@ -36,9 +36,9 @@ export class AuthService {
     private teams: TeamsService
   ) {
     this.user$ = this.afAuth.authState.pipe(
-      switchMap(user => {
-        if (user) {
-          return this.getAllUserInfo(user.uid);
+      switchMap((firebaseUser: firebase.User) => {
+        if (firebaseUser) {
+          return this.getAllUserInfo(firebaseUser.uid);
         }
 
         return of(null);
