@@ -1,50 +1,65 @@
+@import "variables.scss";
+
 .content {
   padding: 20px;
 }
 
-.box {
+.card {
+  padding: 0;
   width: 320px;
   border: 1px solid #bbb;
 }
 
-.avatar {
-	width: 50px;
+.card-toolbar {
+  font-size: 1em;
+  height: 45px;
+
+  > span {
+    flex: 1;
+    text-align: center;
+  }
 }
 
-.player-info {
+.card-body {
+  padding: 16px;
+
+  .avatar {
+    width: 50px;
+  }
+}
+
+mat-card-content {
   display: flex;
   justify-content: space-between;
   
-  .player-stats {
+  >.player-stats {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    margin-top: -15px;
+    color: $green;
 
     .exp-pts {
-      font-size: 60px;
-      margin: -12px 0 0 0;
-    }
-
-    .exp-label {
-      justify-content: center;
-      margin: 0;
+      font-size: 50px;
     }
   }
 }
 
-span {
-	display: flex;
-	align-items: center;
-	margin: 5px 0;
+.player-info {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+
+  >mat-icon {
+    margin-right: 5px;
+  }
 }
 
-mat-icon, b {
-	margin-right: 5px;
-}
-
-mat-card-content {
-  margin-bottom: 5px;
-}
-
-player-quest-list {
+.quest-toolbar {
   margin-top: 20px;
+  height: 55px;
+
+  >.spacer {
+    flex: 1 1 auto;
+  }
 }

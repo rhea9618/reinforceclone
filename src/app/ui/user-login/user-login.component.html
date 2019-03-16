@@ -7,20 +7,20 @@
     </button> -->
 
     <button mat-raised-button color="primary"
-      [disabled]="auth.isLoggingIn"
+      *ngIf="!auth.isLoggingIn; else loggingIn"
       (click)="signInWithMicrosoft()">
       Connect Microsoft
     </button>
-
-    <div *ngIf="auth.loggingIn" class="loader">
-      <span>Logging in...</span>
-      <mat-spinner diameter="100"></mat-spinner>
-    </div>
   </div>
-
-  <ng-template #alreadyLoggedIn>
-    <p class="text-success">
-      You are logged in <i class="fa fa-thumbs-up"></i>
-    </p>
-  </ng-template>
 </div>
+
+<ng-template #loggingIn>
+  <span>Logging in...</span>
+  <mat-spinner diameter="100"></mat-spinner>
+</ng-template>
+
+<ng-template #alreadyLoggedIn>
+  <p class="text-success">
+    You are logged in <i class="fa fa-thumbs-up"></i>
+  </p>
+</ng-template>

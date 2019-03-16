@@ -24,6 +24,9 @@
       <span *ngIf="quest.status === 'pending'">
         For Validation
       </span>
+      <span *ngIf="!isOwner && quest.status === 'todo'">
+        Ongoing
+      </span>
       <button *ngIf="isOwner && quest.status === 'todo'"
         matTooltip="Submit for Completion"
         mat-raised-button color="primary" (click)="openSubmitQuestDialog(quest)">

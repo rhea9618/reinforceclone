@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
@@ -25,11 +25,11 @@ export class UserProfileComponent implements OnInit {
   PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
 
   debugMode: boolean;
+  viewOwnProfile = true;
   otherUser$: Observable<User|UserError>;
-  ownExp: number;
-  playerExp: number;
 
-  constructor(public auth: AuthService,
+  constructor(
+    public auth: AuthService,
     private userService: UserService,
     private dialog: MatDialog,
     private route: ActivatedRoute,
@@ -38,23 +38,26 @@ export class UserProfileComponent implements OnInit {
     private emailService: EmailService,
     private notifyService: NotifyService,
     private teamsService: TeamsService,
-    private playerPointsService: PlayerPointsService) {}
+    private playerPointsService: PlayerPointsService
+  ) {}
 
   ngOnInit() {
     // debug mode true if locally run
     this.debugMode = !environment.production;
 
-      // When visiting other player's profile
-    this.otherUser$ = this.route.queryParams.pipe(
-      switchMap((params) => {
-        const playerId = params['uid'] as string;
-        if (playerId) {
-          return this.getPlayerInfo(playerId);
-        }
+    // When visiting other player's profile
+    this.checkUidParam(this.route.snapshot.queryParams);
+    this.route.queryParams.subscribe((params: Params) => this.checkUidParam(params));
+  }
 
-        return of(null);
-      })
-    );
+  private checkUidParam(params: Params) {
+    const playerId = this.route.snapshot.queryParams['uid'];
+    if (playerId) {
+      this.viewOwnProfile = false;
+      this.otherUser$ = this.getPlayerInfo(playerId);
+    } else {
+      this.viewOwnProfile = true;
+    }
   }
 
   private getPlayerInfo(playerId: string): Observable<User|UserError> {
