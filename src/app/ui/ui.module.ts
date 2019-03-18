@@ -24,7 +24,6 @@ import { DialogModule } from './dialog/dialog.module';
 import { AdminPageComponent } from './admin-page/admin-page.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { HomePageComponent } from './home-page/home-page.component';
-import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserFormComponent } from './user-form/user-form.component';
 import { SsrPageComponent } from './ssr-page/ssr-page.component';
@@ -69,7 +68,7 @@ import { SeasonRankPipe } from './seasonRank.pipe';
   declarations: [
     UserLoginComponent,
     HomePageComponent,
-    LoadingSpinnerComponent,
+    HomePageComponent,
     UserProfileComponent,
     UserFormComponent,
     SsrPageComponent,
@@ -92,7 +91,6 @@ import { SeasonRankPipe } from './seasonRank.pipe';
     SubmitQuestDialogComponent
   ],
   exports: [
-    LoadingSpinnerComponent,
     UserProfileComponent,
     UserFormComponent,
     NicknamePipe,
