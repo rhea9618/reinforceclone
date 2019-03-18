@@ -84,7 +84,7 @@ export class UserProfileComponent implements OnInit {
       <strong>Quest Type:</strong> ${reqString}<bt />`;
 
     this.emailService.sendEmail(
-      playerQuest.teamLeadEmail,
+      playerQuest.playerEmail,
       'Leader Board: New Quest Assigned',
       content,
       'HTML'
@@ -113,6 +113,11 @@ export class UserProfileComponent implements OnInit {
         return null;
       })
     ).subscribe((playerQuest: PlayerQuest) => {
+      // Modal cancel goes here
+      if (!playerQuest) {
+        return;
+      }
+
       this.playerQuestService.assignPlayerQuest(playerQuest).then(() => {
         this.sendQuestAddedEmail(playerQuest);
       }).catch((err) => {

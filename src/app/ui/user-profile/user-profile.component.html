@@ -1,7 +1,7 @@
 <div class="content" >
-  <div *ngIf="viewOwnProfile; else othersProfile">
+  <div *ngIf="auth.user$ | async as user; else loadingProfile">
     <!-- My Own Profile -->
-    <div *ngIf="auth.user$ | async as user; else loadingProfile">
+    <div *ngIf="viewOwnProfile; else othersProfile">
       <!-- My Own Info -->
       <mat-card class="card">
         <mat-toolbar color="primary" class="card-toolbar">
@@ -51,55 +51,55 @@
       </mat-toolbar>
       <player-quest-list [user]="user" isOwner="true"></player-quest-list>
     </div>
+
+    <!-- Other User's Profile -->
+    <ng-template #othersProfile>
+      <div *ngIf="otherUser$ | async as otherUser; else loadingProfile">
+        <span *ngIf="otherUser.error">{{ otherUser.error }}</span>
+        <div *ngIf="!otherUser.error">
+          <!-- Profile Box -->
+          <mat-card class="card card-body">
+            <mat-card-header>
+              <img mat-card-avatar class="avatar"
+                [src]="otherUser.photoURL || 'https://api.adorable.io/avatars/109/fire.png'"/>
+              <mat-card-title>{{ otherUser.displayName }}</mat-card-title>
+              <mat-card-subtitle>{{ otherUser.membership?.teamName || 'No Team Yet' }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div>
+                <span class="player-info" *ngIf="otherUser.membership?.isLead">
+                  <mat-icon>work</mat-icon>
+                  <b>Team Lead</b>
+                </span>
+                <span class="player-info" *ngIf="!otherUser.membership?.isLead">
+                  <mat-icon>account_circle</mat-icon>
+                  <b>Player</b>
+                </span>
+                <span class="player-info">
+                  <mat-icon>email</mat-icon> {{ otherUser.email }}
+                </span>
+              </div>
+              <div class="player-stats">
+                <span class="exp-pts">{{ otherUser.seasonExp }}</span>
+                <b>XP</b>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <!-- Player Quests -->
+          <mat-toolbar class="quest-toolbar" color="primary">
+            Quests
+            <span class="spacer"></span>
+            <button mat-button (click)="addQuest(otherUser, user)">
+              <mat-icon class="icon">add_box</mat-icon>
+              Add Quest
+            </button>
+          </mat-toolbar>
+          <player-quest-list [user]="otherUser"></player-quest-list>
+        </div>
+      </div>
+    </ng-template>
   </div>
 </div>
-
-<ng-template #othersProfile>
-  <!-- Other User's Profile -->
-  <div *ngIf="otherUser$ | async as otherUser; else loadingProfile">
-    <span *ngIf="otherUser.error">{{ otherUser.error }}</span>
-    <div *ngIf="!otherUser.error">
-      <!-- Profile Box -->
-      <mat-card class="card card-body">
-        <mat-card-header>
-          <img mat-card-avatar class="avatar"
-            [src]="otherUser.photoURL || 'https://api.adorable.io/avatars/109/fire.png'"/>
-          <mat-card-title>{{ otherUser.displayName }}</mat-card-title>
-          <mat-card-subtitle>{{ otherUser.membership?.teamName || 'No Team Yet' }}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <div>
-            <span class="player-info" *ngIf="otherUser.membership?.isLead">
-              <mat-icon>work</mat-icon>
-              <b>Team Lead</b>
-            </span>
-            <span class="player-info" *ngIf="!otherUser.membership?.isLead">
-              <mat-icon>account_circle</mat-icon>
-              <b>Player</b>
-            </span>
-            <span class="player-info">
-              <mat-icon>email</mat-icon> {{ otherUser.email }}
-            </span>
-          </div>
-          <div class="player-stats">
-            <span class="exp-pts">{{ otherUser.seasonExp }}</span>
-            <b>XP</b>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <!-- Player Quests -->
-      <mat-toolbar class="quest-toolbar" color="primary">
-        Quests
-        <span class="spacer"></span>
-        <button mat-button (click)="addQuest(otherUser, user)">
-          <mat-icon class="icon">add_box</mat-icon>
-          Add Quest
-        </button>
-      </mat-toolbar>
-      <player-quest-list [user]="otherUser"></player-quest-list>
-    </div>
-  </div>
-</ng-template>
 
 <ng-template #loadingProfile>
   <span>Loading profile...</span>
