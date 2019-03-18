@@ -41,6 +41,7 @@ import { TeamMembersComponent } from './team-page/team-members/team-members.comp
 import { FirestoreDatePipe } from './firestore-date.pipe';
 import { NicknamePipe } from './nickname.pipe';
 import { SeasonRankPipe } from './seasonRank.pipe';
+import { KickDialogComponent } from './team-page/kick-dialog/kick-dialog.component';
 
 @NgModule({
   imports: [
@@ -84,9 +85,11 @@ import { SeasonRankPipe } from './seasonRank.pipe';
     TeamApplicationsComponent,
     TeamMembersComponent,
     NicknamePipe,
-    SeasonRankPipe
+    SeasonRankPipe,
+    KickDialogComponent
   ],
   entryComponents: [
+    KickDialogComponent,
     QuestApprovalDialogComponent,
     SubmitQuestDialogComponent
   ],
