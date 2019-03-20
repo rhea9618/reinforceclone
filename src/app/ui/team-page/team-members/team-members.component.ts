@@ -4,9 +4,7 @@ import { map } from 'rxjs/operators';
 
 import { TeamsService } from 'src/app/teams/teams.service';
 import { PlayerPointsService } from '../../player-quest/player-points.service';
-
-import { MatDialog } from '@angular/material';
-import { KickDialogComponent } from '../kick-dialog/kick-dialog.component';
+import { ConfirmationModalService } from '../confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'team-members',
@@ -23,7 +21,7 @@ export class TeamMembersComponent implements OnInit {
   readonly memberColumns = ['displayName', 'exp', 'seasonRank', 'kickButton'];
 
   constructor(
-    private dialog: MatDialog,
+    private confirmationModal: ConfirmationModalService,
     private teamsService: TeamsService,
     private playerPointsService: PlayerPointsService
   ) {}
@@ -50,12 +48,12 @@ export class TeamMembersComponent implements OnInit {
     return this.currentUser.membership.isLead && (uid !== this.currentUser.uid);
   }
 
-  removeTeamMember(uid: string, displayName: string) {
-    const kickMemberDialog = this.dialog.open(KickDialogComponent, {
-      data: { displayName }
-    });
+  removeTeamMember(uid: string, user: string) {
+    const data = {
+      message: `Are you sure you want to kick ${user}?`
+    };
 
-    kickMemberDialog.afterClosed().subscribe(result => {
+    this.confirmationModal.showConfirmation(data).subscribe(result => {
       if (result) {
         this.teamsService.removeTeamMember(uid);
       }

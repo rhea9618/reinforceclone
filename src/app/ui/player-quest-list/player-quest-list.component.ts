@@ -7,7 +7,7 @@ import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 import { SeasonService } from 'src/app/core/season.service';
-
+import { environment } from 'src/environments/environment';
 import { SubmitQuestDialogComponent } from './submit-quest-dialog.component';
 
 @Component({
@@ -16,16 +16,17 @@ import { SubmitQuestDialogComponent } from './submit-quest-dialog.component';
   styleUrls: ['./player-quest-list.component.scss']
 })
 export class PlayerQuestListComponent implements OnInit {
-  readonly displayedColumns = [
-    'type',
-    'questName',
-    'status',
-    'xp'
-  ];
 
   @Input() user: User;
   @Input() isOwner: boolean;
+
   questList: Observable<PlayerQuest[]>;
+  displayedColumns = [
+    'type',
+    'questName',
+    'status',
+    'xp',
+  ];
 
   constructor(
     private emailService: EmailService,
@@ -35,6 +36,10 @@ export class PlayerQuestListComponent implements OnInit {
     private season: SeasonService) {}
 
   async ngOnInit() {
+    if (!this.isOwner) {
+      this.displayedColumns.push('action');
+    }
+
     const seasonId = await this.season.getEnabledSeasonId().toPromise();
 
     if (this.user && this.user.membership) {
@@ -63,4 +68,8 @@ export class PlayerQuestListComponent implements OnInit {
       }
     });
   }
+
+  public editQuest(playerQuest: PlayerQuest) {}
+  
+  public deleteQuest(playerQuest: PlayerQuest) {}
 }

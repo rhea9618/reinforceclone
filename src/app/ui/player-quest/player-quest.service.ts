@@ -21,6 +21,15 @@ export class PlayerQuestService {
   }
 
   /**
+   * Get Quest info from given id
+   * @param  {string}                                id quest id
+   * @return {AngularFirestoreDocument<PlayerQuest>}    observable quest info
+   */
+  getQuest(id: string): AngularFirestoreDocument<PlayerQuest> {
+    return this.afs.doc<PlayerQuest>(`playerQuests/${id}`);
+  }
+
+  /**
    * Create a quest for player
    * @param {PlayerQuest} quest all quest info
    */
@@ -32,12 +41,22 @@ export class PlayerQuestService {
   }
 
   /**
-   * Get Quest info from given id
-   * @param  {string}                                id quest id
-   * @return {AngularFirestoreDocument<PlayerQuest>}    observable quest info
+   * Update a player's quest
+   * @param {Partial<PlayerQuest>} quest quest changes
    */
-  getQuest(id: string): AngularFirestoreDocument<PlayerQuest> {
-    return this.afs.doc<PlayerQuest>(`playerQuests/${id}`);
+  updatePlayerQuest(quest: Partial<PlayerQuest>) {
+    return this.getQuest(quest.id).update({
+      ...quest,
+      updated: Timestamp.now()
+    });
+  }
+
+  /**
+   * Delete a player's quest
+   * @param {string} quest quest changes
+   */
+  deletePlayerQuest(questId: string) {
+    return this.getQuest(questId).delete();
   }
 
   /**
