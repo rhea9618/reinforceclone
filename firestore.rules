@@ -100,7 +100,7 @@ service cloud.firestore {
     // Owner: allow write only when status is going to 'pending'
     //   limited to fields: status, submitted, completed, completionProof
     function isPlayerQuestWriteAllowed() {
-      return isTeamLead(incomingData().teamId) || (
+      return isTeamLead(incomingData().teamId) || isTeamLead(existingData().teamId) || (
         isOwner(existingData().playerId) &&
         incomingData().keys().hasOnly(['status', 'submitted', 'completed', 'completionProof']) &&
         incomingData().status == 'pending'

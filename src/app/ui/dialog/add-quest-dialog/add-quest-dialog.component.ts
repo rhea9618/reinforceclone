@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatDialogRef } from '@angular/material/dialog';
 
@@ -8,39 +8,28 @@ import { MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./add-quest-dialog.component.scss']
 })
 export class AddQuestDialogComponent implements OnInit {
-  public categoryList: Array<String> = [
+
+  readonly categoryList = [
     QuestCategories.CERTIFICATION,
     QuestCategories.FUNCTIONAL,
     QuestCategories.INFOR_SPECIFIC,
     QuestCategories.SOFT_SKILL,
     QuestCategories.TECHNICAL
   ];
-  public playerQuest: PlayerQuest;
-  public user: User;
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: { user: User, lead: User },
-    private dialogRef: MatDialogRef<AddQuestDialogComponent>) {}
+  playerQuest: Partial<PlayerQuest>;
+  actionLabel = 'Add Quest';
 
-  adjustQuestType(required: boolean) {
-    this.playerQuest.required = required;
-  }
-
-  assignQuest() {
-    this.dialogRef.close(this.playerQuest);
-  }
+  constructor(
+    @Inject(MAT_DIALOG_DATA) private data: Partial<PlayerQuest>,
+    private dialogRef: MatDialogRef<AddQuestDialogComponent, Partial<PlayerQuest>>
+  ) {}
 
   ngOnInit() {
-    this.user = this.data.user;
-    const lead = this.data.lead;
-    // will need to recoordinate team id, we get it now from membership collection
-    this.playerQuest = {
-      playerId: this.user.uid,
-      required: true,
-      playerName: this.user.displayName,
-      teamId: this.user.membership.teamId,
-      status: 'todo',
-      playerEmail: this.user.email,
-      teamLeadEmail: lead.email
-    } as PlayerQuest;
+    this.playerQuest = this.data;
+
+    if (this.playerQuest.id) {
+      this.actionLabel = 'Update Quest';
+    }
   }
 }

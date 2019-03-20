@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 
 import { TeamsService } from 'src/app/teams/teams.service';
 import { PlayerPointsService } from '../../player-quest/player-points.service';
-import { ConfirmationModalService } from '../confirmation-modal/confirmation-modal.service';
+import { ConfirmationModalService } from '../../confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'team-members',
@@ -49,11 +49,9 @@ export class TeamMembersComponent implements OnInit {
   }
 
   removeTeamMember(uid: string, user: string) {
-    const data = {
-      message: `Are you sure you want to kick ${user}?`
-    };
+    const message = `Are you sure you want to kick ${user}?`;
 
-    this.confirmationModal.showConfirmation(data).subscribe(result => {
+    this.confirmationModal.showConfirmation({ message }).subscribe(result => {
       if (result) {
         this.teamsService.removeTeamMember(uid);
       }

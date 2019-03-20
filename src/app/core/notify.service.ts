@@ -8,7 +8,8 @@ export class NotifyService {
 
   constructor(private snackBar: MatSnackBar) {}
 
-  update(message: string, panelClass: 'error' | 'info' | 'success'): Observable<MatSnackBarDismiss> {
+  update(message: string, panelClass?: 'error' | 'info' | 'success'): Observable<MatSnackBarDismiss> {
+    panelClass = panelClass || 'info';
     return this.snackBar.open(message, 'OK', { panelClass, duration: 3000 }).afterDismissed();
   }
 }

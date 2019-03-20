@@ -9,6 +9,7 @@ import {
   MatDatepickerModule,
   MatDialogModule,
   MatFormFieldModule,
+  MatGridListModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
@@ -41,7 +42,7 @@ import { TeamMembersComponent } from './team-page/team-members/team-members.comp
 import { FirestoreDatePipe } from './firestore-date.pipe';
 import { NicknamePipe } from './nickname.pipe';
 import { SeasonRankPipe } from './seasonRank.pipe';
-import { ConfirmationModalComponent } from './team-page/confirmation-modal/confirmation-modal.component';
+import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
 
 @NgModule({
   imports: [
@@ -55,6 +56,7 @@ import { ConfirmationModalComponent } from './team-page/confirmation-modal/confi
     MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
+    MatGridListModule,
     MatIconModule,
     MatInputModule,
     MatListModule,

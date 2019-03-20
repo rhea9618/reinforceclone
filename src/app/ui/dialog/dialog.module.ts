@@ -2,6 +2,7 @@ import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AddQuestDialogComponent } from './add-quest-dialog/add-quest-dialog.component';
+import { AddQuestDialogService } from './add-quest-dialog/add-quest-dialog.service';
 
 import {
   MatCardModule,
@@ -32,6 +33,9 @@ import {
     FormsModule
   ],
   declarations: [ AddQuestDialogComponent ],
-  entryComponents: [ AddQuestDialogComponent ]
+  entryComponents: [ AddQuestDialogComponent ],
+  providers: [
+    AddQuestDialogService,
+  ]
 })
 export class DialogModule { }

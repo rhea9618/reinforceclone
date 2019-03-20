@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take } from 'rxjs/operators';
 
@@ -11,9 +10,8 @@ import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 import { TeamsService } from 'src/app/teams/teams.service';
 import { environment } from 'src/environments/environment';
-import { AddQuestDialogComponent } from '../dialog/add-quest-dialog/add-quest-dialog.component';
-import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { PlayerPointsService } from '../player-quest/player-points.service';
+import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dialog.service';
 
 @Component({
   selector: 'user-profile',
@@ -31,14 +29,13 @@ export class UserProfileComponent implements OnInit {
   constructor(
     public auth: AuthService,
     private userService: UserService,
-    private dialog: MatDialog,
     private route: ActivatedRoute,
-    private playerQuestService: PlayerQuestService,
     private seasonService: SeasonService,
     private emailService: EmailService,
     private notifyService: NotifyService,
     private teamsService: TeamsService,
-    private playerPointsService: PlayerPointsService
+    private playerPointsService: PlayerPointsService,
+    private addQuestDialog: AddQuestDialogService
   ) {}
 
   ngOnInit() {
@@ -75,55 +72,48 @@ export class UserProfileComponent implements OnInit {
     );
   }
 
-  private sendQuestAddedEmail(playerQuest: PlayerQuest) {
-    const reqString = playerQuest.required ? 'Required' : 'Additional';
+  private sendQuestAddedEmail(quest: PlayerQuest) {
+    const type = quest.required ? 'Required' : 'Additional';
+    const subjectPrefix = '[Gamification of Learnings and Certifications]';
+    const subject = `${subjectPrefix} [${type}] [${quest.category}] Quest Added for ${quest.playerName}]`;
     const content =
-      `<strong>Quest Name:</strong> ${playerQuest.questName}<br />
-      <strong>Quest Category:</strong> ${playerQuest.category}<br />
-      <strong>Quest Source:</strong> ${playerQuest.source}<br />
-      <strong>Quest Type:</strong> ${reqString}<bt />`;
+      `Hi ${quest.playerName}!<br/>
+      <br/>
+      Below are the details for your quest. Good luck and may the odds be ever in your favor!<br/>
+      <br/>
+      Quest Type: ${type}<br/>
+      Category: ${quest.category}<br/>
+      Quest: ${quest.questName}<br/>
+      Source: ${quest.source}<br/>
+      <br/>
+      REWARDS AND RECOGNITION PH`;
 
-    this.emailService.sendEmail(
-      playerQuest.playerEmail,
-      'Leader Board: New Quest Assigned',
-      content,
-      'HTML'
-    ).subscribe((res) => {
-      console.log(res);
-      this.notifyService.update('Assign quest successful!', 'success');
-    });
+
+    this.emailService.sendEmail(quest.playerEmail, subject, content, 'HTML')
+      .subscribe(() => this.notifyService.update('Assign quest successful!', 'success'));
   }
 
-  addQuest(user: User, lead: User) {
-    const assignQuestDialog = this.dialog.open(AddQuestDialogComponent, {
-      data: { user, lead }
-    });
+  async addQuest(user: User, lead: User) {
+    const seasonId = await this.seasonService.getEnabledSeasonId().toPromise();
+    const playerQuest = {
+      seasonId,
+      playerId: user.uid,
+      required: true,
+      playerName: user.displayName,
+      teamId: user.membership.teamId,
+      status: QuestStatus.TODO,
+      playerEmail: user.email,
+      teamLeadEmail: lead.email
+    };
 
-    const playerQuest$ = assignQuestDialog.afterClosed() as Observable<PlayerQuest>;
-    const seasonId$ = this.seasonService.getEnabledSeasonId();
-
-    combineLatest(playerQuest$, seasonId$).pipe(
-      take(1),
-      map(([playerQuest, seasonId]) => {
-        if (playerQuest) {
-          playerQuest.seasonId = seasonId;
-          return playerQuest;
-        }
-
-        return null;
-      })
-    ).subscribe((playerQuest: PlayerQuest) => {
-      // Modal cancel goes here
-      if (!playerQuest) {
-        return;
-      }
-
-      this.playerQuestService.assignPlayerQuest(playerQuest).then(() => {
+    const playerQuest$ = this.addQuestDialog.assignQuest(playerQuest);
+    playerQuest$.subscribe((playerQuest: PlayerQuest) => {
+      if (playerQuest) {
         this.sendQuestAddedEmail(playerQuest);
-      }).catch((err) => {
-        console.log(err);
-        this.notifyService.update('Assign quest failed!', 'error');
-      });
+      }
+    }, (err) => {
+      console.log(err);
+      this.notifyService.update('Assign quest failed!', 'error');
     });
   }
 }

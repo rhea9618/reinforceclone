@@ -1,5 +1,7 @@
-<p>Are you sure you want to kick <span class="name">{{ name }}</span>?</p>
-<div mat-dialog-actions>
+<p>
+  <mat-icon color="accent">warning</mat-icon>{{message}}
+</p>
+<mat-dialog-actions>
+  <button mat-raised-button color="accent" [mat-dialog-close]="true">{{confirmBtn}}</button>
   <button mat-raised-button [mat-dialog-close]>Cancel</button>
-  <button mat-raised-button color="accent" [mat-dialog-close]="'yes'">Yes</button>
-</div>
+</mat-dialog-actions>

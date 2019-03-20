@@ -3,18 +3,22 @@ import { MatDialogRef } from '@angular/material';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
-  selector: 'kick-dialog',
-  templateUrl: './kick-dialog.component.html',
-  styleUrls: ['./kick-dialog.component.scss']
+  selector: 'confirmation-modal',
+  templateUrl: './confirmation-modal.component.html',
+  styleUrls: ['./confirmation-modal.component.scss']
 })
-export class KickDialogComponent implements OnInit {
+export class ConfirmationModalComponent implements OnInit {
 
-  public name: string;
+  public message: string;
+  public confirmBtn: string;
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: { displayName: string },
-  private dialogRef: MatDialogRef<KickDialogComponent>) {}
+  constructor(
+    @Inject(MAT_DIALOG_DATA) private data: ConfirmationModalData,
+    private dialogRef: MatDialogRef<ConfirmationModalComponent, boolean>
+  ) {}
 
   ngOnInit() {
-    this.name = this.data.displayName;
+    this.message = this.data.message;
+    this.confirmBtn = this.data.confirmBtn || 'Yes';
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { empty, Observable } from 'rxjs';
+import { EMPTY, from, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { PlayerQuestService } from '../player-quest/player-quest.service';
@@ -9,6 +9,8 @@ import { NotifyService } from 'src/app/core/notify.service';
 import { SeasonService } from 'src/app/core/season.service';
 import { environment } from 'src/environments/environment';
 import { SubmitQuestDialogComponent } from './submit-quest-dialog.component';
+import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dialog.service';
+import { ConfirmationModalService } from '../confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'player-quest-list',
@@ -20,7 +22,7 @@ export class PlayerQuestListComponent implements OnInit {
   @Input() user: User;
   @Input() isOwner: boolean;
 
-  questList: Observable<PlayerQuest[]>;
+  questList$: Observable<PlayerQuest[]>;
   displayedColumns = [
     'type',
     'questName',
@@ -33,7 +35,10 @@ export class PlayerQuestListComponent implements OnInit {
     private dialog: MatDialog,
     private notifyService: NotifyService,
     private playerQuestService: PlayerQuestService,
-    private season: SeasonService) {}
+    private season: SeasonService,
+    private addQuestDialog: AddQuestDialogService,
+    private confirmationModal: ConfirmationModalService
+   ) {}
 
   async ngOnInit() {
     if (!this.isOwner) {
@@ -44,7 +49,7 @@ export class PlayerQuestListComponent implements OnInit {
 
     if (this.user && this.user.membership) {
       const teamId = this.user.membership.teamId;
-      this.questList = this.playerQuestService.getMemberQuests(seasonId, teamId, this.user.uid);
+      this.questList$ = this.playerQuestService.getMemberQuests(seasonId, teamId, this.user.uid);
     }
   }
 
@@ -58,7 +63,7 @@ export class PlayerQuestListComponent implements OnInit {
               'Leader Board: Player Quest Submitted',
               `Player ${playerQuest.playerName} has completed the quest '${playerQuest.questName}'. Kindly validate the quest completion.`
             ).subscribe(() => {
-              this.notifyService.update(`Your quest has been submitted to your team lead for validation.`, 'success');
+              this.notifyService.update(`Your quest has been submitted to your team lead for validation.`);
             });
           })
           .catch((err) => {
@@ -69,7 +74,81 @@ export class PlayerQuestListComponent implements OnInit {
     });
   }
 
-  public editQuest(playerQuest: PlayerQuest) {}
-  
-  public deleteQuest(playerQuest: PlayerQuest) {}
+  private questInfoEmail(quest: PlayerQuest): string {
+    const type = quest.required ? 'Required' : 'Additional';
+    return `
+      Quest Type: ${type}<br/>
+      Category: ${quest.category}<br/>
+      Quest: ${quest.questName}<br/>
+      Source: ${quest.source}<br/>`;
+  }
+
+  private sendQuestUpdatedEmail(quest: PlayerQuest) {
+    const type = quest.required ? 'Required' : 'Additional';
+    const subjectPrefix = '[Gamification of Learnings and Certifications]';
+    const subject = `${subjectPrefix} Revisit your [${type}] [${quest.category}] Quest Details`;
+    const dashboardUrl = `${environment.firebase.authDomain}/profile`;
+    const questInfo = this.questInfoEmail(quest);
+    const content =
+      `Hi ${quest.playerName}!<br/>
+      <br/>
+      Your quest has been updated.<br/>
+      <br/>
+      ${questInfo}
+      <br/>
+      Amazing adventures await you!<br/>
+      Visit your <a href="${dashboardUrl}"">dashboard</a> to start your quests.<br/>
+      <br/>
+      REWARDS AND RECOGNITION PH`;
+
+    this.emailService.sendEmail(quest.playerEmail, subject, content, 'HTML')
+      .subscribe(() => this.notifyService.update(`${quest.questName} updated!`));
+  }
+
+  public editQuest(playerQuest: PlayerQuest) {
+    this.addQuestDialog.assignQuest(playerQuest).subscribe((playerQuest: PlayerQuest) => {
+      if (playerQuest) {
+        this.sendQuestUpdatedEmail(playerQuest);
+      }
+    }, (err) => {
+      console.log(err);
+      this.notifyService.update('Update quest failed!', 'error');
+    });
+  }
+
+  private sendQuestDeletedEmail(quest: PlayerQuest) {
+    const type = quest.required ? 'Required' : 'Additional';
+    const subjectPrefix = '[Gamification of Learnings and Certifications]';
+    const subject = `${subjectPrefix} [${type}] [${quest.category}] Quest Cancelled`;
+    const dashboardUrl = `${environment.firebase.authDomain}/profile`;
+    const questInfo = this.questInfoEmail(quest);
+    const content =
+      `Hi ${quest.playerName}!<br/>
+      <br/>
+      Your quest below has been cancelled.<br/>
+      <br/>
+      ${questInfo}
+      <br/>
+      Visit your <a href="${dashboardUrl}"">dashboard</a> to view other quests.<br/>
+      <br/>
+      REWARDS AND RECOGNITION PH`;
+
+    this.emailService.sendEmail(quest.playerEmail, subject, content, 'HTML')
+      .subscribe(() => this.notifyService.update(`${quest.questName} deleted!`));
+  }
+
+  public deleteQuest(playerQuest: PlayerQuest) {
+    const message = `Are you sure you want to delete ${playerQuest.questName}`;
+    this.confirmationModal.showConfirmation({ message }).pipe(
+      flatMap((proceed: boolean) => {
+        if (proceed) {
+          return from(this.playerQuestService.deletePlayerQuest(playerQuest.id));     
+        }
+        return EMPTY;
+      })
+    ).subscribe(() => this.sendQuestDeletedEmail(playerQuest), (err) => {
+      console.log(err);
+      this.notifyService.update('Delete quest failed!', 'error');
+    });
+  }
 }

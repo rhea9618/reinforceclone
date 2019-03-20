@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="questList | async">
+<table mat-table [dataSource]="questList$ | async">
   <ng-container matColumnDef="type">
     <th mat-header-cell *matHeaderCellDef> Type </th>
     <td mat-cell *matCellDef="let quest">
