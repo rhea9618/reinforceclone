@@ -3,19 +3,19 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({name: 'seasonRank'})
 export class SeasonRankPipe implements PipeTransform {
 
-    transform(exp: number): number {
+    transform(exp: number): string {
         if (exp < 1) {
-          return 0;
+          return 'Unranked';
         } else if (exp < 20) {
-          return 1;
+          return 'Rank 1';
         } else if (exp < 50) {
-          return 2;
+          return 'Rank 2';
         } else if (exp < 90) {
-          return 3;
+          return 'Rank 3';
         } else if (exp < 150) {
-          return 4;
+          return 'Rank 4';
         } else {
-          return 5;
+          return 'Rank 5';
         }
       }
 }

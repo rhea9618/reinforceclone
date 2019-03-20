@@ -18,12 +18,15 @@ import { NotifyService } from './notify.service';
 import { UserService } from './user.service';
 import { TeamsService } from '../teams/teams.service';
 import { PlayerPointsService } from '../ui/player-quest/player-points.service';
+import { SeasonService } from './season.service';
 
 @Injectable()
 export class AuthService {
   PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
 
   user$: Observable<User>;
+  seasonId$: Observable<string>;
+  loginInfo: Observable<any>;
   isLoggingIn = false;
 
   constructor(
@@ -37,7 +40,8 @@ export class AuthService {
     private notify: NotifyService,
     private user: UserService,
     private teams: TeamsService,
-    private playerPointsService: PlayerPointsService
+    private playerPointsService: PlayerPointsService,
+    private seasonService: SeasonService
   ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((firebaseUser: firebase.User) => {
@@ -46,6 +50,16 @@ export class AuthService {
         }
 
         return of(null);
+      })
+    );
+
+    this.seasonId$ = this.seasonService.getEnabledSeasonId();
+    this.loginInfo = combineLatest(this.user$, this.seasonId$).pipe(
+      map(([userInfo, seasonId]) => {
+        return {
+          userInfo: userInfo,
+          seasonId: seasonId
+        };
       })
     );
   }
@@ -62,11 +76,11 @@ export class AuthService {
     const user$ = this.user.getUser(uid);
     const isAdmin$ = this.admin.isAdmin(uid);
     const membership$ = this.teams.getMembership(uid);
-    const totalExp$ = this.playerPointsService.getTotalExp(uid);
+    // const totalExp$ = this.playerPointsService.getTotalExp(uid);
     const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.PLACEHOLDER_SEASON);
 
-    return combineLatest(user$, isAdmin$, membership$, totalExp$, seasonExp$).pipe(
-      map(([user, isAdmin, membership, totalExp, seasonExp]) => {
+    return combineLatest(user$, isAdmin$, membership$, seasonExp$).pipe(
+      map(([user, isAdmin, membership, seasonExp]) => {
         if (user.isMicrosoft) {
           this.checkMicrosoftState();
         }
@@ -75,7 +89,6 @@ export class AuthService {
           ...user,
           isAdmin,
           membership,
-          totalExp,
           seasonExp
         };
       })

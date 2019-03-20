@@ -1,6 +1,6 @@
-<div class="container" *ngIf="auth.user$ | async as user">
-  <team-members [currentUser]="user"></team-members>
+<div class="container" *ngIf="auth.loginInfo | async as info">
+  <team-members [currentUser]="info.userInfo" [seasonId]="info.seasonId"></team-members>
   <hr/>
-  <team-applications [currentUser]="user"
-    *ngIf="user.membership.isLead"></team-applications>
+  <team-applications [currentUser]="info.userInfo"
+    *ngIf="info.userInfo.membership.isLead"></team-applications>
 </div>
