@@ -29,7 +29,6 @@ export class TeamMembersComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.currentUser);
     if (this.currentUser && this.currentUser.membership) {
       this.title = this.currentUser.membership.isLead ?
         'Team Members' :
