@@ -18,7 +18,6 @@ import { NotifyService } from './notify.service';
 import { UserService } from './user.service';
 import { TeamsService } from '../teams/teams.service';
 import { PlayerPointsService } from '../ui/player-quest/player-points.service';
-import { SeasonService } from './season.service';
 
 @Injectable()
 export class AuthService {

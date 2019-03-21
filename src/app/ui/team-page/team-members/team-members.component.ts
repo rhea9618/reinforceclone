@@ -66,7 +66,7 @@ export class TeamMembersComponent implements OnInit {
     const uid = member.uid;
     const membership$ = this.teamsService.getMembership(uid);
     const totalExp$ = this.playerPointsService.getTotalExp(uid);
-    const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.seasonId); // till we get seasonService handled
+    const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.seasonId);
 
     return combineLatest(membership$, totalExp$, seasonExp$).pipe(
       map(([membership, totalExp, seasonExp]) => ({ ...membership, totalExp, seasonExp }))
