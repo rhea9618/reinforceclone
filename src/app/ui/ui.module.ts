@@ -40,7 +40,7 @@ import { TeamApplicationsComponent } from './team-page/team-applications/team-ap
 import { TeamMembersComponent } from './team-page/team-members/team-members.component';
 import { FirestoreDatePipe } from './firestore-date.pipe';
 import { NicknamePipe } from './nickname.pipe';
-import { SeasonRankPipe } from './seasonRank.pipe';
+import { SeasonRankPipe } from './season-rank.pipe';
 import { KickDialogComponent } from './team-page/kick-dialog/kick-dialog.component';
 
 @NgModule({
