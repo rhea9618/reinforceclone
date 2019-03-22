@@ -14,10 +14,8 @@ import { KickDialogComponent } from '../kick-dialog/kick-dialog.component';
   styleUrls: ['./team-members.component.scss']
 })
 export class TeamMembersComponent implements OnInit {
-
-  PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
-
   @Input() currentUser: User;
+  @Input() seasonId: string;
   teamMembers$: Observable<Membership[]>;
   members$: Observable<Membership[]>;
   title: string;
@@ -68,7 +66,7 @@ export class TeamMembersComponent implements OnInit {
     const uid = member.uid;
     const membership$ = this.teamsService.getMembership(uid);
     const totalExp$ = this.playerPointsService.getTotalExp(uid);
-    const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.PLACEHOLDER_SEASON); // till we get seasonService handled
+    const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.seasonId);
 
     return combineLatest(membership$, totalExp$, seasonExp$).pipe(
       map(([membership, totalExp, seasonExp]) => ({ ...membership, totalExp, seasonExp }))
@@ -77,28 +75,38 @@ export class TeamMembersComponent implements OnInit {
 
   private mergeMemberInfo(teamId: string): Observable<Membership[]> {
     const teamMembers$ = this.teamsService.getTeamMembers(teamId);
-    const teamPoints$ = this.playerPointsService.getTeamPoints(teamId, this.PLACEHOLDER_SEASON);
+    const teamPoints$ = this.playerPointsService.getTeamPoints(teamId, this.seasonId);
 
     return combineLatest(teamMembers$, teamPoints$).pipe(
       map(([teamMembers, teamPoints]) => {
-        return this.joinMemberPoints(teamMembers, teamPoints);
+        return this.joinPointsToMember(teamMembers, teamPoints);
       })
     );
   }
 
-  private joinMemberPoints(members: Membership[], playerPoints: PlayerPoints[]): Membership[] {
+  private joinPointsToMember(members: Membership[], playerPoints: PlayerPoints[]): Membership[] {
+    const membership: Membership[] = [];
 
-    members.forEach( member => {
-      const match = playerPoints.find( (playerPoint) => {
+    playerPoints.forEach( playerPoint => {
+      const match = members.find( member => {
         return playerPoint.playerId === member.uid;
       });
-
       if (match) {
-        member.seasonExp = match.totalPoints;
+        match.seasonExp = playerPoint.totalPoints;
+        membership.push(match);
+      }
+
+    });
+
+    // round up those without points
+    members.forEach( member => {
+      if (member.seasonExp === 0 || !member.seasonExp) {
+        member.seasonExp = 0;
+        membership.push(member);
       }
     });
 
-    return members;
+    return membership;
   }
 
 }

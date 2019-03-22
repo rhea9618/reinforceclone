@@ -37,7 +37,7 @@ export class AuthService {
     private notify: NotifyService,
     private user: UserService,
     private teams: TeamsService,
-    private playerPointsService: PlayerPointsService
+    private playerPointsService: PlayerPointsService,
   ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((firebaseUser: firebase.User) => {
@@ -62,11 +62,10 @@ export class AuthService {
     const user$ = this.user.getUser(uid);
     const isAdmin$ = this.admin.isAdmin(uid);
     const membership$ = this.teams.getMembership(uid);
-    const totalExp$ = this.playerPointsService.getTotalExp(uid);
     const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.PLACEHOLDER_SEASON);
 
-    return combineLatest(user$, isAdmin$, membership$, totalExp$, seasonExp$).pipe(
-      map(([user, isAdmin, membership, totalExp, seasonExp]) => {
+    return combineLatest(user$, isAdmin$, membership$, seasonExp$).pipe(
+      map(([user, isAdmin, membership, seasonExp]) => {
         if (user.isMicrosoft) {
           this.checkMicrosoftState();
         }
@@ -75,7 +74,6 @@ export class AuthService {
           ...user,
           isAdmin,
           membership,
-          totalExp,
           seasonExp
         };
       })
