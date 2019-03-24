@@ -107,9 +107,9 @@ export class UserProfileComponent implements OnInit {
     };
 
     const playerQuest$ = this.addQuestDialog.assignQuest(playerQuest);
-    playerQuest$.subscribe((playerQuest: PlayerQuest) => {
-      if (playerQuest) {
-        this.sendQuestAddedEmail(playerQuest);
+    playerQuest$.subscribe((quest: PlayerQuest) => {
+      if (quest) {
+        this.sendQuestAddedEmail(quest);
       }
     }, (err) => {
       console.log(err);

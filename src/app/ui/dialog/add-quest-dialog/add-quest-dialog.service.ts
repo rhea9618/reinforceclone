@@ -23,25 +23,25 @@ export class AddQuestDialogService {
   /**
    * Creates/Updates a Player Quest
    * @param  {PlayerQuest}                  playerQuest quest info
-   * @return {Observable<PlayerQuest|null>}             saved playerQuest if 
+   * @return {Observable<PlayerQuest|null>}             saved playerQuest if
    *                                                    Add/Update button is clicked
    */
   assignQuest(playerQuest: Partial<PlayerQuest>): Observable<PlayerQuest|null> {
     return this.showQuestModal(playerQuest).pipe(
-      flatMap((playerQuest: PlayerQuest) => {
+      flatMap((quest: PlayerQuest) => {
         // cancel goes here
-        if (!playerQuest) {
+        if (!quest) {
           return of(null);
         }
 
         let promise;
-        if (playerQuest.id) {
-          promise = this.playerQuestService.updatePlayerQuest(playerQuest);
+        if (quest.id) {
+          promise = this.playerQuestService.updatePlayerQuest(quest);
         } else {
-          promise = this.playerQuestService.assignPlayerQuest(playerQuest);
+          promise = this.playerQuestService.assignPlayerQuest(quest);
         }
 
-        return from(promise).pipe(map(() => playerQuest));
+        return from(promise).pipe(map(() => quest));
       })
     );
   }

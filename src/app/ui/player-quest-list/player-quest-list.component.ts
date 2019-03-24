@@ -106,9 +106,9 @@ export class PlayerQuestListComponent implements OnInit {
   }
 
   public editQuest(playerQuest: PlayerQuest) {
-    this.addQuestDialog.assignQuest(playerQuest).subscribe((playerQuest: PlayerQuest) => {
-      if (playerQuest) {
-        this.sendQuestUpdatedEmail(playerQuest);
+    this.addQuestDialog.assignQuest(playerQuest).subscribe((quest: PlayerQuest) => {
+      if (quest) {
+        this.sendQuestUpdatedEmail(quest);
       }
     }, (err) => {
       console.log(err);
@@ -142,7 +142,7 @@ export class PlayerQuestListComponent implements OnInit {
     this.confirmationModal.showConfirmation({ message }).pipe(
       flatMap((proceed: boolean) => {
         if (proceed) {
-          return from(this.playerQuestService.deletePlayerQuest(playerQuest.id));     
+          return from(this.playerQuestService.deletePlayerQuest(playerQuest.id));
         }
         return EMPTY;
       })

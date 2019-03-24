@@ -17,7 +17,8 @@ service cloud.firestore {
 
     match /playerQuests/{id} {
       allow read: if isPlayerQuestReadAllowed();
-      allow write: if isPlayerQuestWriteAllowed();
+      allow create: if isTeamLead(incomingData().teamId);
+      allow update, delete: if isPlayerQuestWriteAllowed();
     }
 
     match /playerPoints/{id} {
@@ -96,15 +97,16 @@ service cloud.firestore {
     }
 
     // Allow playerQuest write under the ff conditions:
-    // Team Lead: allow writes to all fields without restriction
+    // Team Lead: allow writes to all fields as long as status != 'completed'
     // Owner: allow write only when status is going to 'pending'
     //   limited to fields: status, submitted, completed, completionProof
     function isPlayerQuestWriteAllowed() {
-      return isTeamLead(incomingData().teamId) || isTeamLead(existingData().teamId) || (
-        isOwner(existingData().playerId) &&
-        incomingData().keys().hasOnly(['status', 'submitted', 'completed', 'completionProof']) &&
-        incomingData().status == 'pending'
-      );
+      return (isTeamLead(existingData().teamId) && existingData().status != 'completed') || 
+        (
+          isOwner(existingData().playerId) &&
+          incomingData().keys().hasOnly(['status', 'submitted', 'completed', 'completionProof']) &&
+          incomingData().status == 'pending'
+        );
     }
 
     function getAdminData(userId) {

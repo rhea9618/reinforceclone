@@ -54,7 +54,7 @@ export class AuthService {
     // Signout if there's an error getting MS token
     this.email.getToken().subscribe(null, (error) => {
       console.log(error);
-      this.signOut();
+      this.microsoftSignIn();
     });
   }
 

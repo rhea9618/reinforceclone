@@ -16,7 +16,7 @@ export class ConfirmationModalService {
    * @return {Observable<boolean>}   returns true if confirm button is clicked
    */
   showConfirmation(data: ConfirmationModalData): Observable<boolean> {
-    const assignQuestDialog = 
+    const assignQuestDialog =
       this.dialog.open(ConfirmationModalComponent, { data }) as MatDialogRef<ConfirmationModalComponent, boolean>;
 
     return assignQuestDialog.afterClosed();
