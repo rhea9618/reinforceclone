@@ -14,7 +14,7 @@ import { ConfirmationModalService } from '../../confirmation-modal/confirmation-
 export class TeamMembersComponent implements OnInit {
   @Input() currentUser: User;
   @Input() seasonId: string;
-  teamMembers$: Observable<Membership[]>;
+
   members$: Observable<Membership[]>;
   title: string;
 
@@ -31,9 +31,6 @@ export class TeamMembersComponent implements OnInit {
       this.title = this.currentUser.membership.isLead ?
         'Team Members' :
         'Team Leaderboard';
-
-      this.teamMembers$ =
-        this.teamsService.getTeamMembers(this.currentUser.membership.teamId);
 
       const teamId = this.currentUser.membership.teamId;
       this.members$ = this.mergeMemberInfo(teamId);
@@ -56,17 +53,6 @@ export class TeamMembersComponent implements OnInit {
         this.teamsService.removeTeamMember(uid);
       }
     });
-  }
-
-  private getMemberInfo(member: Membership): Observable<Membership> {
-    const uid = member.uid;
-    const membership$ = this.teamsService.getMembership(uid);
-    const totalExp$ = this.playerPointsService.getTotalExp(uid);
-    const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.seasonId);
-
-    return combineLatest(membership$, totalExp$, seasonExp$).pipe(
-      map(([membership, totalExp, seasonExp]) => ({ ...membership, totalExp, seasonExp }))
-    );
   }
 
   private mergeMemberInfo(teamId: string): Observable<Membership[]> {
