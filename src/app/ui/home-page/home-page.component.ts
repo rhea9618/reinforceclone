@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
-import { LeaderboardService } from './leaderboard.service';
+import { PlayerPointsService } from '../player-quest/player-points.service';
 import { SeasonService } from '../../core/season.service';
 
 @Component({
@@ -11,16 +11,16 @@ import { SeasonService } from '../../core/season.service';
 })
 export class HomePageComponent implements OnInit {
 
-  topUsers$: Observable<UserScore[]>;
-  season$: Observable<Season>;
+  topUsers$: Observable<PlayerPoints[]>;
+  readonly displayedColumns = ['index', 'name', 'points', 'rank', 'info'];
 
   constructor(
-    private leaderboard: LeaderboardService,
-    private season: SeasonService) { }
+    private playerPoints: PlayerPointsService,
+    private season: SeasonService
+  ) {}
 
-  ngOnInit() {
-    this.topUsers$ = of([]); // this.leaderboard.getTopUsers();
-    this.season$ = this.season.getEnabledSeason();
+  async ngOnInit() {
+    const seasonId = await this.season.getEnabledSeasonId().toPromise();
+    this.topUsers$ = this.playerPoints.getSeasonTopPlayers(seasonId);
   }
-
 }

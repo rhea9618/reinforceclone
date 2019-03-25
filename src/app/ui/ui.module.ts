@@ -28,8 +28,6 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserFormComponent } from './user-form/user-form.component';
 import { SsrPageComponent } from './ssr-page/ssr-page.component';
-
-import { LeaderboardService } from './home-page/leaderboard.service';
 import { PlayerQuestComponent } from './player-quest/player-quest.component';
 import { MembersQuestApprovalComponent } from './members-quest-approval/members-quest-approval.component';
 import { QuestApprovalDialogComponent } from './members-quest-approval/quest-approval-dialog.component';
@@ -39,10 +37,13 @@ import { JoinTeamPageComponent } from './join-team-page/join-team-page.component
 import { TeamPageComponent } from './team-page/team-page.component';
 import { TeamApplicationsComponent } from './team-page/team-applications/team-applications.component';
 import { TeamMembersComponent } from './team-page/team-members/team-members.component';
+import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
+
 import { FirestoreDatePipe } from './firestore-date.pipe';
 import { NicknamePipe } from './nickname.pipe';
 import { SeasonRankPipe } from './season-rank.pipe';
-import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
+
+import { PlayerPointsService } from './player-quest/player-points.service';
 
 @NgModule({
   imports: [
@@ -101,7 +102,7 @@ import { ConfirmationModalComponent } from './confirmation-modal/confirmation-mo
     NicknamePipe,
   ],
   providers: [
-    LeaderboardService,
+    PlayerPointsService,
   ]
 })
 export class UiModule {}

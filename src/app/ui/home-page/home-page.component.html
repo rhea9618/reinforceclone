@@ -1,43 +1,37 @@
 <div class="content">
-  <div class="leaderboard-content">
-    <h3>LeaderBoard Top 10</h3>
-    <h4 *ngIf="season$ | async as season">{{season.name}}</h4>
-    <div *ngIf="topUsers$ | async as users; else loading">
-      <mat-card *ngFor="let user of users">
-        <mat-card-header>
-          <img  mat-card-avatar src="{{user.photoURL}}" alt="photo">
-          <mat-card-title>{{user.username}}</mat-card-title>
-          <mat-card-subtitle><b>Team: </b>{{user.teamName || 'Unknown Team'}}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <h3>Total Score: </h3>
-          <p>{{user.totalScore}}</p>
-          <!--<span>( {{user.updated | firestoreDate}} )</span>-->
-        </mat-card-content>
-        <div *ngIf="!users.length" class="loader">
-            Oops! No one has a scored yet!
-          </div>
-      </mat-card>
-    </div>
-  </div>
+  <h3>LeaderBoard Top 20</h3>
+  <div *ngIf="topUsers$ | async as users; else loading">
+    <table mat-table [dataSource]="users">
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef>No.</th>
+        <td mat-cell *matCellDef="let user; let i = index">{{ i+1 }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Player</th>
+        <td mat-cell *matCellDef="let user">{{ user.playerName }}</td>
+      </ng-container>
+      <ng-container matColumnDef="points">
+        <th mat-header-cell *matHeaderCellDef>XP</th>
+        <td mat-cell *matCellDef="let user">{{ user.totalPoints }}</td>
+      </ng-container>
+      <ng-container matColumnDef="rank">
+        <th mat-header-cell *matHeaderCellDef>Season Rank</th>
+        <td mat-cell *matCellDef="let user">{{ user.totalPoints | seasonRank }}</td>
+      </ng-container>
+      <ng-container matColumnDef="info">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let user" class="points-info">
+          <mat-icon matTooltip="Points achieved by {{user.updated | firestoreDate}}">info</mat-icon>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
 
-  <!-- Old Code, not removing yet just in case reverting to list -->
-  <!--<mat-list *ngIf="topUsers$ | async as users; else loading">
-    <mat-list-item *ngFor="let user of users">
-      <img matListAvatar src="{{user.photoURL}}" alt="photo">
-      <h3 matLine>{{user.username}}</h3>
-      <p matLine>
-        <b>Team: </b>{{user.teamName || 'Unknown Team'}}
-      </p>
-      <p matLine>
-        <b>Total Score: </b>{{user.totalScore}}
-        <span>( {{user.updated | firestoreDate}} )</span>
-      </p>
-    </mat-list-item>
     <div *ngIf="!users.length" class="loader">
       Oops! No one has a scored yet!
     </div>
-  </mat-list>-->
+  </div>
 
   <ng-template #loading>
     <div class="loader">
