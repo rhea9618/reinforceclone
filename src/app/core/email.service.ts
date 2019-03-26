@@ -25,7 +25,7 @@ export class EmailService {
 
     return from(this.msalService.acquireTokenSilent(this.scopes)).pipe(
       catchError((error) => {
-        console.trace(error);
+        console.log(error);
         // try to retrieve token thru popup
         return from(this.msalService.acquireTokenPopup(this.scopes));
       })
