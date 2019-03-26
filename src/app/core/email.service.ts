@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MsalService} from '@azure/msal-angular';
 import { Observable, from, of } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
+import { catchError, flatMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,13 @@ export class EmailService {
       return of(cache.token);
     }
 
-    return from(this.msalService.acquireTokenSilent(this.scopes));
+    return from(this.msalService.acquireTokenSilent(this.scopes)).pipe(
+      catchError((error) => {
+        console.trace(error);
+        // try to retrieve token thru popup
+        return from(this.msalService.acquireTokenPopup(this.scopes));
+      })
+    );
   }
 
   sendEmail(emailAddress: string, subject: string, content: string, contentType: 'Text' | 'HTML' = 'Text') {

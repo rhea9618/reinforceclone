@@ -66,9 +66,11 @@ export class AuthService {
 
     return combineLatest(user$, isAdmin$, membership$, seasonExp$).pipe(
       map(([user, isAdmin, membership, seasonExp]) => {
-        if (user.isMicrosoft) {
-          this.checkMicrosoftState();
-        }
+        // TODO: disable for now and monitor
+        // token checker in EmailService as needed
+        // if (user.isMicrosoft) {
+        //   this.checkMicrosoftState();
+        // }
 
         return {
           ...user,
