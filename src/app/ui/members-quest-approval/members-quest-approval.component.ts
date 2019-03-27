@@ -78,7 +78,7 @@ export class MembersQuestApprovalComponent implements OnInit {
         reasonDialogRef.afterClosed().subscribe( reasonRes => {
         if (reasonRes !== 'cancel') {
           this.email.sendEmail(
-            'FrancisJomer.Gallardo@infor.com',
+            quest.playerEmail,
             `Your quest: ${quest.questName} is Rejected!`,
             reasonRes).subscribe(() =>
             this.notify.update('Quest Rejected', 'info'));
