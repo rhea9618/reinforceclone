@@ -1,0 +1,13 @@
+<div class="container">
+  <mat-form-field>
+    <textarea matInput
+    rows="1"
+    placeholder="Reason for Rejection"
+    [(ngModel)]="reason"></textarea>
+  </mat-form-field>
+
+  <div mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="reason" color="accent">Submit</button>
+    <button mat-button [mat-dialog-close]="'cancel'">Cancel</button>
+  </div>
+</div>

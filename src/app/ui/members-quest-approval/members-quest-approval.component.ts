@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { EMPTY, from, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
@@ -8,6 +8,8 @@ import { NotifyService } from 'src/app/core/notify.service';
 import { SeasonService } from 'src/app/core/season.service';
 import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
+import { RejectConfirmDialogComponent } from './reject-confirm-dialog/reject-confirmation-dialog.component';
+import { RejectReasonDialogComponent } from './reject-confirm-dialog/reject-reason-dialog.component';
 
 @Component({
   selector: 'members-quest-approval',
@@ -31,7 +33,8 @@ export class MembersQuestApprovalComponent implements OnInit {
     private dialog: MatDialog,
     private notify: NotifyService,
     private playerQuest: PlayerQuestService,
-    private season: SeasonService) {}
+    private season: SeasonService,
+    private snackBar: MatSnackBar) {}
 
   async ngOnInit() {
     if (this.user && this.user.membership)  {
@@ -50,10 +53,8 @@ export class MembersQuestApprovalComponent implements OnInit {
         action = result;
         if (result === 'approved') {
           return this.playerQuest.approveQuest(quest);
-        }
-
-        if (result === 'rejected') {
-          return this.playerQuest.rejectQuest(quest);
+        } else if (result === 'rejected') {
+          this.rejectQuest(quest);
         }
 
         return EMPTY;
@@ -67,5 +68,25 @@ export class MembersQuestApprovalComponent implements OnInit {
           `Your quest: ${quest.questName} is ${action}!`);
       })
     ).subscribe((res) => console.log(res));
+  }
+
+  private rejectQuest(quest: PlayerQuest) {
+    const rejectDialogRef = this.dialog.open(RejectConfirmDialogComponent, { });
+    rejectDialogRef.afterClosed().subscribe( rejectRes => {
+      if (rejectRes === 'reject') {
+        const reasonDialogRef = this.dialog.open(RejectReasonDialogComponent, { });
+        reasonDialogRef.afterClosed().subscribe( reasonRes => {
+        if (reasonRes !== 'cancel') {
+          this.email.sendEmail(
+            'FrancisJomer.Gallardo@infor.com',
+            `Your quest: ${quest.questName} is Rejected!`,
+            reasonRes).subscribe(() =>
+            this.notify.update('Quest Rejected', 'info'));
+
+            return this.playerQuest.rejectQuest(quest);
+          }
+        });
+      }
+    });
   }
 }
