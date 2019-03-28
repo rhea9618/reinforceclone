@@ -2,13 +2,14 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { EMPTY, from, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
+import { firestore } from 'firebase/app';
+import Timestamp = firestore.Timestamp;
 
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 import { SeasonService } from 'src/app/core/season.service';
 import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
-import { RejectConfirmDialogComponent } from './reject-confirm-dialog/reject-confirmation-dialog.component';
 import { RejectReasonDialogComponent } from './reject-confirm-dialog/reject-reason-dialog.component';
 
 @Component({
@@ -33,8 +34,7 @@ export class MembersQuestApprovalComponent implements OnInit {
     private dialog: MatDialog,
     private notify: NotifyService,
     private playerQuest: PlayerQuestService,
-    private season: SeasonService,
-    private snackBar: MatSnackBar) {}
+    private season: SeasonService) {}
 
   async ngOnInit() {
     if (this.user && this.user.membership)  {
@@ -71,22 +71,99 @@ export class MembersQuestApprovalComponent implements OnInit {
   }
 
   private rejectQuest(quest: PlayerQuest) {
-    const rejectDialogRef = this.dialog.open(RejectConfirmDialogComponent, { });
-    rejectDialogRef.afterClosed().subscribe( rejectRes => {
-      if (rejectRes === 'reject') {
-        const reasonDialogRef = this.dialog.open(RejectReasonDialogComponent, { });
-        reasonDialogRef.afterClosed().subscribe( reasonRes => {
-        if (reasonRes !== 'cancel') {
-          this.email.sendEmail(
-            quest.playerEmail,
-            `Your quest: ${quest.questName} is Rejected!`,
-            reasonRes).subscribe(() =>
-            this.notify.update('Quest Rejected', 'info'));
+    const reasonDialogRef = this.dialog.open(RejectReasonDialogComponent, { });
+      reasonDialogRef.afterClosed().subscribe( reasonRes => {
+      if (reasonRes !== 'cancel') {
+        const subject = this.getEmailSubject(quest.required, quest.category, quest.playerName, false);
+        const body = this.getRejectedEmailBody(
+          quest.playerName,
+          quest.required,
+          quest.category,
+          quest.questName,
+          quest.source,
+          quest.created,
+          reasonRes);
 
-            return this.playerQuest.rejectQuest(quest);
-          }
-        });
+        this.email.sendEmail(
+          quest.playerEmail,
+          subject,
+          body,
+          'HTML').subscribe(() =>
+          this.notify.update('Quest Rejected', 'info'));
+
+          return this.playerQuest.rejectQuest(quest);
       }
     });
+  }
+
+  private getEmailSubject(required: boolean, category: string, name: string, approved: boolean): string {
+    const approveStr = approved ? '' : 'Rejected';
+    let subject = `[Gamification of Learnings and Certifications]`;
+
+    subject += required ? ` [Required] ` : ` [Additional] `;
+    subject += `${category} Quest Completion ${approveStr} for ${name}`;
+
+    return subject;
+  }
+
+  private getApprovedEmailBody(
+    name: string,
+    required: boolean,
+    category: string,
+    questName: string,
+    source: string,
+    date: Timestamp,
+    reasonRes: string): string {
+    const requiredStr = required ? ` [Required] ` : ` [Additional] `;
+    const body =
+    `
+    <p>Hi ${name}!</p>
+
+    <p>Kindly revisit the details and resend completion for this quest.</p>
+
+    <ul style='list-style: none;'>
+      <li>Quest Type: ${requiredStr}</li>
+      <li>Category: ${category}</li>
+      <li>Quest: ${questName}</li>
+      <li>Source: ${source}</li>
+      <li>Date Assigned: ${date}</li>
+      <li>Rejection Reason: ${reasonRes}</li>
+    </ul>
+
+    <p>REWARDS AND RECOGNITION PH</p>
+    `;
+
+    return body;
+
+  }
+
+  private getRejectedEmailBody(
+    name: string,
+    required: boolean,
+    category: string,
+    questName: string,
+    source: string,
+    date: Timestamp,
+    reasonRes: string): string {
+    const requiredStr = required ? ` [Required] ` : ` [Additional] `;
+    const body =
+    `
+    <p>Hi ${name}!</p>
+
+    <p>Kindly revisit the details and resend completion for this quest.</p>
+
+    <ul style='list-style: none;'>
+      <li>Quest Type: ${requiredStr}</li>
+      <li>Category: ${category}</li>
+      <li>Quest: ${questName}</li>
+      <li>Source: ${source}</li>
+      <li>Date Assigned: ${date}</li>
+      <li>Rejection Reason: ${reasonRes}</li>
+    </ul>
+
+    <p>REWARDS AND RECOGNITION PH</p>
+    `;
+
+    return body;
   }
 }

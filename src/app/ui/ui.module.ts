@@ -44,7 +44,6 @@ import { NicknamePipe } from './nickname.pipe';
 import { SeasonRankPipe } from './season-rank.pipe';
 
 import { PlayerPointsService } from './player-quest/player-points.service';
-import { RejectConfirmDialogComponent } from './members-quest-approval/reject-confirm-dialog/reject-confirmation-dialog.component';
 import { RejectReasonDialogComponent } from './members-quest-approval/reject-confirm-dialog/reject-reason-dialog.component';
 
 @NgModule({
@@ -92,13 +91,11 @@ import { RejectReasonDialogComponent } from './members-quest-approval/reject-con
     NicknamePipe,
     SeasonRankPipe,
     ConfirmationModalComponent,
-    RejectConfirmDialogComponent,
     RejectReasonDialogComponent
   ],
   entryComponents: [
     ConfirmationModalComponent,
     QuestApprovalDialogComponent,
-    RejectConfirmDialogComponent,
     RejectReasonDialogComponent,
     SubmitQuestDialogComponent
   ],
