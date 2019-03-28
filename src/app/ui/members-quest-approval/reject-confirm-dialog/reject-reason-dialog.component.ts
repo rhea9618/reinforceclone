@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RejectReasonDialogComponent implements OnInit {
 
-  private reason: string;
+  reason: string;
 
   constructor() { }
 
