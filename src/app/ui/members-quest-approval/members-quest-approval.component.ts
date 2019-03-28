@@ -52,7 +52,7 @@ export class MembersQuestApprovalComponent implements OnInit {
       flatMap(result => {
         action = result;
         if (result === 'approved') {
-          return this.playerQuest.approveQuest(quest);
+          this.approveQuest(quest);
         } else if (result === 'rejected') {
           this.rejectQuest(quest);
         }
@@ -68,6 +68,31 @@ export class MembersQuestApprovalComponent implements OnInit {
           `Your quest: ${quest.questName} is ${action}!`);
       })
     ).subscribe((res) => console.log(res));
+  }
+
+
+  private approveQuest(quest: PlayerQuest) {
+    const exp = quest.required ? 10 : 5;
+    const subject = this.getEmailSubject(quest.required, quest.category, quest.playerName, true);
+    const body = this.getApprovedEmailBody(
+      quest.playerName,
+      quest.required,
+      quest.category,
+      quest.questName,
+      quest.source,
+      quest.created,
+      quest.completionProof,
+      exp
+    );
+
+    this.email.sendEmail(
+      quest.playerEmail,
+      subject,
+      body,
+      'HTML').subscribe(() =>
+      this.notify.update('Quest Completed', 'info'));
+
+    // return this.playerQuest.approveQuest(quest);
   }
 
   private rejectQuest(quest: PlayerQuest) {
@@ -113,22 +138,22 @@ export class MembersQuestApprovalComponent implements OnInit {
     questName: string,
     source: string,
     date: Timestamp,
-    reasonRes: string): string {
+    attachment: string,
+    xp: number): string {
     const requiredStr = required ? ` [Required] ` : ` [Additional] `;
     const body =
     `
-    <p>Hi ${name}!</p>
-
-    <p>Kindly revisit the details and resend completion for this quest.</p>
-
+    <p>Player ${name} has completed a quest!</p>
     <ul style='list-style: none;'>
       <li>Quest Type: ${requiredStr}</li>
       <li>Category: ${category}</li>
       <li>Quest: ${questName}</li>
       <li>Source: ${source}</li>
-      <li>Date Assigned: ${date}</li>
-      <li>Rejection Reason: ${reasonRes}</li>
+      <li>Date Assigned: ${date.toDate()}</li>
+      <li>Attachment: ${attachment}</li>
     </ul>
+
+    <p>Please visit your dashboard to award ${name} ${xp} xp.</p>
 
     <p>REWARDS AND RECOGNITION PH</p>
     `;
@@ -157,7 +182,7 @@ export class MembersQuestApprovalComponent implements OnInit {
       <li>Category: ${category}</li>
       <li>Quest: ${questName}</li>
       <li>Source: ${source}</li>
-      <li>Date Assigned: ${date}</li>
+      <li>Date Assigned: ${date.toDate()}</li>
       <li>Rejection Reason: ${reasonRes}</li>
     </ul>
 

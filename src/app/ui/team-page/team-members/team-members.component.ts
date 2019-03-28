@@ -5,6 +5,8 @@ import { map } from 'rxjs/operators';
 import { TeamsService } from 'src/app/teams/teams.service';
 import { PlayerPointsService } from '../../player-quest/player-points.service';
 import { ConfirmationModalService } from '../../confirmation-modal/confirmation-modal.service';
+import { UserService } from 'src/app/core/user.service';
+import { EmailService } from 'src/app/core/email.service';
 
 @Component({
   selector: 'team-members',
@@ -21,6 +23,8 @@ export class TeamMembersComponent implements OnInit {
   readonly memberColumns = ['displayName', 'exp', 'seasonRank', 'kickButton'];
 
   constructor(
+    private userService: UserService,
+    private email: EmailService,
     private confirmationModal: ConfirmationModalService,
     private teamsService: TeamsService,
     private playerPointsService: PlayerPointsService
@@ -50,7 +54,10 @@ export class TeamMembersComponent implements OnInit {
 
     this.confirmationModal.showConfirmation({ message }).subscribe(result => {
       if (result) {
-        this.teamsService.removeTeamMember(uid);
+        this.userService.getUser(uid).subscribe(usr => {
+          this.emailRemovedPlayer(usr.displayName, usr.email);
+        });
+        // this.teamsService.removeTeamMember(uid);
       }
     });
   }
@@ -89,6 +96,25 @@ export class TeamMembersComponent implements OnInit {
     });
 
     return membership;
+  }
+
+  private emailRemovedPlayer(name: string, playerEmail: string) {
+    const subject = `[Gamification of Learnings and Certifications]  ${name}, it’s time to join another team`;
+    const body = `<p> Hi ${name}, </p>
+    <p>
+    We are sorry to inform you that you have been kicked out from your current team
+    </p>
+    <p>
+    Visit your dashboard to join another team.
+    </p>
+
+    REWARDS AND RECOGNITION PH`;
+
+    this.email.sendEmail(
+      playerEmail,
+      subject,
+      body,
+      'HTML').subscribe();
   }
 
 }
