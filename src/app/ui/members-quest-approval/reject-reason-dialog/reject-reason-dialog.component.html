@@ -1,0 +1,14 @@
+<div class="container">
+  <p>Are you sure you want to Reject this Quest?</p>
+  <mat-form-field>
+    <textarea matInput
+    rows="1"
+    placeholder="Reason for Rejection (Optional)"
+    [(ngModel)]="reason"></textarea>
+  </mat-form-field>
+
+  <div mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="reason" color="accent">Reject Quest</button>
+    <button mat-button [mat-dialog-close]="'cancel'">Cancel</button>
+  </div>
+</div>

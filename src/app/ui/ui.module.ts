@@ -44,6 +44,7 @@ import { NicknamePipe } from './nickname.pipe';
 import { SeasonRankPipe } from './season-rank.pipe';
 
 import { PlayerPointsService } from './player-quest/player-points.service';
+import { RejectReasonDialogComponent } from './members-quest-approval/reject-reason-dialog/reject-reason-dialog.component';
 
 @NgModule({
   imports: [
@@ -89,11 +90,13 @@ import { PlayerPointsService } from './player-quest/player-points.service';
     TeamMembersComponent,
     NicknamePipe,
     SeasonRankPipe,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    RejectReasonDialogComponent
   ],
   entryComponents: [
     ConfirmationModalComponent,
     QuestApprovalDialogComponent,
+    RejectReasonDialogComponent,
     SubmitQuestDialogComponent
   ],
   exports: [

@@ -31,7 +31,7 @@ export class TeamsService {
   }
 
   addToTeam(uid: string) {
-    this.membersCollection.doc<Membership>(uid).update({
+    return this.membersCollection.doc<Membership>(uid).update({
       isApproved: true
     });
   }
@@ -77,6 +77,6 @@ export class TeamsService {
   }
 
   removeTeamMember(uid: string) {
-    this.membersCollection.doc<Membership>(uid).delete();
+    return this.membersCollection.doc<Membership>(uid).delete();
   }
 }

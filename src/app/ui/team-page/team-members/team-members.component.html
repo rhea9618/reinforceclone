@@ -29,7 +29,7 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let member">
         <button mat-button *ngIf="kickButtonisVisible(member.uid)"
-        (click)="removeTeamMember(member.uid, member.displayName)">Kick</button>
+        (click)="removeTeamMember(member)">Kick</button>
       </td>
   </ng-container>
 
