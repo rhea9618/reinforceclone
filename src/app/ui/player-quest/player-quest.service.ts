@@ -165,6 +165,11 @@ export class PlayerQuestService {
         if (playerPoints.exists) {
           totalPoints = Number(playerPoints.data().totalPoints);
           totalQuests = Number(playerPoints.data().totalQuests);
+
+          if (playerPoints.data().teamId !== quest.teamId) {
+            // Catch for the scenario where they don't match.
+            initialData = { teamId: quest.teamId };
+          }
         } else {
           initialData = {
             seasonId: quest.seasonId,
