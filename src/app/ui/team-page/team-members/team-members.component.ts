@@ -49,15 +49,14 @@ export class TeamMembersComponent implements OnInit {
     return this.currentUser.membership.isLead && (uid !== this.currentUser.uid);
   }
 
-  removeTeamMember(uid: string, user: string) {
-    const message = `Are you sure you want to kick ${user}?`;
+  removeTeamMember(user: Membership) {
+    const message = `Are you sure you want to kick ${user.displayName}?`;
 
     this.confirmationModal.showConfirmation({ message }).subscribe(result => {
       if (result) {
-        this.userService.getUser(uid).subscribe(usr => {
-          this.emailRemovedPlayer(usr.displayName, usr.email);
+        this.teamsService.removeTeamMember(user.uid).then(() => {
+          this.emailRemovedPlayer(user.displayName, user.email);
         });
-        // this.teamsService.removeTeamMember(uid);
       }
     });
   }

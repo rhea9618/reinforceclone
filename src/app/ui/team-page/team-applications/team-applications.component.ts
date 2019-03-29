@@ -28,18 +28,16 @@ export class TeamApplicationsComponent implements OnInit {
     }
   }
 
-  addTeamMember(uid) {
-    this.userService.getUser(uid).subscribe(user => {
+  addTeamMember(user: Membership) {
+    this.teamsService.addToTeam(user.uid).then(() => {
       this.emailAddedPlayer(user.displayName, user.email);
     });
-    this.teamsService.addToTeam(uid);
   }
 
-  removeTeamMember(uid) {
-    this.userService.getUser(uid).subscribe(user => {
+  removeTeamMember(user: Membership) {
+    this.teamsService.removeTeamMember(user.uid).then(() => {
       this.emailRemovedPlayer(user.displayName, user.email);
     });
-    this.teamsService.removeTeamMember(uid);
   }
 
   private emailAddedPlayer(name: string, playerEmail: string) {

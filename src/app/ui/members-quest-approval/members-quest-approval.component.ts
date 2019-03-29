@@ -10,7 +10,7 @@ import { NotifyService } from 'src/app/core/notify.service';
 import { SeasonService } from 'src/app/core/season.service';
 import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
-import { RejectReasonDialogComponent } from './reject-confirm-dialog/reject-reason-dialog.component';
+import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component';
 
 @Component({
   selector: 'members-quest-approval',
@@ -85,14 +85,14 @@ export class MembersQuestApprovalComponent implements OnInit {
       exp
     );
 
-    this.email.sendEmail(
-      quest.playerEmail,
-      subject,
-      body,
-      'HTML').subscribe(() =>
-      this.notify.update('Quest Completed', 'info'));
-
-    // return this.playerQuest.approveQuest(quest);
+    this.playerQuest.approveQuest(quest).subscribe(() => {
+      this.email.sendEmail(
+        quest.playerEmail,
+        subject,
+        body,
+        'HTML');
+      this.notify.update('Quest Completed', 'info');
+    });
   }
 
   private rejectQuest(quest: PlayerQuest) {
@@ -109,14 +109,14 @@ export class MembersQuestApprovalComponent implements OnInit {
           quest.created,
           reasonRes);
 
-        this.email.sendEmail(
-          quest.playerEmail,
-          subject,
-          body,
-          'HTML').subscribe(() =>
-          this.notify.update('Quest Rejected', 'info'));
-
-          return this.playerQuest.rejectQuest(quest);
+          this.playerQuest.rejectQuest(quest).subscribe(() => {
+            this.email.sendEmail(
+              quest.playerEmail,
+              subject,
+              body,
+              'HTML');
+            this.notify.update('Quest Rejected', 'info');
+          });
       }
     });
   }
