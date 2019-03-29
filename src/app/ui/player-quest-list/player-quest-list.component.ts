@@ -59,12 +59,7 @@ export class PlayerQuestListComponent implements OnInit {
       if (data && data.questId) {
         this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
           .then(() => {
-            this.emailService.sendEmail(playerQuest.teamLeadEmail,
-              'Leader Board: Player Quest Submitted',
-              `Player ${playerQuest.playerName} has completed the quest '${playerQuest.questName}'. Kindly validate the quest completion.`
-            ).subscribe(() => {
-              this.notifyService.update(`Your quest has been submitted to your team lead for validation.`);
-            });
+            this.sendQuestSubmittedEmail(playerQuest);
           })
           .catch((err) => {
             console.log(err);
@@ -81,6 +76,31 @@ export class PlayerQuestListComponent implements OnInit {
       Category: ${quest.category}<br/>
       Quest: ${quest.questName}<br/>
       Source: ${quest.source}<br/>`;
+  }
+
+  private sendQuestSubmittedEmail(quest: PlayerQuest) {
+    const type = quest.required ? 'Required' : 'Additional';
+    const xp = quest.required ? '10 XP' : '5 XP';
+    const subjectPrefix = '[Gamification of Learnings and Certifications]';
+    const subject = `${subjectPrefix} [${type}] [${quest.category}] Validation of Quest Completion for ${quest.playerName}`;
+    const dashboardUrl = `${environment.firebase.authDomain}/profile`;
+    const questInfo = this.questInfoEmail(quest);
+    const attachment = quest.completionProof ?
+      `<a href="${quest.completionProof}">${quest.completionProof}</a><br/>` : '<br/>';
+    const content =
+      `Hi ${quest.playerName}!<br/>
+      <br/>
+      Your quest below has been cancelled.<br/>
+      <br/>
+      ${questInfo}
+      ${attachment}
+      <br/>
+      Visit your <a href="${dashboardUrl}"">dashboard</a> to award ${quest.playerName} ${xp}<br/>
+      <br/>
+      REWARDS AND RECOGNITION PH`;
+
+    this.emailService.sendEmail(quest.teamLeadEmail, subject, content, 'HTML')
+      .subscribe(() => this.notifyService.update(`${quest.questName} submitted!`));
   }
 
   private sendQuestUpdatedEmail(quest: PlayerQuest) {
