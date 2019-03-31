@@ -41,22 +41,20 @@ export class TeamApplicationsComponent implements OnInit {
   }
 
   private emailAddedPlayer(name: string, playerEmail: string) {
+    console.log(playerEmail);
     const subject = `[Gamification of Learnings and Certifications] Congratulations for making it to the team!`;
     const body = `<p> Hi ${name}, </p>
-    <p>
-    Amazing adventures await you!
-    </p>
-    <p>
-    Visit your dashboard to start your quests.
-    </p>
 
-    REWARDS AND RECOGNITION PH`;
+    <p>Amazing adventures await you!<p>
+    <p>Visit your <a href='https://leaderboard-79b77.firebaseapp.com/profile'>dashboard</a> to start your quests.</p>
+    `;
 
     this.email.sendEmail(
       [playerEmail],
       subject,
       body,
-      'HTML').subscribe((res) => console.log(res));
+      'HTML').subscribe();
+
   }
 
   private emailRemovedPlayer(name: string, playerEmail: string) {
@@ -66,7 +64,7 @@ export class TeamApplicationsComponent implements OnInit {
     We are sorry to inform you that you have been kicked out from your current team
     </p>
     <p>
-    Visit your dashboard to join another team.
+    Visit your <a href='https://leaderboard-79b77.firebaseapp.com/profile'>dashboard</a> to join another team.
     </p>
 
     REWARDS AND RECOGNITION PH`;

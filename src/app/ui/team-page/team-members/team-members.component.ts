@@ -97,8 +97,25 @@ export class TeamMembersComponent implements OnInit {
     return membership;
   }
 
+
+  private emailAddedPlayer(name: string, playerEmail: string) {
+    const subject = `[Gamification of Learnings and Certifications] Congratulations for making it to the team!`;
+    const body = `<p> Hi ${name}, </p>
+
+    <p>Amazing adventures await you!<p>
+    <p>Visit your <a href='https://leaderboard-79b77.firebaseapp.com/profile'>dashboard</a> to start your quests.</p>
+    `;
+
+    this.email.sendEmail(
+      playerEmail,
+      subject,
+      body,
+      'HTML').subscribe();
+
+  }
+
   private emailRemovedPlayer(name: string, playerEmail: string) {
-    const subject = `[Gamification of Learnings and Certifications]  ${name}, it’s time to join another team`;
+    const subject = `[Gamification of Learnings and Certifications] ${name}, it’s time to join another team`;
     const body = `<p> Hi ${name}, </p>
     <p>
     We are sorry to inform you that you have been kicked out from your current team
