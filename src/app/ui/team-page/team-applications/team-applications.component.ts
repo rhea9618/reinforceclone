@@ -41,7 +41,6 @@ export class TeamApplicationsComponent implements OnInit {
   }
 
   private emailAddedPlayer(name: string, playerEmail: string) {
-    console.log(playerEmail);
     const subject = `[Gamification of Learnings and Certifications] Congratulations for making it to the team!`;
     const body = `<p> Hi ${name}, </p>
 

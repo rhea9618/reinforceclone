@@ -15,9 +15,8 @@ export class TeamsService {
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(uid: string, displayName: string, email: string, teamId: string) {
-    this.teamsCollection.doc<Team>(teamId).valueChanges().subscribe(team => {
-      console.log(team.name);
+  addMembership(uid: string, displayName: string, email: string, teamId: string, emailService?: Function) {
+    return this.teamsCollection.doc<Team>(teamId).valueChanges().subscribe(team => {
       this.membersCollection.doc<Membership>(uid).set({
         uid: uid,
         isApproved: false,
@@ -26,6 +25,19 @@ export class TeamsService {
         teamName: team.name,
         displayName: displayName,
         email: email
+      });
+
+      const leadMembersCollection: AngularFirestoreCollection<Membership> = this.afs.collection('membership', ref =>
+        ref.where('teamId', '==', teamId).where('isLead', '==', true));
+
+      const leadsObservable = leadMembersCollection.snapshotChanges().pipe(
+        map((members) => members.map(item => item.payload.doc.data()))
+      );
+
+      leadsObservable.subscribe(leads => {
+        leads.forEach(lead => {
+          emailService(displayName, lead.email);
+        });
       });
     });
   }
