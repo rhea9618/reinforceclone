@@ -1,12 +1,14 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { combineLatest, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 import { TeamsService } from 'src/app/teams/teams.service';
 import { PlayerPointsService } from '../../player-quest/player-points.service';
 import { ConfirmationModalService } from '../../confirmation-modal/confirmation-modal.service';
 import { UserService } from 'src/app/core/user.service';
 import { EmailService } from 'src/app/core/email.service';
+import { NotifyService } from 'src/app/core/notify.service';
 
 @Component({
   selector: 'team-members',
@@ -23,7 +25,7 @@ export class TeamMembersComponent implements OnInit {
   readonly memberColumns = ['displayName', 'exp', 'seasonRank', 'kickButton'];
 
   constructor(
-    private userService: UserService,
+    private notify: NotifyService,
     private email: EmailService,
     private confirmationModal: ConfirmationModalService,
     private teamsService: TeamsService,
@@ -97,31 +99,15 @@ export class TeamMembersComponent implements OnInit {
     return membership;
   }
 
-
-  private emailAddedPlayer(name: string, playerEmail: string) {
-    const subject = `[Gamification of Learnings and Certifications] Congratulations for making it to the team!`;
-    const body = `<p> Hi ${name}, </p>
-
-    <p>Amazing adventures await you!<p>
-    <p>Visit your <a href='https://leaderboard-79b77.firebaseapp.com/profile'>dashboard</a> to start your quests.</p>
-    `;
-
-    this.email.sendEmail(
-      playerEmail,
-      subject,
-      body,
-      'HTML').subscribe();
-
-  }
-
   private emailRemovedPlayer(name: string, playerEmail: string) {
+    const dashboardLink = environment.firebase.authDomain + '/profile';
     const subject = `[Gamification of Learnings and Certifications] ${name}, it’s time to join another team`;
     const body = `<p> Hi ${name}, </p>
     <p>
     We are sorry to inform you that you have been kicked out from your current team
     </p>
     <p>
-    Visit your dashboard to join another team.
+    Visit your <a href='${dashboardLink}'>dashboard</a> to join another team.
     </p>
 
     REWARDS AND RECOGNITION PH`;
@@ -130,7 +116,9 @@ export class TeamMembersComponent implements OnInit {
       [playerEmail],
       subject,
       body,
-      'HTML').subscribe();
+      'HTML').subscribe(() => {
+        this.notify.update('Player Removed from Team', 'info');
+      });
   }
 
 }
