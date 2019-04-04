@@ -2,7 +2,6 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { TeamsService } from 'src/app/teams/teams.service';
-import { UserService } from 'src/app/core/user.service';
 import { EmailService } from 'src/app/core/email.service';
 import { environment } from 'src/environments/environment';
 import { NotifyService } from 'src/app/core/notify.service';
