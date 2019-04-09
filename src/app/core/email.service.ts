@@ -32,7 +32,9 @@ export class EmailService {
     );
   }
 
-  sendEmail(emailAddress: string, subject: string, content: string, contentType: 'Text' | 'HTML' = 'Text') {
+  sendEmail(emailAddress: string[], subject: string, content: string, contentType: 'Text' | 'HTML' = 'Text', ccEmailAddress: string[] = []) {
+    const toRecipients = emailAddress.map((address) => ({ emailAddress:{ address } }));
+    const ccRecipients = ccEmailAddress.map((address) => ({ emailAddress:{ address } }));
     const body = {
       message: {
         subject,
@@ -40,13 +42,8 @@ export class EmailService {
           contentType,
           content
         },
-        toRecipients: [
-          {
-            emailAddress: {
-              address: emailAddress
-            }
-          }
-        ]
+        toRecipients,
+        ccRecipients
       },
       saveToSentItems: false
     };

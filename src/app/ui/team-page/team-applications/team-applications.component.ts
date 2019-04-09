@@ -53,7 +53,7 @@ export class TeamApplicationsComponent implements OnInit {
     REWARDS AND RECOGNITION PH`;
 
     this.email.sendEmail(
-      playerEmail,
+      [playerEmail],
       subject,
       body,
       'HTML').subscribe((res) => console.log(res));
@@ -72,7 +72,7 @@ export class TeamApplicationsComponent implements OnInit {
     REWARDS AND RECOGNITION PH`;
 
     this.email.sendEmail(
-      playerEmail,
+      [playerEmail],
       subject,
       body,
       'HTML').subscribe();

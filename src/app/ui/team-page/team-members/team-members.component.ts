@@ -110,7 +110,7 @@ export class TeamMembersComponent implements OnInit {
     REWARDS AND RECOGNITION PH`;
 
     this.email.sendEmail(
-      playerEmail,
+      [playerEmail],
       subject,
       body,
       'HTML').subscribe();

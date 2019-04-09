@@ -63,7 +63,7 @@ export class MembersQuestApprovalComponent implements OnInit {
         const status = action === 'approved' ? 'success' : 'error';
         this.notify.update(`${quest.questName} by ${quest.playerName} is ${action}!`, status);
         return this.email.sendEmail(
-          quest.playerEmail,
+          [quest.playerEmail],
           `Your quest: ${quest.questName} is ${action}!`,
           `Your quest: ${quest.questName} is ${action}!`);
       })
@@ -87,7 +87,7 @@ export class MembersQuestApprovalComponent implements OnInit {
 
     this.playerQuest.approveQuest(quest).subscribe(() => {
       this.email.sendEmail(
-        quest.playerEmail,
+        [quest.playerEmail],
         subject,
         body,
         'HTML');
@@ -111,7 +111,7 @@ export class MembersQuestApprovalComponent implements OnInit {
 
           this.playerQuest.rejectQuest(quest).subscribe(() => {
             this.email.sendEmail(
-              quest.playerEmail,
+              [quest.playerEmail],
               subject,
               body,
               'HTML');

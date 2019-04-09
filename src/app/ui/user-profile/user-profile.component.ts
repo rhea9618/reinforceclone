@@ -89,7 +89,7 @@ export class UserProfileComponent implements OnInit {
       REWARDS AND RECOGNITION PH`;
 
 
-    this.emailService.sendEmail(quest.playerEmail, subject, content, 'HTML')
+    this.emailService.sendEmail([quest.playerEmail], subject, content, 'HTML')
       .subscribe(() => this.notifyService.update('Assign quest successful!', 'success'));
   }
 

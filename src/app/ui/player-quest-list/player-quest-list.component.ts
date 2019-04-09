@@ -99,7 +99,7 @@ export class PlayerQuestListComponent implements OnInit {
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-    this.emailService.sendEmail(quest.teamLeadEmail, subject, content, 'HTML')
+    this.emailService.sendEmail([quest.teamLeadEmail], subject, content, 'HTML')
       .subscribe(() => this.notifyService.update(`${quest.questName} submitted!`));
   }
 
@@ -121,7 +121,7 @@ export class PlayerQuestListComponent implements OnInit {
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-    this.emailService.sendEmail(quest.playerEmail, subject, content, 'HTML')
+    this.emailService.sendEmail([quest.playerEmail], subject, content, 'HTML')
       .subscribe(() => this.notifyService.update(`${quest.questName} updated!`));
   }
 
@@ -153,7 +153,7 @@ export class PlayerQuestListComponent implements OnInit {
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-    this.emailService.sendEmail(quest.playerEmail, subject, content, 'HTML')
+    this.emailService.sendEmail([quest.playerEmail], subject, content, 'HTML')
       .subscribe(() => this.notifyService.update(`${quest.questName} deleted!`));
   }
 
