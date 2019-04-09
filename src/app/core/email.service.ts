@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MsalService} from '@azure/msal-angular';
 import { Observable, from, of } from 'rxjs';
-import { catchError, flatMap } from 'rxjs/operators';
+import { catchError, flatMap, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,12 @@ export class EmailService {
     private msalService: MsalService
   ) {}
 
+  private loginAndGetToken() {
+    return from(this.msalService.loginPopup(this.scopes)).pipe(
+      tap((result => console.log(result)))
+    );
+  }
+
   getToken(): Observable<string> {
     const cache = this.msalService.getCachedTokenInternal(this.scopes);
     if (cache && cache.token) {
@@ -28,13 +34,23 @@ export class EmailService {
         console.log(error);
         // try to retrieve token thru popup
         return from(this.msalService.acquireTokenPopup(this.scopes));
+      }),
+      // User login must be required
+      catchError((error) => {
+        return from(this.loginAndGetToken());
       })
     );
   }
 
-  sendEmail(emailAddress: string[], subject: string, content: string, contentType: 'Text' | 'HTML' = 'Text', ccEmailAddress: string[] = []) {
-    const toRecipients = emailAddress.map((address) => ({ emailAddress:{ address } }));
-    const ccRecipients = ccEmailAddress.map((address) => ({ emailAddress:{ address } }));
+  sendEmail(
+    emailAddress: string[],
+    subject: string,
+    content: string,
+    contentType: 'Text' | 'HTML' = 'Text',
+    ccEmailAddress: string[] = []
+  ) {
+    const toRecipients = emailAddress.map((address) => ({emailAddress: {address}}));
+    const ccRecipients = ccEmailAddress.map((address) => ({emailAddress: {address}}));
     const body = {
       message: {
         subject,
