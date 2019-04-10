@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, DocumentChangeAction } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { EmailService } from '../core/email.service';
 
 @Injectable()
 export class TeamsService {
@@ -10,12 +11,12 @@ export class TeamsService {
   membersCollection: AngularFirestoreCollection<Membership>;
   teamsCollection: AngularFirestoreCollection<Team>;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(private afs: AngularFirestore, private emailService: EmailService) {
     this.membersCollection = this.afs.collection('membership');
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(uid: string, displayName: string, email: string, teamId: string, emailService?: Function) {
+  addMembership(uid: string, displayName: string, email: string, teamId: string, emailSender?: Function) {
     return this.teamsCollection.doc<Team>(teamId).valueChanges().subscribe(team => {
       this.membersCollection.doc<Membership>(uid).set({
         uid: uid,
@@ -35,9 +36,12 @@ export class TeamsService {
       );
 
       leadsObservable.subscribe(leads => {
+        const emails: string[] = [];
         leads.forEach(lead => {
-          emailService(displayName, lead.email);
+          emails.push(lead.email);
         });
+
+        emailSender(displayName, emails);
       });
     });
   }

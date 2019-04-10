@@ -29,7 +29,7 @@ export class JoinTeamPageComponent implements OnInit {
     this.teamsService.removeTeamMember(user.uid);
   }
 
-  private emailLead(name: string, leadEmail: string) {
+  private emailLead(name: string, leadEmails: string[]) {
     const dashboardLink = environment.firebase.authDomain + '/profile';
     const subject = `[Gamification of Learnings and Certifications] ${name} wants to join your team!`;
     const body = `<p>Player Name: ${name}</p>
@@ -38,7 +38,7 @@ export class JoinTeamPageComponent implements OnInit {
     `;
 
     this.email.sendEmail(
-      leadEmail,
+      leadEmails,
       subject,
       body,
       'HTML').subscribe();
