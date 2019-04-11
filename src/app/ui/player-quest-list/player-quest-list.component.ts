@@ -54,12 +54,12 @@ export class PlayerQuestListComponent implements OnInit {
   }
 
   public openSubmitQuestDialog(playerQuest: PlayerQuest) {
-    const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent, { data: playerQuest, width: '600px'});
+    const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent, { data: playerQuest, width: '400px' });
     submitQuestDialog.afterClosed().subscribe( data => {
       if (data && data.questId) {
         this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
           .then(() => {
-            this.sendQuestSubmittedEmail(playerQuest);
+            this.sendQuestSubmittedEmail({...playerQuest, ...data});
           })
           .catch((err) => {
             console.log(err);
@@ -88,14 +88,13 @@ export class PlayerQuestListComponent implements OnInit {
     const attachment = quest.completionProof ?
       `<a href="${quest.completionProof}">${quest.completionProof}</a><br/>` : '<br/>';
     const content =
-      `Hi ${quest.playerName}!<br/>
-      <br/>
-      Your quest below has been cancelled.<br/>
+      `Player ${quest.playerName} has completed a quest!<br/>
       <br/>
       ${questInfo}
-      ${attachment}
+      Date Completed: ${quest.completed}<br/>
+      Attachment: ${attachment}
       <br/>
-      Visit your <a href="${dashboardUrl}"">dashboard</a> to award ${quest.playerName} ${xp}<br/>
+      Visit your <a href="${dashboardUrl}">dashboard</a> to award ${quest.playerName} ${xp}<br/>
       <br/>
       REWARDS AND RECOGNITION PH`;
 
@@ -117,7 +116,7 @@ export class PlayerQuestListComponent implements OnInit {
       ${questInfo}
       <br/>
       Amazing adventures await you!<br/>
-      Visit your <a href="${dashboardUrl}"">dashboard</a> to start your quests.<br/>
+      Visit your <a href="${dashboardUrl}">dashboard</a> to start your quests.<br/>
       <br/>
       REWARDS AND RECOGNITION PH`;
 

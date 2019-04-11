@@ -17,7 +17,7 @@ export class AddQuestDialogService {
   ) {}
 
   private showQuestModal(data: Partial<PlayerQuest>): Observable<PlayerQuest> {
-    return this.dialog.open(AddQuestDialogComponent, { data }).afterClosed();
+    return this.dialog.open(AddQuestDialogComponent, { data, width: '400px' }).afterClosed();
   }
 
   /**

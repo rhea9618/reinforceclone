@@ -35,8 +35,9 @@ export class EmailService {
         // try to retrieve token thru popup
         return from(this.msalService.acquireTokenPopup(this.scopes));
       }),
-      // User login must be required
       catchError((error) => {
+        console.log(error);
+        // User login must be required
         return from(this.loginAndGetToken());
       })
     );

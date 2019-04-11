@@ -1,17 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'reject-reason-dialog',
   templateUrl: './reject-reason-dialog.component.html',
   styleUrls: ['./reject-reason-dialog.component.scss']
 })
-export class RejectReasonDialogComponent implements OnInit {
+export class RejectReasonDialogComponent {
 
   reason: string;
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  constructor() {}
 }
