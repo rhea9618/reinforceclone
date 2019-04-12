@@ -16,33 +16,15 @@ export class TeamsService {
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(uid: string, displayName: string, email: string, teamId: string, emailSender?: Function) {
-    return this.teamsCollection.doc<Team>(teamId).valueChanges().subscribe(team => {
-      this.membersCollection.doc<Membership>(uid).set({
-        uid: uid,
-        isApproved: false,
-        isLead: false,
-        teamId: teamId,
-        teamName: team.name,
-        displayName: displayName,
-        email: email
-      });
-
-      const leadMembersCollection: AngularFirestoreCollection<Membership> = this.afs.collection('membership', ref =>
-        ref.where('teamId', '==', teamId).where('isLead', '==', true));
-
-      const leadsObservable = leadMembersCollection.snapshotChanges().pipe(
-        map((members) => members.map(item => item.payload.doc.data()))
-      );
-
-      leadsObservable.subscribe(leads => {
-        const emails: string[] = [];
-        leads.forEach(lead => {
-          emails.push(lead.email);
-        });
-
-        emailSender(displayName, emails);
-      });
+  addMembership(uid: string, displayName: string, email: string, teamId: string, teamName: string) {
+    return this.membersCollection.doc<Membership>(uid).set({
+      uid: uid,
+      isApproved: false,
+      isLead: false,
+      teamId: teamId,
+      teamName: teamName,
+      displayName: displayName,
+      email: email
     });
   }
 
@@ -66,6 +48,15 @@ export class TeamsService {
     );
   }
 
+  getTeamLeadEmails(teamId: string): Observable<string[]> {
+    const leadMembersCollection: AngularFirestoreCollection<Membership> = this.afs.collection('membership', ref =>
+    ref.where('teamId', '==', teamId).where('isLead', '==', true));
+
+    return leadMembersCollection.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data().email))
+    );
+  }
+
   getTeamMembers(teamId: string, isApproved = true): Observable<Membership[]> {
     this.membersCollection = this.afs.collection('membership', ref =>
       ref.where('teamId', '==', teamId).where('isApproved', '==', isApproved));
@@ -77,6 +68,12 @@ export class TeamsService {
   getTeamId(uid: string): Observable<string> {
     return this.getMembership(uid).pipe(
       map((membership: Membership) => membership ? membership.teamId : null)
+    );
+  }
+
+  getTeamName(teamId: string): Observable<string> {
+    return this.teamsCollection.doc<Team>(teamId).valueChanges().pipe(
+      map( (team: Team) => team.name )
     );
   }
 
