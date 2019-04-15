@@ -6,6 +6,7 @@ import { AuthService } from '../../core/auth.service';
 import { TeamsService } from 'src/app/teams/teams.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
+import { flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'join-team-page',
@@ -26,12 +27,13 @@ export class JoinTeamPageComponent implements OnInit {
   }
 
   applyForTeam(user: User, teamId: string, teamName: string) {
-    this.teamsService.addMembership(user.uid, user.displayName, user.email, teamId, teamName).then(() => {
-      this.teamsService.getTeamLeadEmails(teamId).subscribe((teamLeadEmails: string[]) => {
-      this.emailLeads(user.displayName, teamLeadEmails);
+    Observable.fromPromise(
+      this.teamsService.addMembership(user.uid, user.displayName, user.email, teamId, teamName)).pipe(
+        flatMap(() => this.teamsService.getTeamLeadEmails(teamId))
+      ).subscribe((teamLeadEmails: string[]) => {
+        this.emailLeads(user.displayName, teamLeadEmails);
         this.notify.update(`Applied for ${teamName}`);
       });
-    });
   }
 
   cancelApplication(user: User) {
