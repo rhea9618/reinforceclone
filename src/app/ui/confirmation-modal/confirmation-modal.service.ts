@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, of, EMPTY } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
 
 import { ConfirmationModalComponent } from './confirmation-modal.component';
 
@@ -19,6 +20,8 @@ export class ConfirmationModalService {
     const assignQuestDialog =
       this.dialog.open(ConfirmationModalComponent, { data }) as MatDialogRef<ConfirmationModalComponent, boolean>;
 
-    return assignQuestDialog.afterClosed();
+    return assignQuestDialog.afterClosed().pipe(
+      flatMap(yes => yes ? of(true) : EMPTY)
+    );
   }
 }

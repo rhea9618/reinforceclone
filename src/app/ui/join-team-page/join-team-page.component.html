@@ -1,11 +1,39 @@
-<ul *ngIf="auth.user$ | async as user">
-  <li *ngFor="let team of teams$ | async">
-    {{ team.name }}
-    <button *ngIf="!user.membership" (click)="applyForTeam(user, team.id)">
-      Join
-    </button>
-    <button *ngIf="user.membership?.teamId === team.id;" (click)="cancelApplication()">
-      Cancel Application
-    </button>
-  </li>
-</ul>
+<div class="content" *ngIf="auth.user$ | async as user">
+  <h3>Join a Team:</h3>
+  <table mat-table [dataSource]="teams$ | async">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Team Name </th>
+      <td mat-cell *matCellDef="let team"
+        [ngClass]="{ 'joined-team': user.membership?.teamId === team.id }">
+        {{team.name}}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef> Action </th>
+      <td mat-cell *matCellDef="let team">
+        <button mat-stroked-button color="primary" [disabled]="applyingTeam"
+          *ngIf="!user.membership" (click)="applyForTeam(user, team)">
+          Join
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Status </th>
+      <td mat-cell *matCellDef="let team">
+        <span class="joined-team" *ngIf="user.membership?.teamId === team.id">
+          Pending Team Lead Approval
+        </span>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: getDisplayedColumns(user);"></tr>
+  </table>
+</div>
+
+<ng-template #loadingTeams>
+  <span>Loading teams...</span>
+  <mat-spinner diameter="100"></mat-spinner>
+</ng-template>

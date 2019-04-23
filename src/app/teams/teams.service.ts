@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, DocumentChangeAction } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+
 
 @Injectable()
 export class TeamsService {
@@ -15,19 +15,16 @@ export class TeamsService {
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(uid: string, displayName: string, email: string, teamId: string) {
-    this.teamsCollection.doc<Team>(teamId).valueChanges().subscribe(team => {
-      console.log(team.name);
-      this.membersCollection.doc<Membership>(uid).set({
-        uid: uid,
-        isApproved: false,
-        isLead: false,
-        teamId: teamId,
-        teamName: team.name,
-        displayName: displayName,
-        email: email
-      });
-    });
+  addMembership(user: User, team: Team) {
+    return from(this.membersCollection.doc<Membership>(user.uid).set({
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      teamId: team.id,
+      teamName: team.name,
+      isApproved: false,
+      isLead: false
+    }));
   }
 
   addToTeam(uid: string) {
@@ -47,6 +44,15 @@ export class TeamsService {
           return { id: a.payload.doc.id, ...data };
         })
       )
+    );
+  }
+
+  getTeamLeadEmails(teamId: string): Observable<string[]> {
+    const leadMembersCollection: AngularFirestoreCollection<Membership> = this.afs.collection('membership', ref =>
+    ref.where('teamId', '==', teamId).where('isLead', '==', true));
+
+    return leadMembersCollection.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data().email))
     );
   }
 
