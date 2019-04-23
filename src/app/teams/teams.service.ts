@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, DocumentChangeAction } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { EmailService } from '../core/email.service';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+
 
 @Injectable()
 export class TeamsService {
@@ -11,21 +10,21 @@ export class TeamsService {
   membersCollection: AngularFirestoreCollection<Membership>;
   teamsCollection: AngularFirestoreCollection<Team>;
 
-  constructor(private afs: AngularFirestore, private emailService: EmailService) {
+  constructor(private afs: AngularFirestore) {
     this.membersCollection = this.afs.collection('membership');
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(uid: string, displayName: string, email: string, teamId: string, teamName: string) {
-    return this.membersCollection.doc<Membership>(uid).set({
-      uid: uid,
+  addMembership(user: User, team: Team) {
+    return from(this.membersCollection.doc<Membership>(user.uid).set({
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      teamId: team.id,
+      teamName: team.name,
       isApproved: false,
-      isLead: false,
-      teamId: teamId,
-      teamName: teamName,
-      displayName: displayName,
-      email: email
-    });
+      isLead: false
+    }));
   }
 
   addToTeam(uid: string) {
@@ -68,12 +67,6 @@ export class TeamsService {
   getTeamId(uid: string): Observable<string> {
     return this.getMembership(uid).pipe(
       map((membership: Membership) => membership ? membership.teamId : null)
-    );
-  }
-
-  getTeamName(teamId: string): Observable<string> {
-    return this.teamsCollection.doc<Team>(teamId).valueChanges().pipe(
-      map( (team: Team) => team.name )
     );
   }
 

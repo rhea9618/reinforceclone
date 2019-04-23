@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { Observable, EMPTY } from 'rxjs';
+import { flatMap, map } from 'rxjs/operators';
 
-import { AuthService } from '../../core/auth.service';
-import { TeamsService } from 'src/app/teams/teams.service';
+import { AuthService } from 'src/app/core/auth.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
-import { flatMap } from 'rxjs/operators';
+import { TeamsService } from 'src/app/teams/teams.service';
+import { environment } from 'src/environments/environment';
+import { ConfirmationModalService } from '../confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'join-team-page',
@@ -16,43 +17,57 @@ import { flatMap } from 'rxjs/operators';
 export class JoinTeamPageComponent implements OnInit {
 
   teams$: Observable<Team[]>;
+  applyingTeam = false;
+  private displayedColumns = ['name', 'action'];
 
-  constructor(public auth: AuthService,
-    private teamsService: TeamsService,
+  constructor(
+    public auth: AuthService,
+    private email: EmailService,
     private notify: NotifyService,
-    private email: EmailService) {}
+    private teams: TeamsService,
+    private confirmation: ConfirmationModalService
+  ) {}
 
   ngOnInit() {
-    this.teams$ = this.teamsService.getTeams();
+    this.teams$ = this.teams.getTeams();
   }
 
-  applyForTeam(user: User, teamId: string, teamName: string) {
-    Observable.fromPromise(
-      this.teamsService.addMembership(user.uid, user.displayName, user.email, teamId, teamName)).pipe(
-        flatMap(() => this.teamsService.getTeamLeadEmails(teamId))
-      ).subscribe((teamLeadEmails: string[]) => {
-        this.emailLeads(user.displayName, teamLeadEmails);
-        this.notify.update(`Applied for ${teamName}`);
-      });
-  }
+  getDisplayedColumns(user: User) {
+    if (user.membership) {
+      this.displayedColumns.splice(1, 1, 'status');
+    }
 
-  cancelApplication(user: User) {
-    this.teamsService.removeTeamMember(user.uid);
+    return this.displayedColumns;
   }
 
   private emailLeads(name: string, leadEmails: string[]) {
-    const dashboardLink = environment.firebase.authDomain + '/profile';
+    const dashboardLink = `${environment.firebase.authDomain}/profile`;
     const subject = `[Gamification of Learnings and Certifications] ${name} wants to join your team!`;
-    const body = `<p>Player Name: ${name}</p>
-
+    const body =
+    `
+    <p>Player Name: ${name}</p>
     <p>Please visit your <a href='${dashboardLink}'>dashboard</a> to approve request and assign quests.</p>
+    <p>REWARDS AND RECOGNITION PH</p>
     `;
 
-    this.email.sendEmail(
+    return this.email.sendEmail(
       leadEmails,
       subject,
       body,
-      'HTML').subscribe();
+      'HTML'
+    );
+   }
 
+  applyForTeam(user: User, team: Team) {
+    this.applyingTeam = true;
+    this.confirmation.showConfirmation({ message: `Are you sure to join ${team.name}?` }).pipe(
+      flatMap(() => this.teams.addMembership(user, team)),
+      flatMap(() => this.teams.getTeamLeadEmails(team.id)),
+      flatMap((leadEmails) => this.emailLeads(user.displayName, leadEmails))
+    ).subscribe(() => {
+      this.notify.update(`Now applied to ${team.name}`);
+    }, null, () => {
+      this.applyingTeam = false;
+    });
   }
 }
