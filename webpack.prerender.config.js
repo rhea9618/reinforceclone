@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const APP_NAME = 'firestarter';
+const APP_NAME = 'leaderboard';
 
 module.exports = {
   entry: {  prerender: './prerender.ts' },

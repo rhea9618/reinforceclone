@@ -54,7 +54,7 @@ export class SeasonService {
 
     return enabledSeasonQuery.snapshotChanges().pipe(
       first(),
-      map((actions) => actions[0].payload.doc.id)
+      map((actions) => actions[0] ? actions[0].payload.doc.id : null)
     );
   }
 

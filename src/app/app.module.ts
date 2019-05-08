@@ -37,7 +37,7 @@ import { TeamsModule } from './teams/teams.module';
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    AngularFireModule.initializeApp(environment.firebase, 'firestarter'),
+    AngularFireModule.initializeApp(environment.firebase, 'leaderboard'),
     AngularFirestoreModule,
     AngularFireAuthModule,
     AngularFireStorageModule,

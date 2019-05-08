@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/firestarter",
+    "public": "dist/leaderboard",
     "ignore": [
       "firebase.json",
       "**/.*",

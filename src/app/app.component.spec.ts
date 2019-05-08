@@ -20,7 +20,7 @@ describe('AppComponent', () => {
         UploadsModule,
         UiModule,
         NotesModule,
-        AngularFireModule.initializeApp(environment.firebase, 'firestarter'),
+        AngularFireModule.initializeApp(environment.firebase, 'leaderboard'),
         AngularFirestoreModule,
         AngularFireAuthModule,
         AngularFireStorageModule
