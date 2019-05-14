@@ -13,9 +13,7 @@ import { SeasonService } from '../../core/season.service';
 export class AdminPageComponent implements OnInit {
   readonly displayedColumns = [
     'name',
-    'created',
     'created_by',
-    'updated',
     'updated_by',
     'enabled',
     'action',
