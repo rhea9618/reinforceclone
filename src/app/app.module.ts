@@ -53,7 +53,7 @@ import { TeamsModule } from './teams/teams.module';
     MatSidenavModule,
     MatToolbarModule,
     MatTooltipModule,
-    MsalModule.forRoot({ clientID: '9fc78166-b1bb-4cc6-bb92-a2425705410a' }),
+    MsalModule.forRoot({ clientID: 'e6894d11-cb0a-4e71-b3ef-f10463b5b6dd' }),
     NotesModule,
     TeamsModule,
     UiModule,
