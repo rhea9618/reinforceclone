@@ -7,5 +7,6 @@ export const environment = {
     projectId: 'app-leaderboard',
     storageBucket: 'app-leaderboard.appspot.com',
     messagingSenderId: '495840246452'
-  }
+  },
+  clientID: 'e6894d11-cb0a-4e71-b3ef-f10463b5b6dd'
 };

@@ -1,8 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
+// Start writing Firebase Functions
+// https://firebase.google.com/docs/functions/typescript
 
 admin.initializeApp();
 export const createFirebaseToken = functions.https.onCall(async(data, context) => {

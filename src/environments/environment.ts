@@ -5,13 +5,14 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyAcTAtfn9scNwBhXA8ApGZBZlNsR57e4jU',
-    authDomain: 'app-leaderboard.firebaseapp.com',
-    databaseURL: 'https://app-leaderboard.firebaseio.com',
-    projectId: 'app-leaderboard',
-    storageBucket: 'app-leaderboard.appspot.com',
-    messagingSenderId: '495840246452'
-  }
+    apiKey: 'AIzaSyCiQOyWXs6bN_J_Cv3v-MoRi2Nee7VlKtI',
+    authDomain: 'leaderboard-79b77.firebaseapp.com',
+    databaseURL: 'https://leaderboard-79b77.firebaseio.com',
+    projectId: 'leaderboard-79b77',
+    storageBucket: 'leaderboard-79b77.appspot.com',
+    messagingSenderId: '519592004308'
+  },
+  clientID: '9fc78166-b1bb-4cc6-bb92-a2425705410a'
 };
 
 /*

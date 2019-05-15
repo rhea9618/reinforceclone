@@ -27,12 +27,8 @@ import { CoreModule } from './core/core.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { UiModule } from './ui/ui.module';
 import { NotesModule } from './notes/notes.module';
-
-import { functions } from 'firebase';
 import { TeamsModule } from './teams/teams.module';
 
-// IMPORTANT
-// Add your own project credentials to environments/*.ts
 
 @NgModule({
   declarations: [AppComponent],
@@ -53,7 +49,7 @@ import { TeamsModule } from './teams/teams.module';
     MatSidenavModule,
     MatToolbarModule,
     MatTooltipModule,
-    MsalModule.forRoot({ clientID: 'e6894d11-cb0a-4e71-b3ef-f10463b5b6dd' }),
+    MsalModule.forRoot({ clientID: environment.clientID }),
     NotesModule,
     TeamsModule,
     UiModule,

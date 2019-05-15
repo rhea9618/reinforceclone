@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "app-leaderboard"
+    "default": "app-leaderboard",
+    "staging": "leaderboard-79b77"
   }
 }
