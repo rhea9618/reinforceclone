@@ -15,7 +15,7 @@ Granted points are determined whether quests are required or not (10 xp for requ
 6. [Enable IAM API](https://firebase.google.com/docs/auth/admin/create-custom-tokens#iam_api_not_enabled)
 7. [Add Service Account Token Creator role to your service account](https://firebase.google.com/docs/auth/admin/create-custom-tokens#service_account_does_not_have_required_permissions)
 
-**Run locally via:** `npm run start`
+**Run locally via:** `npm run start` then open http://localhost:4200 on your browser
 
 
 **Deploy to Firebase via:** `firebase deploy`

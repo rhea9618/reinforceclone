@@ -1,31 +1,33 @@
 language: node_js
+# use version in `.nvmrc`
 node_js:
-  - "8.11.1"
+cache:
+  directories:
+    - node_modules
 
 branches:
   only:
-    - master
-    - staging
+  - master
+  - staging
 
 before_script:
   - npm install -g firebase-tools
   - npm install -g @angular/cli
-  - cd functions && npm install && npm run build
-  - cd ..
+  - npm run build:functions
 
 script:
   - npm run lint
-  - if [ "$TRAVIS_BRANCH" = "master" ]; then npm run build:prod; fi
-  - if [ "$TRAVIS_BRANCH" = "staging" ]; then npm run build; fi
-
-before_deploy:
+  - if [ branch = master ]; then npm run build:prod; fi
+  - if [ branch = staging ]; then npm run build; fi
 
 deploy:
   skip_cleanup: true
+  # production deployment
   - provider: firebase
     token: $FIREBASE_TOKEN
     on:
       branch: master
+  # staging deployment
   - provider: firebase
     project: staging
     token: $FIREBASE_TOKEN_STAGING
