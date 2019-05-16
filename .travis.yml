@@ -17,8 +17,8 @@ before_script:
 script:
   - npm run build:functions
   - npm run lint
-  - $TRAVIS_BRANCH == "master" && npm run build:prod
-  - $TRAVIS_BRANCH == "staging" && npm run build
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then npm run build:prod; fi
+  - if [ "$TRAVIS_BRANCH" == "staging" ]; then npm run build; fi
 
 deploy:
   # production deployment
