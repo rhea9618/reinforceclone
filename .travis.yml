@@ -17,12 +17,13 @@ before_script:
 script:
   - npm run build:functions
   - npm run lint
-  - if [ branch = master ]; then npm run build:prod; fi
-  - if [ branch = staging ]; then npm run build; fi
+  - $TRAVIS_BRANCH == "master" && npm run build:prod
+  - $TRAVIS_BRANCH == "staging" && npm run build
 
 deploy:
   # production deployment
   - provider: firebase
+    project: "default"
     token: $FIREBASE_TOKEN
     skip_cleanup: true
     on:
