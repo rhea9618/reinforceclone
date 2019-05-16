@@ -21,16 +21,17 @@ script:
   - if [ branch = staging ]; then npm run build; fi
 
 deploy:
-  skip_cleanup: true
   # production deployment
   - provider: firebase
     token: $FIREBASE_TOKEN
+    skip_cleanup: true
     on:
       branch: master
   # staging deployment
   - provider: firebase
     project: "staging"
     token: $FIREBASE_TOKEN_STAGING
+    skip_cleanup: true
     on:
       branch: staging
 
