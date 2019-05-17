@@ -9,7 +9,6 @@ import { SeasonService } from 'src/app/core/season.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 import { TeamsService } from 'src/app/teams/teams.service';
-import { environment } from 'src/environments/environment';
 import { PlayerPointsService } from '../player-quest/player-points.service';
 import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dialog.service';
 
@@ -40,7 +39,7 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit() {
     // debug mode true if locally run
-    this.debugMode = !environment.production;
+    this.debugMode = !this.auth.debugMode;
 
     // When visiting other player's profile
     this.checkUidParam(this.route.snapshot.queryParams);

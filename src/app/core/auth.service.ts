@@ -18,6 +18,7 @@ import { NotifyService } from './notify.service';
 import { UserService } from './user.service';
 import { TeamsService } from '../teams/teams.service';
 import { PlayerPointsService } from '../ui/player-quest/player-points.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
 
   user$: Observable<User>;
   isLoggingIn = false;
+  debugMode = !environment.production;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -109,7 +111,11 @@ export class AuthService {
       .signInWithPopup(provider)
       .then(credential => {
         this.notify.update('Welcome to LeaderBoard!!!', 'success');
-        return this.setUserDoc(credential.user);
+        return this.setUserDoc({
+          uid: credential.user.uid,
+          email: credential.user.email,
+          displayName: credential.user.displayName
+        });
       })
       .catch(error => this.handleError(error));
   }
