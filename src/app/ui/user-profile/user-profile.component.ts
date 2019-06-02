@@ -74,14 +74,14 @@ export class UserProfileComponent implements OnInit {
   private sendQuestAddedEmail(quest: PlayerQuest) {
     const type = quest.required ? 'Required' : 'Additional';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${quest.category}] Quest Added for ${quest.playerName}]`;
+    const subject = `${subjectPrefix} [${type}] [${quest.category.name}] Quest Added for ${quest.playerName}]`;
     const content =
       `Hi ${quest.playerName}!<br/>
       <br/>
       Below are the details for your quest. Good luck and may the odds be ever in your favor!<br/>
       <br/>
       Quest Type: ${type}<br/>
-      Category: ${quest.category}<br/>
+      Category: ${quest.category.name}<br/>
       Quest: ${quest.questName}<br/>
       Source: ${quest.source}<br/>
       <br/>

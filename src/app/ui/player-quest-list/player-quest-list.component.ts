@@ -73,7 +73,7 @@ export class PlayerQuestListComponent implements OnInit {
     const type = quest.required ? 'Required' : 'Additional';
     return `
       Quest Type: ${type}<br/>
-      Category: ${quest.category}<br/>
+      Category: ${quest.category.name}<br/>
       Quest: ${quest.questName}<br/>
       Source: ${quest.source}<br/>`;
   }
@@ -82,7 +82,7 @@ export class PlayerQuestListComponent implements OnInit {
     const type = quest.required ? 'Required' : 'Additional';
     const xp = quest.required ? '10 XP' : '5 XP';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${quest.category}] Validation of Quest Completion for ${quest.playerName}`;
+    const subject = `${subjectPrefix} [${type}] [${quest.category.name}] Validation of Quest Completion for ${quest.playerName}`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
     const questInfo = this.questInfoEmail(quest);
     const attachment = quest.completionProof ?
@@ -105,7 +105,7 @@ export class PlayerQuestListComponent implements OnInit {
   private sendQuestUpdatedEmail(quest: PlayerQuest) {
     const type = quest.required ? 'Required' : 'Additional';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} Revisit your [${type}] [${quest.category}] Quest Details`;
+    const subject = `${subjectPrefix} Revisit your [${type}] [${quest.category.name}] Quest Details`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
     const questInfo = this.questInfoEmail(quest);
     const content =
@@ -138,7 +138,7 @@ export class PlayerQuestListComponent implements OnInit {
   private sendQuestDeletedEmail(quest: PlayerQuest) {
     const type = quest.required ? 'Required' : 'Additional';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${quest.category}] Quest Cancelled`;
+    const subject = `${subjectPrefix} [${type}] [${quest.category.name}] Quest Cancelled`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
     const questInfo = this.questInfoEmail(quest);
     const content =
