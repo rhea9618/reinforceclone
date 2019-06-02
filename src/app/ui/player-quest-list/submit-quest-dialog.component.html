@@ -5,29 +5,29 @@
 <form [formGroup]="form">
   <div mat-dialog-content>
     <mat-form-field class="content" [floatLabel]="true">
-          <input matInput disabled placeholder="Category" value="{{data.category}}" />
-        </mat-form-field>
-        <br />
-        <mat-form-field>
-          <input matInput disabled placeholder="Quest Name" value="{{data.questName}}" />
-        </mat-form-field>
-        <br />
-        <mat-form-field>
-          <input matInput disabled placeholder="Source" value="{{data.source}}" />
-        </mat-form-field>
-        <br />
-        <mat-form-field>
-          <input matInput [matDatepicker]="picker" required [max]="currentDate" placeholder="Date Completed" formControlName="completed"/>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="hasError('completed','required')">Completion date is a required field</mat-error>
-        </mat-form-field>
-        <br />
-        <mat-form-field>
-          <input matInput placeholder="Proof of Completion" formControlName="completionProof"/>
-          <mat-error *ngIf="hasError('completionProof','pattern')">Please enter a valid link/url</mat-error>
-          <mat-hint>Enter link to the proof of quest completion</mat-hint>
-        </mat-form-field>
+      <input matInput disabled placeholder="Category" value="{{data.category.name}}" />
+    </mat-form-field>
+    <br />
+    <mat-form-field>
+      <input matInput disabled placeholder="Quest Name" value="{{data.questName}}" />
+    </mat-form-field>
+    <br />
+    <mat-form-field>
+      <input matInput disabled placeholder="Source" value="{{data.source}}" />
+    </mat-form-field>
+    <br />
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" required [max]="currentDate" placeholder="Date Completed" formControlName="completed"/>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="hasError('completed','required')">Completion date is a required field</mat-error>
+    </mat-form-field>
+    <br />
+    <mat-form-field>
+      <input matInput placeholder="Proof of Completion" formControlName="completionProof"/>
+      <mat-error *ngIf="hasError('completionProof','pattern')">Please enter a valid link/url</mat-error>
+      <mat-hint>Enter link to the proof of quest completion</mat-hint>
+    </mat-form-field>
   </div>
 
   <div mat-dialog-actions align="end">

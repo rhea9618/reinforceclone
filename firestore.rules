@@ -15,6 +15,11 @@ service cloud.firestore {
       allow write: if isOwner(userId);
     }
 
+    match /questCategories/{id} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
     match /playerQuests/{id} {
       allow read: if isPlayerQuestReadAllowed();
       allow create: if isTeamLead(incomingData().teamId);

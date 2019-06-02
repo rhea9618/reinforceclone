@@ -39,7 +39,7 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit() {
     // debug mode true if locally run
-    this.debugMode = !this.auth.debugMode;
+    this.debugMode = this.auth.debugMode;
 
     // When visiting other player's profile
     this.checkUidParam(this.route.snapshot.queryParams);

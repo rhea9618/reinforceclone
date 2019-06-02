@@ -4,14 +4,6 @@ declare const enum QuestStatus {
   COMPLETED = 'completed'
 }
 
-declare const enum QuestCategories {
-  INFOR_SPECIFIC = 'Core - Infor Specific',
-  SOFT_SKILL = 'Core - Soft Skill',
-  TECHNICAL = 'Product Specific - Technical',
-  FUNCTIONAL = 'Product Specific - Functional',
-  CERTIFICATION = 'Certification'
-}
-
 interface PlayerQuest {
   id?: string;
   seasonId: string;
@@ -27,7 +19,7 @@ interface PlayerQuest {
   completed?: firebase.firestore.Timestamp;
   completionProof?: string; // link to screenshot?
   questName: string;
-  source: string;  // e.g. LMS
+  source: string;    // e.g. LMS
   required: boolean; // true = 10 points granted, else 5 points
-  category: QuestCategories;
+  category: QuestCategory;
 }
