@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TeamsService } from './teams.service';
+import { QuestCategoriesService } from './quest-categories.service';
 
 @NgModule({
   imports: [
     CommonModule
   ],
-  providers: [ TeamsService ]
+  providers: [ QuestCategoriesService ]
 })
-export class TeamsModule { }
+export class QuestsModule { }

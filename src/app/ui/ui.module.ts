@@ -22,6 +22,7 @@ import {
 } from '@angular/material';
 
 import { DialogModule } from './dialog/dialog.module';
+import { QuestsModule } from '../quests/quests.module';
 import { AdminPageComponent } from './admin-page/admin-page.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { HomePageComponent } from './home-page/home-page.component';
@@ -69,6 +70,7 @@ import { RejectReasonDialogComponent } from './members-quest-approval/reject-rea
     MatToolbarModule,
     MatTooltipModule,
     DialogModule,
+    QuestsModule,
   ],
   declarations: [
     UserLoginComponent,

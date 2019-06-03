@@ -84,7 +84,7 @@ export class MembersQuestApprovalComponent implements OnInit {
     let subject = `[Gamification of Learnings and Certifications]`;
 
     subject += quest.required ? ` [Required] ` : ` [Additional] `;
-    subject += `${quest.category} Quest Completion ${approveStr} for ${quest.playerName}`;
+    subject += `${quest.category.name} Quest Completion ${approveStr} for ${quest.playerName}`;
 
     return subject;
   }
@@ -95,7 +95,7 @@ export class MembersQuestApprovalComponent implements OnInit {
     const dashboardUrl = `${environment.firebase.authDomain}`;
 
     return `
-      Congratulations! You have been awarded ${xp} XP for completing your ${requiredStr} [${quest.category}] quest.<br/>
+      Congratulations! You have been awarded ${xp} XP for completing your ${requiredStr} [${quest.category.name}] quest.<br/>
       <br/>
       Visit the <a href="${dashboardUrl}"">Leaderboard</a> to see your current ranking!<br/>
       <br/>
@@ -113,7 +113,7 @@ export class MembersQuestApprovalComponent implements OnInit {
 
       <ul style='list-style: none;'>
         <li>Quest Type: ${requiredStr}</li>
-        <li>Category: ${quest.category}</li>
+        <li>Category: ${quest.category.name}</li>
         <li>Quest: ${quest.questName}</li>
         <li>Source: ${quest.source}</li>
         <li>Date Assigned: ${quest.created.toDate()}</li>

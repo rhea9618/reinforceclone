@@ -7,8 +7,8 @@
 
     <mat-form-field>
       <mat-select placeholder="Quest Category" [(ngModel)]="playerQuest.category" name="category">
-        <mat-option *ngFor="let category of categoryList" [value]="category">
-          {{category}}
+        <mat-option *ngFor="let category of categoryList$ | async" [value]="category">
+          {{category.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
