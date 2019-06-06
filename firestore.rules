@@ -31,9 +31,9 @@ service cloud.firestore {
       allow write: if isTeamLead(incomingData().teamId);
     }
 
-    match /membership/{userId} {
+    match /membership/{id} {
       allow read: if true;
-      allow create: if isOwner(userId) && incomingData().isApproved == false;
+      allow create: if isOwner(incomingData().uid) && incomingData().isApproved == false;
       allow update, delete: if isTeamLead(existingData().teamId);
     }
 
@@ -71,8 +71,8 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/teams/$(teamId)).data;
     }
 
-    function getMembershipData(uid) {
-      return get(/databases/$(database)/documents/membership/$(uid)).data;
+    function getMembershipData(id) {
+      return get(/databases/$(database)/documents/membership/$(id)).data;
     }
 
     /// Condition Checkers ///
@@ -86,7 +86,7 @@ service cloud.firestore {
     }
 
     function isTeamLead(teamId) {
-      return isTeamLeadFromDoc(teamId, getMembershipData(currentUser().uid));
+      return isTeamLeadFromDoc(teamId, getMembershipData(currentUser().uid + currentUser().uid));
     }
 
     // Allow user read for both Owner and Team Lead only
