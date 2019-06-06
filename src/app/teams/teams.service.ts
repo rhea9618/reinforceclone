@@ -44,14 +44,14 @@ export class TeamsService {
   /*
   * Return ALL of the memberships, including approver memberships.
   */
- getAllMemberships(uid: string): Observable<Membership[]> {
-  const playerMemberships: AngularFirestoreCollection<Membership>
-  = this.afs.collection('membership', ref => ref.where('uid', '==', uid));
+  getAllMemberships(uid: string): Observable<Membership[]> {
+    const playerMemberships: AngularFirestoreCollection<Membership>
+      = this.afs.collection('membership', ref => ref.where('uid', '==', uid));
 
-  return playerMemberships.snapshotChanges().pipe(
-    map((members) => members.map(item => item.payload.doc.data()) )
-  );
-}
+    return playerMemberships.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data()) )
+    );
+  }
 
   getTeams(): Observable<Team[]> {
     return this.teamsCollection.snapshotChanges().pipe(
