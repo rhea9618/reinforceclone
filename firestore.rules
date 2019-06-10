@@ -86,7 +86,7 @@ service cloud.firestore {
     }
 
     function isTeamLead(teamId) {
-      return isTeamLeadFromDoc(teamId, getMembershipData(currentUser().uid + currentUser().uid));
+      return isTeamLeadFromDoc(teamId, getMembershipData(currentUser().uid + teamId));
     }
 
     // Allow user read for both Owner and Team Lead only
