@@ -6,7 +6,6 @@ import { environment } from 'src/environments/environment';
 import { TeamsService } from 'src/app/teams/teams.service';
 import { PlayerPointsService } from '../../player-quest/player-points.service';
 import { ConfirmationModalService } from '../../confirmation-modal/confirmation-modal.service';
-import { UserService } from 'src/app/core/user.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 
@@ -18,6 +17,7 @@ import { NotifyService } from 'src/app/core/notify.service';
 export class TeamMembersComponent implements OnInit {
   @Input() currentUser: User;
   @Input() seasonId: string;
+  _selectedTeam: Membership;
 
   members$: Observable<Membership[]>;
   title: string;
@@ -32,13 +32,20 @@ export class TeamMembersComponent implements OnInit {
     private playerPointsService: PlayerPointsService
   ) {}
 
+  @Input()
+  public set selectedTeam(selectedTeam: Membership) {
+    // added this method so that the component would fetch the data every time the selected team is changed
+    this._selectedTeam = selectedTeam;
+    this.ngOnInit();
+  }
+
   ngOnInit() {
-    if (this.currentUser && this.currentUser.membership) {
-      this.title = this.currentUser.membership.isLead ?
+    if (this.currentUser && this._selectedTeam) {
+      this.title = this._selectedTeam.isLead ?
         'Team Members' :
         'Team Leaderboard';
 
-      const teamId = this.currentUser.membership.teamId;
+      const teamId = this._selectedTeam.teamId;
       this.members$ = this.mergeMemberInfo(teamId);
     }
   }

@@ -12,8 +12,8 @@ import { NotifyService } from 'src/app/core/notify.service';
   styleUrls: ['./team-applications.component.scss']
 })
 export class TeamApplicationsComponent implements OnInit {
-
   @Input() currentUser: User;
+  _selectedTeam: Membership;
   teamApplications$: Observable<Membership[]>;
 
   readonly applicationColumns = ['displayName', 'acceptButton', 'kickButton'];
@@ -22,10 +22,17 @@ export class TeamApplicationsComponent implements OnInit {
     private notify: NotifyService,
     private email: EmailService) {}
 
+  @Input()
+  public set selectedTeam(selectedTeam: Membership) {
+    // added this method so that the component would fetch the data every time the selected team is changed
+    this._selectedTeam = selectedTeam;
+    this.ngOnInit();
+  }
+
   ngOnInit() {
-    if (this.currentUser && this.currentUser.membership) {
+    if (this.currentUser && this._selectedTeam) {
       this.teamApplications$ =
-        this.teamsService.getTeamMembers(this.currentUser.membership.teamId, false);
+        this.teamsService.getTeamMembers(this._selectedTeam.teamId, false);
     }
   }
 

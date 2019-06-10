@@ -18,6 +18,7 @@ import {
   MatStepperModule,
   MatTableModule,
   MatToolbarModule,
+  MatSelectModule,
   MatTooltipModule
 } from '@angular/material';
 
@@ -69,6 +70,7 @@ import { RejectReasonDialogComponent } from './members-quest-approval/reject-rea
     MatTableModule,
     MatToolbarModule,
     MatTooltipModule,
+    MatSelectModule,
     DialogModule,
     QuestsModule,
   ],
