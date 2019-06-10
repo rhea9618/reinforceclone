@@ -56,67 +56,68 @@ export class MembersQuestApprovalComponent implements OnInit {
     });
   }
 
-  private approveQuest(quest: PlayerQuest) {
-    const subject = this.getEmailSubject(quest, true);
-    const body = this.getApprovedEmailBody(quest);
+  private approveQuest(playerQuest: PlayerQuest) {
+    const subject = this.getEmailSubject(playerQuest, true);
+    const body = this.getApprovedEmailBody(playerQuest);
 
-    this.playerQuest.approveQuest(quest).pipe(
-      flatMap(() => this.email.sendEmail([quest.playerEmail], subject, body, 'HTML'))
-    ).subscribe(() => this.notify.update(`Quest: ${quest.questName} Approved!`, 'info'));
+    this.playerQuest.approveQuest(playerQuest).pipe(
+      flatMap(() => this.email.sendEmail([playerQuest.playerEmail], subject, body, 'HTML'))
+    ).subscribe(() => this.notify.update(`Quest: ${playerQuest.quest.name} Approved!`, 'info'));
   }
 
-  private rejectQuest(quest: PlayerQuest) {
+  private rejectQuest(playerQuest: PlayerQuest) {
     const reasonDialogRef = this.dialog.open(RejectReasonDialogComponent);
     reasonDialogRef.afterClosed().subscribe( reasonRes => {
       if (reasonRes !== 'cancel') {
-        const subject = this.getEmailSubject(quest, false);
-        const body = this.getRejectedEmailBody(quest, reasonRes);
+        const subject = this.getEmailSubject(playerQuest, false);
+        const body = this.getRejectedEmailBody(playerQuest, reasonRes);
 
-        this.playerQuest.rejectQuest(quest).pipe(
-          flatMap(() => this.email.sendEmail([quest.playerEmail], subject, body, 'HTML'))
-        ).subscribe(() => this.notify.update(`Quest: ${quest.questName} Rejected!`, 'info'));
+        this.playerQuest.rejectQuest(playerQuest).pipe(
+          flatMap(() => this.email.sendEmail([playerQuest.playerEmail], subject, body, 'HTML'))
+        ).subscribe(() => this.notify.update(`Quest: ${playerQuest.quest.name} Rejected!`, 'info'));
       }
     });
   }
 
-  private getEmailSubject(quest: PlayerQuest, approved: boolean): string {
+  private getEmailSubject(playerQuest: PlayerQuest, approved: boolean): string {
     const approveStr = approved ? '' : 'Rejected';
     let subject = `[Gamification of Learnings and Certifications]`;
 
-    subject += quest.required ? ` [Required] ` : ` [Additional] `;
-    subject += `${quest.category.name} Quest Completion ${approveStr} for ${quest.playerName}`;
+    subject += playerQuest.required ? ` [Required] ` : ` [Additional] `;
+    subject += `${playerQuest.quest.category.name} Quest Completion ${approveStr} for ${playerQuest.playerName}`;
 
     return subject;
   }
 
-  private getApprovedEmailBody(quest: PlayerQuest): string {
-    const requiredStr = quest.required ? ` [Required] ` : ` [Additional] `;
-    const xp = quest.required ? 10 : 5;
+  private getApprovedEmailBody(playerQuest: PlayerQuest): string {
+    const requiredStr = playerQuest.required ? ` [Required] ` : ` [Additional] `;
+    const xp = playerQuest.required ? 10 : 5;
     const dashboardUrl = `${environment.firebase.authDomain}`;
+    const category = playerQuest.quest.category.name;
 
     return `
-      Congratulations! You have been awarded ${xp} XP for completing your ${requiredStr} [${quest.category.name}] quest.<br/>
+      Congratulations! You have been awarded ${xp} XP for completing your ${requiredStr} [${category}] quest.<br/>
       <br/>
-      Visit the <a href="${dashboardUrl}"">Leaderboard</a> to see your current ranking!<br/>
+      Visit the <a href="${dashboardUrl}">Leaderboard</a> to see your current ranking!<br/>
       <br/>
       REWARDS AND RECOGNITION PH
       `;
   }
 
-  private getRejectedEmailBody(quest: PlayerQuest, reasonRes: string): string {
-    const requiredStr = quest.required ? ` [Required] ` : ` [Additional] `;
+  private getRejectedEmailBody(playerQuest: PlayerQuest, reasonRes = 'None'): string {
+    const requiredStr = playerQuest.required ? ` [Required] ` : ` [Additional] `;
 
     return `
-      <p>Hi ${quest.playerName}!</p>
+      <p>Hi ${playerQuest.playerName}!</p>
 
       <p>Kindly revisit the details and resend completion for this quest.</p>
 
       <ul style='list-style: none;'>
         <li>Quest Type: ${requiredStr}</li>
-        <li>Category: ${quest.category.name}</li>
-        <li>Quest: ${quest.questName}</li>
-        <li>Source: ${quest.source}</li>
-        <li>Date Assigned: ${quest.created.toDate()}</li>
+        <li>Category: ${playerQuest.quest.category.name}</li>
+        <li>Quest: ${playerQuest.quest.name}</li>
+        <li>Source: ${playerQuest.quest.source}</li>
+        <li>Date Assigned: ${playerQuest.created.toDate()}</li>
         <li>Rejection Reason: ${reasonRes}</li>
       </ul>
 

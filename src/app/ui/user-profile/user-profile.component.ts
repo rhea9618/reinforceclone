@@ -19,7 +19,6 @@ import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dial
 })
 export class UserProfileComponent implements OnInit {
 
-  debugMode: boolean;
   viewOwnProfile = true;
   otherUser$: Observable<User|UserError>;
   playerMembership: Membership;
@@ -37,9 +36,6 @@ export class UserProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // debug mode true if locally run
-    this.debugMode = this.auth.debugMode;
-
     // When visiting other player's profile
     this.checkUidParam(this.route.snapshot.queryParams);
     this.route.queryParams.subscribe((params: Params) => this.checkUidParam(params));
@@ -47,7 +43,7 @@ export class UserProfileComponent implements OnInit {
 
   private checkUidParam(params: Params) {
     // Need to account for url params having both uid and teamId
-    const playerId = this.route.snapshot.queryParams['uid'];
+    const playerId = params['uid'];
     if (playerId) {
       this.viewOwnProfile = false;
       this.otherUser$ = this.getPlayerInfo(playerId);
@@ -64,36 +60,35 @@ export class UserProfileComponent implements OnInit {
 
     return combineLatest(membership$, seasonExp$).pipe(
       map(([membership, seasonExp]) => ({ ...membership, seasonExp })),
-        catchError((err) => {
-          console.log(err);
-          return of({ error });
-        })
+      catchError((err) => {
+        console.log(err);
+        return of({ error });
+      })
     );
   }
 
-  private sendQuestAddedEmail(quest: PlayerQuest) {
-    const type = quest.required ? 'Required' : 'Additional';
+  private sendQuestAddedEmail(playerQuest: PlayerQuest) {
+    const type = playerQuest.required ? 'Required' : 'Additional';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${quest.category.name}] Quest Added for ${quest.playerName}]`;
+    const subject = `${subjectPrefix} [${type}] [${playerQuest.quest.category.name}] Quest Added for ${playerQuest.playerName}]`;
     const content =
-      `Hi ${quest.playerName}!<br/>
+      `Hi ${playerQuest.playerName}!<br/>
       <br/>
       Below are the details for your quest. Good luck and may the odds be ever in your favor!<br/>
       <br/>
       Quest Type: ${type}<br/>
-      Category: ${quest.category.name}<br/>
-      Quest: ${quest.questName}<br/>
-      Source: ${quest.source}<br/>
+      Category: ${playerQuest.quest.category.name}<br/>
+      Quest: ${playerQuest.quest.name}<br/>
+      Source: ${playerQuest.quest.source}<br/>
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-
-    this.emailService.sendEmail([quest.playerEmail], subject, content, 'HTML')
+    this.emailService.sendEmail([playerQuest.playerEmail], subject, content, 'HTML')
       .subscribe(() => this.notifyService.update('Assign quest successful!', 'success'));
   }
 
-  async addQuest(user: Membership, lead: User) {
-    const seasonId = await this.seasonService.getEnabledSeasonId().toPromise();
+  addQuest(user: Membership, lead: User) {
+    const seasonId = this.auth.seasonId;
     const playerQuest = {
       seasonId,
       playerId: user.uid,

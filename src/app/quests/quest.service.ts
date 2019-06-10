@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { firestore } from 'firebase/app';
+const Timestamp = firestore.Timestamp;
 
 @Injectable({
   providedIn: 'root'
@@ -10,15 +12,16 @@ export class QuestService {
 
   questCollection: AngularFirestoreCollection<Quest>;
 
-  constructor(private afs: AngularFirestore) {
-  }
+  constructor(private afs: AngularFirestore) {}
 
   /**
    * Save the quest object to the database
    * @param quest
    */
-  saveQuest(quest: Quest) {
-    return this.afs.collection('quests').add(quest);
+  async saveQuest(quest: Quest): Promise<string> {
+    quest.createdDate = Timestamp.now();
+    const questDoc = await this.afs.collection('quests').add(quest);
+    return questDoc.id;
   }
 
   /**
@@ -31,7 +34,7 @@ export class QuestService {
       .where('category', '==', questCategory)
       .orderBy('name', 'asc')
       .limit(5)
-      .startAt(searchParam)
+      .startAt('!')
       .endAt(searchParam + '\uf8ff'));
     return this.questCollection.snapshotChanges().pipe(
       map((actions) => this.mapQuestData(actions))

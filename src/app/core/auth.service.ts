@@ -4,8 +4,8 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { MsalService} from '@azure/msal-angular';
 import { firebase } from '@firebase/app';
 import { auth, functions } from 'firebase';
-import { combineLatest, Observable, of } from 'rxjs';
-import { flatMap, map, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
+import { flatMap, map, switchMap, tap } from 'rxjs/operators';
 import {
   AngularFirestore,
   AngularFirestoreDocument
@@ -19,15 +19,13 @@ import { UserService } from './user.service';
 import { SeasonService } from './season.service';
 import { TeamsService } from '../teams/teams.service';
 import { PlayerPointsService } from '../ui/player-quest/player-points.service';
-import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class AuthService {
 
   seasonId: string;
-  user$: Observable<User>;
-  isLoggingIn = false;
-  debugMode = !environment.production;
+  user$ = new BehaviorSubject<User>(null);
+  isLoggingIn = true;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -43,7 +41,7 @@ export class AuthService {
     private teams: TeamsService,
     private playerPointsService: PlayerPointsService,
   ) {
-    this.user$ = this.afAuth.authState.pipe(
+    this.afAuth.authState.pipe(
       switchMap((firebaseUser: firebase.User) => {
         if (firebaseUser) {
           console.log('calling this.getAllUserInfo...');
@@ -51,8 +49,11 @@ export class AuthService {
         }
 
         return of(null);
+      }),
+      tap(() => {
+        this.isLoggingIn = false;
       })
-    );
+    ).subscribe(this.user$);
   }
 
   private checkMicrosoftState() {

@@ -2,14 +2,14 @@
   <div *ngIf="!(auth.user$ | async); else alreadyLoggedIn">
     <h3>Login using your Microsoft Account.</h3>
 
-    <button *ngIf="auth.debugMode" mat-raised-button color="primary" (click)="signInWithGoogle()">
+    <button *ngIf="showGoogleLogin" mat-raised-button color="primary" (click)="signInWithGoogle()">
       <i class="fa fa-google fa-lg"></i> Connect Google
     </button>
 
     <button mat-raised-button color="primary"
       *ngIf="!auth.isLoggingIn; else loggingIn"
       (click)="signInWithMicrosoft()">
-      Connect Microsoft
+      <i class="fa fa-windows fa-lg"></i> Connect Microsoft
     </button>
   </div>
 </div>

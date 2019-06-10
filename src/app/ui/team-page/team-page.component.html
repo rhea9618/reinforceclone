@@ -1,17 +1,16 @@
-<div class="container" *ngIf="auth.user$ | async as user">
-  <div>
-    <mat-form-field>
-      <mat-select placeholder="Team:" [(ngModel)]="selectedTeam" name="selectedTeam" [compareWith]="compareById">
-        <mat-option *ngFor="let team of teams$ | async" [value]="team">
-          {{team.teamName}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+<div class="container" *ngIf="auth.user$.value as user">
+  <mat-form-field appearance="outline">
+    <mat-label>Team</mat-label>
+    <mat-select [(ngModel)]="selectedTeam" name="selectedTeam" [compareWith]="compareById">
+      <mat-option *ngFor="let team of teams$ | async" [value]="team">
+        {{team.teamName}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
   <team-applications *ngIf="selectedTeam && selectedTeam.isLead"
     [currentUser]="user" [selectedTeam]="selectedTeam"></team-applications>
   <hr/>
-  <div *ngIf="selectedTeam && seasonId$ | async as seasonId">
+  <div *ngIf="selectedTeam && seasonId">
     <team-members [currentUser]="user" [seasonId]="seasonId" [selectedTeam]="selectedTeam"></team-members>
   </div>
 </div>

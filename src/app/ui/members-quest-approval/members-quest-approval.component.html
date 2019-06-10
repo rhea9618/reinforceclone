@@ -2,7 +2,7 @@
 <table mat-table [dataSource]="questsForApproval$ | async">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef> Quest Name </th>
-    <td mat-cell *matCellDef="let quest"> {{quest.questName}} </td>
+    <td mat-cell *matCellDef="let quest"> {{quest.quest.name}} </td>
   </ng-container>
 
   <ng-container matColumnDef="submitted_by">
