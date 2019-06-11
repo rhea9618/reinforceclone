@@ -1,8 +1,7 @@
 <div class="container" *ngIf="auth.user$ | async as user">
   <div>
-    <h2>Team:</h2>
     <mat-form-field>
-      <mat-select [(ngModel)]="selectedTeam" name="selectedTeam" [compareWith]="compareFn">
+      <mat-select placeholder="Team:" [(ngModel)]="selectedTeam" name="selectedTeam" [compareWith]="compareById">
         <mat-option *ngFor="let team of teams$ | async" [value]="team">
           {{team.teamName}}
         </mat-option>

@@ -131,5 +131,4 @@ export class TeamMembersComponent implements OnInit {
         this.notify.update('Player Removed from Team', 'info');
       });
   }
-
 }

@@ -2,12 +2,10 @@
   padding: 0 20px;
 }
 
-h2 {
-  display: inline;
-  color: rgba(0,0,0,.54);
-  margin-right: 20px;
+.mat-select {
+  font-size: 18px !important;
 }
 
-.mat-select {
-  font-size: 25px !important;
+mat-form-field {
+  width: 100%;
 }

@@ -14,7 +14,6 @@ export class TeamPageComponent implements OnInit {
   seasonId$: Observable<string>;
   teams$: Observable<Membership[]>;
   selectedTeam: Membership;
-  compareFn: ((f1: Membership, f2: Membership) => boolean) | null = this.compareByValue;
 
   constructor(public auth: AuthService, public seasonService: SeasonService, public teamService: TeamsService) {
     this.seasonId$ = this.seasonService.getEnabledSeasonId();
@@ -32,7 +31,7 @@ export class TeamPageComponent implements OnInit {
     );
   }
 
-  compareByValue(f1: Membership, f2: Membership) {
-    return f1 && f2 && f1.teamId === f2.teamId;
+  compareById(mem1: Membership, mem2: Membership): boolean {
+    return mem1 && mem2 && mem1.teamId === mem2.teamId;
   }
 }
