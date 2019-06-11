@@ -53,8 +53,7 @@
             routerLink="/team"
             (click)="closeSideNav()">
             <mat-icon class="icon">group</mat-icon>
-            <span *ngIf="user.membership.isLead">Manage Team</span>
-            <span *ngIf="!user.membership.isLead">My Team</span>
+            <span>Team</span>
           </a>
           <a mat-list-item *ngIf="user.isAdmin"
             [routerLinkActive]="['active-menu']"
