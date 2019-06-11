@@ -41,7 +41,12 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if false;
     }
-
+		
+    match /quests/{id} {
+	  allow read: if true;
+      allow write: if isQuestWriteAllowed();
+    }
+    
     /// Utility Functions ///
 
     // Current DB record of document being requested
@@ -114,6 +119,13 @@ service cloud.firestore {
         );
     }
 
+	  //Allow quest write if core tag field is false and uid field matches the id of the current user
+    function isQuestWriteAllowed() {
+      return incomingData().coreTag == false &&
+        incomingData().keys().hasAny(['uid']) &&
+        isOwner(incomingData().uid)
+    }
+    
     function getAdminData(userId) {
       return get(/databases/$(database)/documents/adminUsers/$(userId)).data;
     }
