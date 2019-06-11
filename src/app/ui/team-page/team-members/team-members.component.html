@@ -3,11 +3,11 @@
   <ng-container matColumnDef="displayName">
     <th mat-header-cell *matHeaderCellDef> Name </th>
     <td mat-cell *matCellDef="let member">
-      <span *ngIf="!currentUser.membership.isLead || member.uid === currentUser.uid">
+      <span *ngIf="!selectedTeam.isLead || member.uid === currentUser.uid">
         {{ member.displayName }}
         <mat-icon *ngIf="member.uid == currentUser.uid" class="icon">grade</mat-icon>
       </span>
-      <a *ngIf="currentUser.membership.isLead && member.uid !== currentUser.uid"
+      <a *ngIf="selectedTeam.isLead && member.uid !== currentUser.uid"
         routerLink="/profile" [queryParams]="{uid: member.uid}">
         {{ member.displayName }}
       </a>

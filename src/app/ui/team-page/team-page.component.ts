@@ -3,6 +3,7 @@ import { AuthService } from 'src/app/core/auth.service';
 import { Observable } from 'rxjs';
 import { SeasonService } from 'src/app/core/season.service';
 import { TeamsService } from '../../teams/teams.service';
+import { take, tap, flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'team-page',
@@ -22,13 +23,13 @@ export class TeamPageComponent implements OnInit {
   ngOnInit() {
     this.selectedTeam = null;
     // getting the list of teams the user is a member of
-    this.auth.user$.subscribe(user => {
-      this.teams$ = this.teamService.getAllMemberships(user.uid);
-      this.teams$.subscribe(team => {
-        // setting the first team found as the default selected team
-        this.selectedTeam = team[0];
-      });
-    });
+    this.teams$ = this.auth.user$.pipe(
+      take(1),
+      tap((user: User) => {
+        this.selectedTeam = user.membership;
+      }),
+      flatMap((user) => this.teamService.getAllMemberships(user.uid))
+    );
   }
 
   compareByValue(f1: Membership, f2: Membership) {

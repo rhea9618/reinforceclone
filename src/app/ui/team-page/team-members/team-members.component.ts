@@ -39,6 +39,10 @@ export class TeamMembersComponent implements OnInit {
     this.ngOnInit();
   }
 
+  public get selectedTeam() {
+    return this._selectedTeam;
+  }
+
   ngOnInit() {
     if (this.currentUser && this._selectedTeam) {
       this.title = this._selectedTeam.isLead ?
@@ -55,7 +59,7 @@ export class TeamMembersComponent implements OnInit {
   }
 
   kickButtonisVisible(uid: string) {
-    return this.currentUser.membership.isLead && (uid !== this.currentUser.uid);
+    return this._selectedTeam.isLead && (uid !== this.currentUser.uid);
   }
 
   removeTeamMember(user: Membership) {
