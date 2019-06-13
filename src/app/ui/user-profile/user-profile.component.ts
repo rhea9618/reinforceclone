@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { combineLatest, Observable, of } from 'rxjs';
-import { catchError, map, switchMap, take } from 'rxjs/operators';
+import { catchError, map, flatMap } from 'rxjs/operators';
 
 import { AuthService } from 'src/app/core/auth.service';
 import { UserService } from 'src/app/core/user.service';
@@ -24,6 +24,7 @@ export class UserProfileComponent implements OnInit {
   debugMode: boolean;
   viewOwnProfile = true;
   otherUser$: Observable<User|UserError>;
+  playerMembership: Membership;
 
   constructor(
     public auth: AuthService,
@@ -47,19 +48,21 @@ export class UserProfileComponent implements OnInit {
   }
 
   private checkUidParam(params: Params) {
+    // Need to account for url params having both uid and teamId
     const playerId = this.route.snapshot.queryParams['uid'];
     if (playerId) {
       this.viewOwnProfile = false;
       this.otherUser$ = this.getPlayerInfo(playerId);
     } else {
       this.viewOwnProfile = true;
+      this.getPlayerMembership();
     }
   }
 
   private getPlayerInfo(playerId: string): Observable<User|UserError> {
     const error = 'Sorry, You are not allowed to view this user\'s profile';
     const user$ = this.userService.getUser(playerId);
-    const membership$ = this.teamsService.getMembership(playerId);
+    const membership$ = this.teamsService.getPlayerMembership(playerId);
     const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.PLACEHOLDER_SEASON); // till we get seasonService handled
 
     return combineLatest(user$, membership$, seasonExp$).pipe(
@@ -113,6 +116,14 @@ export class UserProfileComponent implements OnInit {
     }, (err) => {
       console.log(err);
       this.notifyService.update('Assign quest failed!', 'error');
+    });
+  }
+
+  private getPlayerMembership() {
+    this.auth.user$.pipe(
+      flatMap(user => this.teamsService.getPlayerMembership(user.uid))
+    ).subscribe(playerMembership => {
+      this.playerMembership = playerMembership;
     });
   }
 }
