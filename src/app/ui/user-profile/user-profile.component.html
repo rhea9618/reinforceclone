@@ -12,7 +12,7 @@
             <img mat-card-avatar class="avatar"
               [src]="user.photoURL || 'https://api.adorable.io/avatars/109/fire.png'"/>
             <mat-card-title>{{ user.displayName }}</mat-card-title>
-            <mat-card-subtitle *ngIf="playerMembership">{{ user.membership?.teamName }}</mat-card-subtitle>
+            <mat-card-subtitle *ngIf="playerMembership">{{ user.playerMembership?.teamName }}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <div>
