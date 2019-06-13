@@ -53,6 +53,21 @@ export class TeamsService {
     );
   }
 
+  // Get Membership in which user is a Player of
+  getPlayerMembership(uid: string): Observable<Membership> {
+    const membershipCol: AngularFirestoreCollection<Membership> =
+    this.afs.collection('membership', ref => ref.where('uid', '==', uid)
+    .where('isLead', '==' , false).where('isApproved', '==', true));
+
+    const memberships = membershipCol.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data()) )
+    );
+
+    return memberships.pipe(
+      map((members) => members.length >= 1 ? members[0] : null)
+    );
+  }
+
   getTeams(): Observable<Team[]> {
     return this.teamsCollection.snapshotChanges().pipe(
       map((teams) => teams.map((a) => {
