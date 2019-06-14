@@ -11,8 +11,7 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isUserReadAllowed(userId);
-      allow write: if isOwner(userId);
+      allow read, write: if isOwner(userId);
     }
 
     match /questCategories/{id} {
@@ -96,6 +95,7 @@ service cloud.firestore {
     }
 
     // Allow user read for both Owner and Team Lead only
+    // TODO: this currently is not working as expected, please fix
     function isUserReadAllowed(userId) {
       return isOwner(userId) ||
         isTeamLead(getMembershipData(userId).teamId);

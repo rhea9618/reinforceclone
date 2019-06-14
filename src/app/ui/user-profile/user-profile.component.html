@@ -62,7 +62,7 @@
                 <img mat-card-avatar class="avatar"
                   [src]="otherUser.photoURL || 'https://api.adorable.io/avatars/109/fire.png'"/>
                 <mat-card-title>{{ otherUser.displayName }}</mat-card-title>
-                <mat-card-subtitle>{{ otherUser.membership?.teamName }}</mat-card-subtitle>
+                <mat-card-subtitle>{{ otherUser.teamName }}</mat-card-subtitle>
               </mat-card-header>
               <mat-card-content>
                 <div>
@@ -70,7 +70,7 @@
                     <mat-icon>email</mat-icon> {{ otherUser.email }}
                   </span>
                 </div>
-                <div class="player-stats" *ngIf="otherUser.membership" >
+                <div class="player-stats">
                   <span class="exp-pts">{{ otherUser.seasonExp }}</span>
                   <b>XP</b>
                 </div>
@@ -78,7 +78,7 @@
             </div>
           </mat-card>
           <!-- Player Quests -->
-          <div class="quest-space" *ngIf="otherUser.membership">
+          <div class="quest-space">
             <mat-toolbar class="quest-toolbar" color="primary">
               Quests
               <span class="spacer"></span>
