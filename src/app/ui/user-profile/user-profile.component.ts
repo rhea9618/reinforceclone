@@ -19,8 +19,6 @@ import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dial
 })
 export class UserProfileComponent implements OnInit {
 
-  PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
-
   debugMode: boolean;
   viewOwnProfile = true;
   otherUser$: Observable<User|UserError>;
@@ -63,7 +61,7 @@ export class UserProfileComponent implements OnInit {
     const error = 'Sorry, You are not allowed to view this user\'s profile';
     const user$ = this.userService.getUser(playerId);
     const membership$ = this.teamsService.getPlayerMembership(playerId);
-    const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.PLACEHOLDER_SEASON); // till we get seasonService handled
+    const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.auth.seasonId);
 
     return combineLatest(user$, membership$, seasonExp$).pipe(
       map(([user, membership, seasonExp]) => ({ ...user, membership, seasonExp })),

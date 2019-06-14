@@ -49,7 +49,7 @@ import { TeamsModule } from './teams/teams.module';
     MatSidenavModule,
     MatToolbarModule,
     MatTooltipModule,
-    MsalModule.forRoot({ clientID: environment.clientID }),
+    MsalModule.forRoot(environment.msalConfig),
     NotesModule,
     TeamsModule,
     UiModule,

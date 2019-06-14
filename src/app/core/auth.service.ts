@@ -5,7 +5,7 @@ import { MsalService} from '@azure/msal-angular';
 import { firebase } from '@firebase/app';
 import { auth, functions } from 'firebase';
 import { combineLatest, Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { flatMap, map, switchMap } from 'rxjs/operators';
 import {
   AngularFirestore,
   AngularFirestoreDocument
@@ -16,14 +16,15 @@ import { AdminService } from './admin.service';
 import { EmailService } from './email.service';
 import { NotifyService } from './notify.service';
 import { UserService } from './user.service';
+import { SeasonService } from './season.service';
 import { TeamsService } from '../teams/teams.service';
 import { PlayerPointsService } from '../ui/player-quest/player-points.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class AuthService {
-  PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
 
+  seasonId: string;
   user$: Observable<User>;
   isLoggingIn = false;
   debugMode = !environment.production;
@@ -38,12 +39,14 @@ export class AuthService {
     private email: EmailService,
     private notify: NotifyService,
     private user: UserService,
+    private season: SeasonService,
     private teams: TeamsService,
     private playerPointsService: PlayerPointsService,
   ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((firebaseUser: firebase.User) => {
         if (firebaseUser) {
+          console.log('calling this.getAllUserInfo...')
           return this.getAllUserInfo(firebaseUser.uid);
         }
 
@@ -64,7 +67,12 @@ export class AuthService {
     const user$ = this.user.getUser(uid);
     const isAdmin$ = this.admin.isAdmin(uid);
     const membership$ = this.teams.getMembership(uid);
-    const seasonExp$ = this.playerPointsService.getSeasonExp(uid, this.PLACEHOLDER_SEASON);
+    const seasonExp$ = this.season.getEnabledSeasonId().pipe(
+      flatMap((seasonId: string) => {
+        this.seasonId = seasonId;
+        return this.playerPointsService.getSeasonExp(uid, seasonId)
+      })
+    );
 
     return combineLatest(user$, isAdmin$, membership$, seasonExp$).pipe(
       map(([user, isAdmin, membership, seasonExp]) => {
