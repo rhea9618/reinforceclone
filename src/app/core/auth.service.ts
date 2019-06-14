@@ -46,7 +46,7 @@ export class AuthService {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((firebaseUser: firebase.User) => {
         if (firebaseUser) {
-          console.log('calling this.getAllUserInfo...')
+          console.log('calling this.getAllUserInfo...');
           return this.getAllUserInfo(firebaseUser.uid);
         }
 
@@ -70,7 +70,7 @@ export class AuthService {
     const seasonExp$ = this.season.getEnabledSeasonId().pipe(
       flatMap((seasonId: string) => {
         this.seasonId = seasonId;
-        return this.playerPointsService.getSeasonExp(uid, seasonId)
+        return this.playerPointsService.getSeasonExp(uid, seasonId);
       })
     );
 
