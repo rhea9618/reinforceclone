@@ -57,14 +57,13 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-  private getPlayerInfo(playerId: string): Observable<User|UserError> {
+  private getPlayerInfo(playerId: string): Observable<Membership|UserError> {
     const error = 'Sorry, You are not allowed to view this user\'s profile';
-    const user$ = this.userService.getUser(playerId);
     const membership$ = this.teamsService.getPlayerMembership(playerId);
     const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.auth.seasonId);
 
-    return combineLatest(user$, membership$, seasonExp$).pipe(
-      map(([user, membership, seasonExp]) => ({ ...user, membership, seasonExp })),
+    return combineLatest(membership$, seasonExp$).pipe(
+      map(([membership, seasonExp]) => ({ ...membership, seasonExp })),
         catchError((err) => {
           console.log(err);
           return of({ error });
@@ -93,14 +92,14 @@ export class UserProfileComponent implements OnInit {
       .subscribe(() => this.notifyService.update('Assign quest successful!', 'success'));
   }
 
-  async addQuest(user: User, lead: User) {
+  async addQuest(user: Membership, lead: User) {
     const seasonId = await this.seasonService.getEnabledSeasonId().toPromise();
     const playerQuest = {
       seasonId,
       playerId: user.uid,
       required: true,
       playerName: user.displayName,
-      teamId: user.membership.teamId,
+      teamId: user.teamId,
       status: QuestStatus.TODO,
       playerEmail: user.email,
       teamLeadEmail: lead.email
