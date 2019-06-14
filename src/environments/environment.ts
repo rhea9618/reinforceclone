@@ -12,7 +12,10 @@ export const environment = {
     storageBucket: 'leaderboard-79b77.appspot.com',
     messagingSenderId: '519592004308'
   },
-  clientID: '9fc78166-b1bb-4cc6-bb92-a2425705410a'
+  msalConfig: {
+    clientID: '768b74ca-92bc-4436-9954-1e41f534d255',
+    consentScopes: ['user.read', 'mail.send']
+  }
 };
 
 /*
