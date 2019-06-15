@@ -67,7 +67,7 @@ export class TeamMembersComponent implements OnInit {
 
     this.confirmationModal.showConfirmation({ message }).subscribe(result => {
       if (result) {
-        this.teamsService.removeTeamMember(user.uid).then(() => {
+        this.teamsService.removeTeamMember(user.uid + user.teamId).then(() => {
           this.emailRemovedPlayer(user.displayName, user.email);
         });
       }

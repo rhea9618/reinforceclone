@@ -37,13 +37,13 @@ export class TeamApplicationsComponent implements OnInit {
   }
 
   addTeamMember(user: Membership) {
-    this.teamsService.addToTeam(user.uid).then(() => {
+    this.teamsService.addToTeam(user.uid + user.teamId).then(() => {
       this.emailAddedPlayer(user.displayName, user.email);
     });
   }
 
   removeTeamMember(user: Membership) {
-    this.teamsService.removeTeamMember(user.uid).then(() => {
+    this.teamsService.removeTeamMember(user.uid + user.teamId).then(() => {
       this.emailRemovedPlayer(user.displayName, user.email);
     });
   }
