@@ -1,4 +1,16 @@
+<div>
+  <mat-form-field>
+    <mat-select placeholder="Team:" [(ngModel)]="selectedLeadMembership" 
+    name="selectedLeadMembership" [compareWith]="compareById" (selectionChange)="changeSelectedMembership()">
+      <mat-option *ngFor="let team of leadMemberships$ | async" [value]="team">
+        {{team.teamName}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
 <h4>Submitted Quests for your Approval:</h4>
+
 <table mat-table [dataSource]="questsForApproval$ | async">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef> Quest Name </th>
