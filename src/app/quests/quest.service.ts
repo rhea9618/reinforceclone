@@ -34,7 +34,8 @@ export class QuestService {
     this.questCollection = this.afs.collection('quests', ref => ref
       .where('category', '==', questCategory)
       .where('keywords', 'array-contains', keyword)
-      .limit(5);
+      .limit(5)
+    );
 
     return this.questCollection.snapshotChanges().pipe(
       map((actions) => this.mapQuestData(actions))
