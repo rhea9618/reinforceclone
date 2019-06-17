@@ -30,12 +30,12 @@ export class QuestService {
    * @param searchParam
    */
   searchQuests(questCategory: QuestCategory, searchParam: string): Observable<Quest[]> {
+    const keyword = searchParam.toLowerCase();
     this.questCollection = this.afs.collection('quests', ref => ref
       .where('category', '==', questCategory)
-      .orderBy('name', 'asc')
-      .limit(5)
-      .startAt('!')
-      .endAt(searchParam + '\uf8ff'));
+      .where('keywords', 'array-contains', keyword)
+      .limit(5);
+
     return this.questCollection.snapshotChanges().pipe(
       map((actions) => this.mapQuestData(actions))
     );
@@ -49,7 +49,7 @@ export class QuestService {
   getAllStandardQuests(questCategory: QuestCategory): Observable<Quest[]> {
     this.questCollection = this.afs.collection('quests', ref => ref
       .where('category', '==', questCategory)
-      .orderBy('name', 'asc'));
+      .orderBy('name'));
     return this.questCollection.snapshotChanges().pipe(
       map((actions) => this.mapQuestData(actions))
     );

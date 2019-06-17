@@ -82,8 +82,8 @@ export class PlayerQuestListComponent implements OnInit {
   private sendQuestSubmittedEmail(playerQuest: PlayerQuest) {
     const type = playerQuest.required ? 'Required' : 'Additional';
     const xp = playerQuest.required ? '10 XP' : '5 XP';
-    const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${playerQuest.quest.category.name}] Validation of Quest Completion for ${playerQuest.playerName}`;
+    const subjectPrefix = '[Gamification of Learnings and Certifications] [${type}] [${playerQuest.quest.category.name}]';
+    const subject = `${subjectPrefix} Validation of Quest Completion for ${playerQuest.playerName}`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
     const questInfo = this.questInfoEmail(playerQuest);
     const attachment = playerQuest.completionProof ?

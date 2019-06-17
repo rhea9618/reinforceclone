@@ -27,8 +27,8 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
     category: [''],
-    quest: [{ value:'', disabled: true }],
-    source: [{ value:'', disabled: true }],
+    quest: [{ value: '', disabled: true }],
+    source: [{ value: '', disabled: true }],
     required: [true]
   });
   private questSuggestions$: Observable<Quest[]>;
@@ -64,7 +64,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       debounceTime(500),
       distinctUntilChanged(),
       tap((name: string) => {
-        const sourceCtrl = this.questForm.get('source')
+        const sourceCtrl = this.questForm.get('source');
         if (sourceCtrl.disabled && this.isNewQuest) {
           sourceCtrl.enable();
         }
@@ -116,22 +116,24 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   }
 
   private async saveQuest() {
-    if(this.questForm.invalid) {
+    if (this.questForm.invalid) {
       return;
     }
     this.saving = true;
 
     // Saving new quest...
     if (this.isNewQuest) {
-      const name = this.questForm.get('quest').value;
+      const name = this.questForm.get('quest').value as string;
       const description = name; // same as name for now until further notice
       const category = this.questForm.get('category').value;
       const source = this.questForm.get('source').value;
+      const keywords = name.toLowerCase().split(' ');
       const quest = {
         name,
         description,
         category,
         source,
+        keywords,
         status: true,
         coreTag: false,
         uid: this.auth.user$.value.uid

@@ -18,7 +18,8 @@ export class TeamPageComponent implements OnInit {
 
   ngOnInit() {
     this.seasonId = this.auth.seasonId;
-    const user = this.auth.user$.value
+
+    const user = this.auth.user$.value;
     this.selectedTeam = user.membership;
     // getting the list of teams the user is a member of
     this.teams$ = this.teamService.getAllMemberships(user.uid);
