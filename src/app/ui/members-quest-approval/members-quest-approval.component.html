@@ -1,8 +1,8 @@
 <div>
   <mat-form-field>
-    <mat-select placeholder="Team:" [(ngModel)]="selectedLeadMembership" 
-    name="selectedLeadMembership" [compareWith]="compareById" (selectionChange)="changeSelectedMembership()">
-      <mat-option *ngFor="let team of leadMemberships$ | async" [value]="team">
+    <mat-select placeholder="Team:"
+    name="selectedLeadMembership" [formControl]="leadMembershipId">
+      <mat-option *ngFor="let team of leadMemberships$ | async" [value]="team.teamId">
         {{team.teamName}}
       </mat-option>
     </mat-select>

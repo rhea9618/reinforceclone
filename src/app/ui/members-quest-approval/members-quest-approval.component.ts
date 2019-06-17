@@ -1,9 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog, MatSnackBar } from '@angular/material';
-import { EMPTY, from, Observable } from 'rxjs';
-import { flatMap, take, tap } from 'rxjs/operators';
-import { firestore } from 'firebase/app';
-import Timestamp = firestore.Timestamp;
+import { MatDialog } from '@angular/material';
+import { Observable } from 'rxjs';
+import { flatMap, take, tap, map } from 'rxjs/operators';
 
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
@@ -13,6 +11,7 @@ import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
 import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component';
 import { TeamsService } from 'src/app/teams/teams.service';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'members-quest-approval',
@@ -23,8 +22,8 @@ export class MembersQuestApprovalComponent implements OnInit {
   @Input() user: User;
   questsForApproval$: Observable<PlayerQuest[]>;
   leadMemberships$: Observable<Membership[]>;
-  selectedLeadMembership: Membership;
   private seasonId: string;
+  leadMembershipId = new FormControl('', []);
 
   readonly displayedColumns = [
     'name',
@@ -44,12 +43,13 @@ export class MembersQuestApprovalComponent implements OnInit {
   async ngOnInit() {
     if (this.user && this.user.membership)  {
       this.seasonId = await this.season.getEnabledSeasonId().toPromise();
-      this.leadMemberships$ = this.teamsService.getAllLeadMemberships(this.user.uid)
-        .pipe(take(1),
-        tap((memberships: Membership[]) => {
-          this.selectedLeadMembership = memberships[0];
-          this.questsForApproval$ = this.playerQuest.getAllMemberSubmittedQuests(this.seasonId, this.selectedLeadMembership.teamId);
-        }));
+      this.leadMemberships$ = this.teamsService.getAllLeadMemberships(this.user.uid);
+
+      this.leadMembershipId.valueChanges.pipe(map(val => {
+        this.questsForApproval$ = this.playerQuest.getAllMemberSubmittedQuests(this.seasonId, val);
+      })).subscribe();
+
+      this.leadMembershipId.setValue(this.user.membership.teamId);
     }
   }
 
@@ -131,13 +131,5 @@ export class MembersQuestApprovalComponent implements OnInit {
 
       <p>REWARDS AND RECOGNITION PH</p>
       `;
-  }
-
-  compareById(mem1: Membership, mem2: Membership): boolean {
-    return mem1 && mem2 && mem1.teamId === mem2.teamId;
-  }
-
-  changeSelectedMembership() {
-    this.questsForApproval$ = this.playerQuest.getAllMemberSubmittedQuests(this.seasonId, this.selectedLeadMembership.teamId);
   }
 }
