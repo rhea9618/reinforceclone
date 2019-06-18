@@ -1,18 +1,30 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AuthService } from '../../core/auth.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'user-login',
   templateUrl: './user-login.component.html',
   styleUrls: ['./user-login.component.scss'],
 })
-export class UserLoginComponent {
+export class UserLoginComponent implements OnInit {
 
-  constructor(public auth: AuthService,
-              private router: Router) { }
+  showGoogleLogin = false;
+
+  constructor(
+    public auth: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    if (!environment.production) {
+      this.showGoogleLogin = !!this.route.snapshot.queryParams.google;
+    }
+  }
 
   async signInWithGoogle() {
     await this.auth.googleLogin();

@@ -6,7 +6,7 @@ import {
   Router
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import { map, take, tap } from 'rxjs/operators';
+import { map, skipWhile, take, tap } from 'rxjs/operators';
 
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AuthService } from './auth.service';
@@ -26,6 +26,7 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
     return this.auth.user$.pipe(
+      skipWhile(() => this.auth.isLoggingIn),
       take(1),
       map(user => !!user),
       tap(loggedIn => {

@@ -1,10 +1,13 @@
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AddQuestDialogComponent } from './add-quest-dialog/add-quest-dialog.component';
 import { AddQuestDialogService } from './add-quest-dialog/add-quest-dialog.service';
 
 import {
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatButtonToggleModule,
   MatCardModule,
   MatIconModule,
   MatGridListModule,
@@ -12,14 +15,16 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatListModule,
-  MatButtonModule,
-  MatSelectModule,
-  MatButtonToggleModule
+  MatProgressSpinnerModule,
+  MatSelectModule
 } from '@angular/material';
 
 @NgModule({
   imports: [
     CommonModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     MatIconModule,
     MatGridListModule,
@@ -27,10 +32,9 @@ import {
     MatFormFieldModule,
     MatInputModule,
     MatListModule,
-    MatButtonModule,
+    MatProgressSpinnerModule,
     MatSelectModule,
-    MatButtonToggleModule,
-    FormsModule
+    ReactiveFormsModule
   ],
   declarations: [ AddQuestDialogComponent ],
   entryComponents: [ AddQuestDialogComponent ],

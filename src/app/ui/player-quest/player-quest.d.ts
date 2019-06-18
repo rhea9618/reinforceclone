@@ -18,8 +18,6 @@ interface PlayerQuest {
   submitted?: firebase.firestore.Timestamp;
   completed?: firebase.firestore.Timestamp;
   completionProof?: string; // link to screenshot?
-  questName: string;
-  source: string;    // e.g. LMS
+  quest: Quest;
   required: boolean; // true = 10 points granted, else 5 points
-  category: QuestCategory;
 }

@@ -5,15 +5,15 @@
 <form [formGroup]="form">
   <div mat-dialog-content>
     <mat-form-field class="content" [floatLabel]="true">
-      <input matInput disabled placeholder="Category" value="{{data.category.name}}" />
+      <input matInput disabled placeholder="Category" value="{{data.quest.category.name}}" />
     </mat-form-field>
     <br />
     <mat-form-field>
-      <input matInput disabled placeholder="Quest Name" value="{{data.questName}}" />
+      <input matInput disabled placeholder="Quest Name" value="{{data.quest.name}}" />
     </mat-form-field>
     <br />
     <mat-form-field>
-      <input matInput disabled placeholder="Source" value="{{data.source}}" />
+      <input matInput disabled placeholder="Source" value="{{data.quest.source}}" />
     </mat-form-field>
     <br />
     <mat-form-field>

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/auth.service';
 import { Observable } from 'rxjs';
-import { SeasonService } from 'src/app/core/season.service';
-import { TeamsService } from '../../teams/teams.service';
-import { take, tap, flatMap } from 'rxjs/operators';
+
+import { TeamsService } from 'src/app/teams/teams.service';
 
 @Component({
   selector: 'team-page',
@@ -11,24 +10,19 @@ import { take, tap, flatMap } from 'rxjs/operators';
   styleUrls: ['./team-page.component.scss']
 })
 export class TeamPageComponent implements OnInit {
-  seasonId$: Observable<string>;
+  seasonId: string;
   teams$: Observable<Membership[]>;
   selectedTeam: Membership;
 
-  constructor(public auth: AuthService, public seasonService: SeasonService, public teamService: TeamsService) {
-    this.seasonId$ = this.seasonService.getEnabledSeasonId();
-  }
+  constructor(public auth: AuthService, private teamService: TeamsService) {}
 
   ngOnInit() {
-    this.selectedTeam = null;
+    this.seasonId = this.auth.seasonId;
+
+    const user = this.auth.user$.value;
+    this.selectedTeam = user.membership;
     // getting the list of teams the user is a member of
-    this.teams$ = this.auth.user$.pipe(
-      take(1),
-      tap((user: User) => {
-        this.selectedTeam = user.membership;
-      }),
-      flatMap((user) => this.teamService.getAllMemberships(user.uid))
-    );
+    this.teams$ = this.teamService.getAllMemberships(user.uid);
   }
 
   compareById(mem1: Membership, mem2: Membership): boolean {

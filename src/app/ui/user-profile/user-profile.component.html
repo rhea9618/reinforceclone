@@ -35,12 +35,6 @@
       <div class="quest-space" *ngIf="playerMembership">
         <mat-toolbar class="quest-toolbar" color="primary">
           My Quests
-          <span class="spacer"></span>
-          <!-- Enable Add Own Quest if in debug mode -->
-          <a *ngIf="debugMode" mat-button (click)="addQuest(user, user)">
-            <mat-icon class="icon">add_box</mat-icon>
-            Add Quest
-          </a>
         </mat-toolbar>
         <player-quest-list [user]="user" isOwner="true"></player-quest-list>
       </div>

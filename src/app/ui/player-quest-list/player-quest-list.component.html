@@ -1,35 +1,37 @@
 <table mat-table [dataSource]="questList$ | async">
   <ng-container matColumnDef="type">
     <th mat-header-cell *matHeaderCellDef> Type </th>
-    <td mat-cell *matCellDef="let quest">
-      {{ quest.required ? 'Required' : 'Additional' }}
+    <td mat-cell *matCellDef="let playerQuest">
+      {{ playerQuest.required ? 'Required' : 'Additional' }}
     </td>
   </ng-container>
   <ng-container matColumnDef="questName">
     <th mat-header-cell *matHeaderCellDef> Quest </th>
-    <td mat-cell *matCellDef="let quest">
+    <td mat-cell *matCellDef="let playerQuest">
       <div class="quest">
-        {{ quest.questName }}
-        <span>Category: {{ quest.category.name }}</span>
+        {{ playerQuest.quest.name }}
+        <span>
+          Category: {{ playerQuest.quest.category.name }} | Source: {{ playerQuest.quest.source }}
+        </span>
       </div>
     </td>
   </ng-container>
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef> Status </th>
-    <td mat-cell *matCellDef="let quest">
-      <span *ngIf="quest.status === 'completed'"
-        matTooltip="Completed on {{quest.completed  | firestoreDate}}">
+    <td mat-cell *matCellDef="let playerQuest">
+      <span *ngIf="playerQuest.status === 'completed'"
+        matTooltip="Completed on {{playerQuest.completed  | firestoreDate}}">
         Completed
       </span>
-      <span *ngIf="quest.status === 'pending'">
+      <span *ngIf="playerQuest.status === 'pending'">
         For Validation
       </span>
-      <span *ngIf="!isOwner && quest.status === 'todo'">
+      <span *ngIf="!isOwner && playerQuest.status === 'todo'">
         Ongoing
       </span>
-      <button *ngIf="isOwner && quest.status === 'todo'"
+      <button *ngIf="isOwner && playerQuest.status === 'todo'"
         matTooltip="Submit for Completion"
-        mat-raised-button color="primary" (click)="openSubmitQuestDialog(quest)">
+        mat-raised-button color="primary" (click)="openSubmitQuestDialog(playerQuest)">
         Submit
         <mat-icon>send</mat-icon>
       </button>
@@ -37,19 +39,19 @@
   </ng-container>
   <ng-container matColumnDef="xp">
     <th mat-header-cell *matHeaderCellDef> XP </th>
-    <td mat-cell *matCellDef="let quest" class="questXP"
-      [ngClass]="{'completedXP': quest.status === 'completed'}">
-      {{ quest.required ? 10 : 5 }} XP
+    <td mat-cell *matCellDef="let playerQuest" class="questXP"
+      [ngClass]="{'completedXP': playerQuest.status === 'completed'}">
+      {{ playerQuest.required ? 10 : 5 }} XP
     </td>
   </ng-container>
   <ng-container matColumnDef="action">
     <th mat-header-cell *matHeaderCellDef> Actions </th>
-    <td mat-cell *matCellDef="let quest">
-      <div *ngIf="quest.status !== 'completed'">
-        <a matTooltip="Modify Quest" mat-icon-button (click)="editQuest(quest)">
+    <td mat-cell *matCellDef="let playerQuest">
+      <div *ngIf="playerQuest.status !== 'completed'">
+        <a matTooltip="Modify Quest" mat-icon-button (click)="editQuest(playerQuest)">
           <mat-icon>edit</mat-icon>
         </a>
-        <a matTooltip="Delete Quest" mat-icon-button (click)="deleteQuest(quest)">
+        <a matTooltip="Delete Quest" mat-icon-button (click)="deleteQuest(playerQuest)">
           <mat-icon>delete</mat-icon>
         </a>
       </div>

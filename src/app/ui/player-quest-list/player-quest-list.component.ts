@@ -4,6 +4,7 @@ import { EMPTY, from, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { PlayerQuestService } from '../player-quest/player-quest.service';
+import { AuthService } from 'src/app/core/auth.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 import { SeasonService } from 'src/app/core/season.service';
@@ -31,6 +32,7 @@ export class PlayerQuestListComponent implements OnInit {
   ];
 
   constructor(
+    private auth: AuthService,
     private emailService: EmailService,
     private dialog: MatDialog,
     private notifyService: NotifyService,
@@ -40,16 +42,15 @@ export class PlayerQuestListComponent implements OnInit {
     private confirmationModal: ConfirmationModalService
    ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     if (!this.isOwner) {
       this.displayedColumns.push('action');
     }
 
-    const seasonId = await this.season.getEnabledSeasonId().toPromise();
-
-    if (this.user && this.user.membership) {
-      const teamId = this.user.membership.teamId;
-      this.questList$ = this.playerQuestService.getMemberQuests(seasonId, teamId, this.user.uid);
+    if (this.user) {
+      const membership = (this.user.membership ? this.user.membership : this.user) as Membership;
+      this.questList$ =
+        this.playerQuestService.getMemberQuests(this.auth.seasonId, membership.teamId, this.user.uid);
     }
   }
 
@@ -69,47 +70,47 @@ export class PlayerQuestListComponent implements OnInit {
     });
   }
 
-  private questInfoEmail(quest: PlayerQuest): string {
-    const type = quest.required ? 'Required' : 'Additional';
+  private questInfoEmail(playerQuest: PlayerQuest): string {
+    const type = playerQuest.required ? 'Required' : 'Additional';
     return `
       Quest Type: ${type}<br/>
-      Category: ${quest.category.name}<br/>
-      Quest: ${quest.questName}<br/>
-      Source: ${quest.source}<br/>`;
+      Category: ${playerQuest.quest.category.name}<br/>
+      Quest: ${playerQuest.quest.name}<br/>
+      Source: ${playerQuest.quest.source}<br/>`;
   }
 
-  private sendQuestSubmittedEmail(quest: PlayerQuest) {
-    const type = quest.required ? 'Required' : 'Additional';
-    const xp = quest.required ? '10 XP' : '5 XP';
-    const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${quest.category.name}] Validation of Quest Completion for ${quest.playerName}`;
+  private sendQuestSubmittedEmail(playerQuest: PlayerQuest) {
+    const type = playerQuest.required ? 'Required' : 'Additional';
+    const xp = playerQuest.required ? '10 XP' : '5 XP';
+    const subjectPrefix = '[Gamification of Learnings and Certifications] [${type}] [${playerQuest.quest.category.name}]';
+    const subject = `${subjectPrefix} Validation of Quest Completion for ${playerQuest.playerName}`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
-    const questInfo = this.questInfoEmail(quest);
-    const attachment = quest.completionProof ?
-      `<a href="${quest.completionProof}">${quest.completionProof}</a><br/>` : '<br/>';
+    const questInfo = this.questInfoEmail(playerQuest);
+    const attachment = playerQuest.completionProof ?
+      `<a href="${playerQuest.completionProof}">${playerQuest.completionProof}</a><br/>` : '<br/>';
     const content =
-      `Player ${quest.playerName} has completed a quest!<br/>
+      `Player ${playerQuest.playerName} has completed a quest!<br/>
       <br/>
       ${questInfo}
-      Date Completed: ${quest.completed}<br/>
+      Date Completed: ${playerQuest.completed}<br/>
       Attachment: ${attachment}
       <br/>
-      Visit your <a href="${dashboardUrl}">dashboard</a> to award ${quest.playerName} ${xp}<br/>
+      Visit your <a href="${dashboardUrl}">dashboard</a> to award ${playerQuest.playerName} ${xp}<br/>
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-    this.emailService.sendEmail([quest.teamLeadEmail], subject, content, 'HTML')
-      .subscribe(() => this.notifyService.update(`${quest.questName} submitted!`));
+    this.emailService.sendEmail([playerQuest.teamLeadEmail], subject, content, 'HTML')
+      .subscribe(() => this.notifyService.update(`${playerQuest.quest.name} submitted!`));
   }
 
-  private sendQuestUpdatedEmail(quest: PlayerQuest) {
-    const type = quest.required ? 'Required' : 'Additional';
+  private sendQuestUpdatedEmail(playerQuest: PlayerQuest) {
+    const type = playerQuest.required ? 'Required' : 'Additional';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} Revisit your [${type}] [${quest.category.name}] Quest Details`;
+    const subject = `${subjectPrefix} Revisit your [${type}] [${playerQuest.quest.category.name}] Quest Details`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
-    const questInfo = this.questInfoEmail(quest);
+    const questInfo = this.questInfoEmail(playerQuest);
     const content =
-      `Hi ${quest.playerName}!<br/>
+      `Hi ${playerQuest.playerName}!<br/>
       <br/>
       Your quest has been updated.<br/>
       <br/>
@@ -120,8 +121,8 @@ export class PlayerQuestListComponent implements OnInit {
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-    this.emailService.sendEmail([quest.playerEmail], subject, content, 'HTML')
-      .subscribe(() => this.notifyService.update(`${quest.questName} updated!`));
+    this.emailService.sendEmail([playerQuest.playerEmail], subject, content, 'HTML')
+      .subscribe(() => this.notifyService.update(`${playerQuest.quest.name} updated!`));
   }
 
   public editQuest(playerQuest: PlayerQuest) {
@@ -135,14 +136,14 @@ export class PlayerQuestListComponent implements OnInit {
     });
   }
 
-  private sendQuestDeletedEmail(quest: PlayerQuest) {
-    const type = quest.required ? 'Required' : 'Additional';
+  private sendQuestDeletedEmail(playerQuest: PlayerQuest) {
+    const type = playerQuest.required ? 'Required' : 'Additional';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${quest.category.name}] Quest Cancelled`;
+    const subject = `${subjectPrefix} [${type}] [${playerQuest.quest.category.name}] Quest Cancelled`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
-    const questInfo = this.questInfoEmail(quest);
+    const questInfo = this.questInfoEmail(playerQuest);
     const content =
-      `Hi ${quest.playerName}!<br/>
+      `Hi ${playerQuest.playerName}!<br/>
       <br/>
       Your quest below has been cancelled.<br/>
       <br/>
@@ -152,12 +153,12 @@ export class PlayerQuestListComponent implements OnInit {
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-    this.emailService.sendEmail([quest.playerEmail], subject, content, 'HTML')
-      .subscribe(() => this.notifyService.update(`${quest.questName} deleted!`));
+    this.emailService.sendEmail([playerQuest.playerEmail], subject, content, 'HTML')
+      .subscribe(() => this.notifyService.update(`${playerQuest.quest.name} deleted!`));
   }
 
   public deleteQuest(playerQuest: PlayerQuest) {
-    const message = `Are you sure you want to delete ${playerQuest.questName}`;
+    const message = `Are you sure you want to delete ${playerQuest.quest.name}`;
     this.confirmationModal.showConfirmation({ message }).pipe(
       flatMap((proceed: boolean) => {
         if (proceed) {
