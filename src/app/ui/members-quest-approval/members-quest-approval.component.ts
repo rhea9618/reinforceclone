@@ -11,7 +11,7 @@ import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reaso
 import { TeamsService } from 'src/app/teams/teams.service';
 import { FormControl } from '@angular/forms';
 import { AuthService } from 'src/app/core/auth.service';
-import { flatMap } from 'rxjs/operators';
+import { flatMap, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'members-quest-approval',
@@ -46,13 +46,11 @@ export class MembersQuestApprovalComponent implements OnInit {
       this.leadMemberships$ = this.teamsService.getAllLeadMemberships(this.user.uid);
 
       this.questsForApproval$ = this.leadMembershipId.valueChanges.pipe(
+        startWith(this.user.membership.teamId),
         flatMap(teamId => this.playerQuest.getAllMemberSubmittedQuests(this.seasonId, teamId))
       );
 
-      // had to do this since the value changes function is not being triggered when the set value is not enclosed in a set timeout function
-      setTimeout(function() {
-        this.leadMembershipId.setValue(this.user.membership.teamId);
-      }.bind(this), 0);
+      this.leadMembershipId.setValue(this.user.membership.teamId);
     }
   }
 
