@@ -40,7 +40,7 @@ export class MembersQuestApprovalComponent implements OnInit {
     private auth: AuthService,
     private teamsService: TeamsService) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     if (this.user && this.user.membership)  {
       this.seasonId = this.auth.seasonId;
       this.leadMemberships$ = this.teamsService.getAllLeadMemberships(this.user.uid);
