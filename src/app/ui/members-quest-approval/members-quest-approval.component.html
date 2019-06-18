@@ -1,7 +1,7 @@
 <div>
-  <mat-form-field>
-    <mat-select placeholder="Team:"
-    name="selectedLeadMembership" [formControl]="leadMembershipId">
+  <mat-form-field appearance="outline">
+    <mat-label>Team</mat-label>
+    <mat-select name="selectedLeadMembership" [formControl]="leadMembershipId">
       <mat-option *ngFor="let team of leadMemberships$ | async" [value]="team.teamId">
         {{team.teamName}}
       </mat-option>
@@ -14,7 +14,7 @@
 <table mat-table [dataSource]="questsForApproval$ | async">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef> Quest Name </th>
-    <td mat-cell *matCellDef="let quest"> {{quest.quest.name}} </td>
+    <td mat-cell *matCellDef="let quest"> Test {{quest.quest.name}} </td>
   </ng-container>
 
   <ng-container matColumnDef="submitted_by">

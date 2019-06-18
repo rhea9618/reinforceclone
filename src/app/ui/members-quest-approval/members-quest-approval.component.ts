@@ -1,17 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs';
-import { flatMap, take, tap, map } from 'rxjs/operators';
 
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
-import { SeasonService } from 'src/app/core/season.service';
 import { environment } from 'src/environments/environment';
 import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
 import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component';
 import { TeamsService } from 'src/app/teams/teams.service';
 import { FormControl } from '@angular/forms';
+import { AuthService } from 'src/app/core/auth.service';
+import { flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'members-quest-approval',
@@ -23,7 +23,7 @@ export class MembersQuestApprovalComponent implements OnInit {
   questsForApproval$: Observable<PlayerQuest[]>;
   leadMemberships$: Observable<Membership[]>;
   private seasonId: string;
-  leadMembershipId = new FormControl('', []);
+  leadMembershipId = new FormControl();
 
   readonly displayedColumns = [
     'name',
@@ -37,19 +37,22 @@ export class MembersQuestApprovalComponent implements OnInit {
     private dialog: MatDialog,
     private notify: NotifyService,
     private playerQuest: PlayerQuestService,
-    private season: SeasonService,
+    private auth: AuthService,
     private teamsService: TeamsService) {}
 
   async ngOnInit() {
     if (this.user && this.user.membership)  {
-      this.seasonId = await this.season.getEnabledSeasonId().toPromise();
+      this.seasonId = this.auth.seasonId;
       this.leadMemberships$ = this.teamsService.getAllLeadMemberships(this.user.uid);
 
-      this.leadMembershipId.valueChanges.pipe(map(val => {
-        this.questsForApproval$ = this.playerQuest.getAllMemberSubmittedQuests(this.seasonId, val);
-      })).subscribe();
+      this.questsForApproval$ = this.leadMembershipId.valueChanges.pipe(
+        flatMap(teamId => this.playerQuest.getAllMemberSubmittedQuests(this.seasonId, teamId))
+      );
 
-      this.leadMembershipId.setValue(this.user.membership.teamId);
+      // had to do this since the value changes function is not being triggered when the set value is not enclosed in a set timeout function
+      setTimeout(function() {
+        this.leadMembershipId.setValue(this.user.membership.teamId);
+      }.bind(this), 0);
     }
   }
 
