@@ -1,17 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog, MatSnackBar } from '@angular/material';
-import { EMPTY, from, Observable } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
-import { firestore } from 'firebase/app';
-import Timestamp = firestore.Timestamp;
+import { MatDialog } from '@angular/material';
+import { Observable } from 'rxjs';
 
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
-import { SeasonService } from 'src/app/core/season.service';
 import { environment } from 'src/environments/environment';
 import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
 import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component';
+import { TeamsService } from 'src/app/teams/teams.service';
+import { FormControl } from '@angular/forms';
+import { AuthService } from 'src/app/core/auth.service';
+import { flatMap, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'members-quest-approval',
@@ -19,9 +19,11 @@ import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reaso
   styleUrls: ['./members-quest-approval.component.scss']
 })
 export class MembersQuestApprovalComponent implements OnInit {
-
   @Input() user: User;
   questsForApproval$: Observable<PlayerQuest[]>;
+  leadMemberships$: Observable<Membership[]>;
+  private seasonId: string;
+  leadMembershipId = new FormControl();
 
   readonly displayedColumns = [
     'name',
@@ -35,13 +37,20 @@ export class MembersQuestApprovalComponent implements OnInit {
     private dialog: MatDialog,
     private notify: NotifyService,
     private playerQuest: PlayerQuestService,
-    private season: SeasonService) {}
+    private auth: AuthService,
+    private teamsService: TeamsService) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     if (this.user && this.user.membership)  {
-      const teamId = this.user.membership.teamId;
-      const seasonId = await this.season.getEnabledSeasonId().toPromise();
-      this.questsForApproval$ = this.playerQuest.getAllMemberSubmittedQuests(seasonId, teamId);
+      this.seasonId = this.auth.seasonId;
+      this.leadMemberships$ = this.teamsService.getAllLeadMemberships(this.user.uid);
+
+      this.questsForApproval$ = this.leadMembershipId.valueChanges.pipe(
+        startWith(this.user.membership.teamId),
+        flatMap(teamId => this.playerQuest.getAllMemberSubmittedQuests(this.seasonId, teamId))
+      );
+
+      this.leadMembershipId.setValue(this.user.membership.teamId);
     }
   }
 

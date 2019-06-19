@@ -53,6 +53,19 @@ export class TeamsService {
     );
   }
 
+  /*
+  * Return ALL of the APPROVED memberships LEAD by the given user
+  */
+  getAllLeadMemberships(uid: string): Observable<Membership[]> {
+    const playerMemberships: AngularFirestoreCollection<Membership>
+      = this.afs.collection('membership', ref => ref.where('uid', '==', uid)
+      .where('isLead', '==' , true).where('isApproved', '==', true));
+
+    return playerMemberships.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data()) )
+    );
+  }
+
   // Get Membership in which user is a Player of
   getPlayerMembership(uid: string): Observable<Membership> {
     const membershipCol: AngularFirestoreCollection<Membership> =
