@@ -1,19 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { MsalService} from '@azure/msal-angular';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { firebase } from '@firebase/app';
-import { auth, functions } from 'firebase';
+import { auth } from 'firebase';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { flatMap, map, switchMap, tap } from 'rxjs/operators';
-import {
-  AngularFirestore,
-  AngularFirestoreDocument
-} from '@angular/fire/firestore';
-import { AngularFireFunctions } from '@angular/fire/functions';
 
 import { AdminService } from './admin.service';
-import { EmailService } from './email.service';
 import { NotifyService } from './notify.service';
 import { UserService } from './user.service';
 import { SeasonService } from './season.service';
@@ -24,17 +18,15 @@ import { PlayerPointsService } from '../ui/player-quest/player-points.service';
 export class AuthService {
 
   seasonId: string;
+  credential: auth.OAuthCredential;
   user$ = new BehaviorSubject<User>(null);
   isLoggingIn = true;
 
   constructor(
     private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
-    private afFunctions: AngularFireFunctions,
-    private msal: MsalService,
     private router: Router,
     private admin: AdminService,
-    private email: EmailService,
     private notify: NotifyService,
     private user: UserService,
     private season: SeasonService,
@@ -56,14 +48,6 @@ export class AuthService {
     ).subscribe(this.user$);
   }
 
-  private checkMicrosoftState() {
-    // Signout if there's an error getting MS token
-    this.email.getToken().subscribe(null, (error) => {
-      console.log(error);
-      this.microsoftSignIn();
-    });
-  }
-
   private getAllUserInfo(uid: string): Observable<User> {
     const user$ = this.user.getUser(uid);
     const isAdmin$ = this.admin.isAdmin(uid);
@@ -75,21 +59,13 @@ export class AuthService {
       })
     );
 
-    return combineLatest(user$, isAdmin$, membership$, seasonExp$).pipe(
-      map(([user, isAdmin, membership, seasonExp]) => {
-        // TODO: disable for now and monitor
-        // token checker in EmailService as needed
-        // if (user.isMicrosoft) {
-        //   this.checkMicrosoftState();
-        // }
-
-        return {
-          ...user,
-          isAdmin,
-          membership,
-          seasonExp
-        };
-      })
+    return combineLatest([user$, isAdmin$, membership$, seasonExp$]).pipe(
+      map(([user, isAdmin, membership, seasonExp]) => ({
+        ...user,
+        isAdmin,
+        membership,
+        seasonExp
+      }))
     );
   }
 
@@ -115,16 +91,23 @@ export class AuthService {
     return this.oAuthLogin(provider);
   }
 
+  microsoftLogin() {
+    const provider = new auth.OAuthProvider('microsoft.com');
+    // provider.addScope('offline_access');
+    return this.oAuthLogin(provider);
+  }
+
   private oAuthLogin(provider: any) {
     return this.afAuth.auth
       .signInWithPopup(provider)
-      .then(credential => {
-        this.notify.update('Welcome to LeaderBoard!!!', 'success');
-        return this.setUserDoc({
-          uid: credential.user.uid,
-          email: credential.user.email,
-          displayName: credential.user.displayName
-        });
+      .then((credential: auth.UserCredential) => {
+        this.credential = credential.credential;
+        // Create user document only for new users
+        const info = credential.additionalUserInfo;
+        if (info && info.isNewUser) {
+          this.setUserDoc(credential);
+        }
+        return this.credential;
       })
       .catch(error => this.handleError(error));
   }
@@ -136,7 +119,7 @@ export class AuthService {
       .signInAnonymously()
       .then(credential => {
         this.notify.update('Welcome to LeaderBoard!!!', 'success');
-        return this.setUserDoc(credential.user); // if using firestore
+        return this.setUserDoc(credential); // if using firestore
       })
       .catch(error => {
         this.handleError(error);
@@ -150,7 +133,7 @@ export class AuthService {
       .createUserWithEmailAndPassword(email, password)
       .then(credential => {
         this.notify.update('Welcome new user!', 'success');
-        return this.setUserDoc(credential.user); // if using firestore
+        return this.setUserDoc(credential); // if using firestore
       })
       .catch(error => this.handleError(error));
   }
@@ -160,7 +143,7 @@ export class AuthService {
       .signInWithEmailAndPassword(email, password)
       .then(credential => {
         this.notify.update('Welcome back!', 'success');
-        return this.setUserDoc(credential.user);
+        return this.setUserDoc(credential);
       })
       .catch(error => this.handleError(error));
   }
@@ -175,43 +158,7 @@ export class AuthService {
       .catch(error => this.handleError(error));
   }
 
-  async microsoftSignIn() {
-    this.isLoggingIn = true;
-
-    await this.msal.loginPopup(['user.read', 'mail.send']);
-
-    const user = this.msal.getUser();
-    const createFirebaseToken = this.afFunctions.httpsCallable('createFirebaseToken');
-    const result = await createFirebaseToken({
-      uid: user.userIdentifier,
-      email: user.displayableId,
-      displayName: user.name
-    }).toPromise();
-
-    return this.afAuth.auth
-      .signInWithCustomToken(result.token)
-      .then(credential => {
-        this.isLoggingIn = false;
-        this.notify.update(`Welcome ${credential.user.displayName}!`, 'success');
-        return this.setUserDoc({
-          uid: credential.user.uid,
-          email: credential.user.email,
-          displayName: credential.user.displayName,
-          isMicrosoft: true
-        });
-      })
-      .catch(error => this.handleError(error));
-  }
-
-  microsoftSignOut() {
-    this.msal.logout();
-  }
-
   signOut() {
-    if (this.msal.getUser()) {
-      this.microsoftSignOut();
-    }
-
     this.afAuth.auth.signOut().then(() => {
       this.router.navigate(['/']);
     });
@@ -222,14 +169,28 @@ export class AuthService {
     this.isLoggingIn = false;
     console.error(error);
     this.notify.update(error.message, 'error');
+    return this.credential;
   }
 
-  // Sets user data to firestore after succesful login
-  private setUserDoc(user: User) {
-    const userRef: AngularFirestoreDocument<User> = this.afs.doc(
-      `users/${user.uid}`
-    );
+  // Saves user data to firestore after successful login
+  private setUserDoc(credential: auth.UserCredential) {
+    const uid = credential.user.uid;
+    const email = credential.user.email;
+    const displayName = credential.user.displayName;
+    const isMicrosoft = (credential.credential.providerId === 'microsoft.com');
+    const additionalInfo = credential.additionalUserInfo ?
+      credential.additionalUserInfo.profile : null;
 
-    return userRef.set(user, { merge: true });
+    this.notify.update(`Welcome ${displayName}!`, 'success');
+    this.afs.doc(`users/${uid}`).set(
+      {
+        uid,
+        email,
+        displayName,
+        isMicrosoft,
+        additionalInfo
+      },
+      { merge: true }
+    );
   }
 }

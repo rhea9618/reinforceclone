@@ -58,7 +58,7 @@ export class UserProfileComponent implements OnInit {
     const membership$ = this.teamsService.getPlayerMembership(playerId);
     const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.auth.seasonId);
 
-    return combineLatest(membership$, seasonExp$).pipe(
+    return combineLatest([membership$, seasonExp$]).pipe(
       map(([membership, seasonExp]) => ({ ...membership, seasonExp })),
       catchError((err) => {
         console.log(err);

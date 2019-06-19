@@ -2,7 +2,7 @@
   <div *ngIf="!(auth.user$ | async); else alreadyLoggedIn">
     <h3>Login using your Microsoft Account.</h3>
 
-    <button *ngIf="showGoogleLogin" mat-raised-button color="primary" (click)="signInWithGoogle()">
+    <button *ngIf="showGoogleLogin && !auth.isLoggingIn" mat-raised-button color="primary" (click)="signInWithGoogle()">
       <i class="fa fa-google fa-lg"></i> Connect Google
     </button>
 
