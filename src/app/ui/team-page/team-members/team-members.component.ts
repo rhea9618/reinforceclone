@@ -75,11 +75,7 @@ export class TeamMembersComponent implements OnInit {
   }
 
   isAllowedToNavigate(member: Membership, currentUser: User): boolean {
-    if ((this._selectedTeam.isLead && member.uid !== currentUser.uid && !member.isLead)) {
-      return true;
-    }
-
-    return false;
+    return this._selectedTeam.isLead && member.uid !== currentUser.uid && !member.isLead;
   }
 
   private mergeMemberInfo(teamId: string): Observable<Membership[]> {
