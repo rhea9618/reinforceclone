@@ -43,7 +43,7 @@ export class EmailService {
     const credential = this.auth.credential;
     const token$ = credential ?
       of(credential.accessToken) :
-      from(this.auth.microsoftLogin()).pipe(map(credential => credential.accessToken));
+      from(this.auth.microsoftLogin()).pipe(map(creds => creds.accessToken));
 
     return token$.pipe(
       flatMap((token: string) => {
