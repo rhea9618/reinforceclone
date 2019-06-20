@@ -74,6 +74,14 @@ export class TeamMembersComponent implements OnInit {
     });
   }
 
+  isAllowedToNavigate(member: Membership, currentUser: User): boolean {
+    if ((this._selectedTeam.isLead && member.uid !== currentUser.uid && !member.isLead)) {
+      return true;
+    }
+
+    return false;
+  }
+
   private mergeMemberInfo(teamId: string): Observable<Membership[]> {
     const teamMembers$ = this.teamsService.getTeamMembers(teamId);
     const teamPoints$ = this.playerPointsService.getTeamPoints(teamId, this.seasonId);
