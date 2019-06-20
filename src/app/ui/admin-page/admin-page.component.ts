@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 
 import { AuthService } from '../../core/auth.service';
 import { SeasonService } from '../../core/season.service';
+import { MatDialog } from '@angular/material';
+import { AddSeasonDialogComponent } from './add-season-dialog.component';
+import { NotifyService } from 'src/app/core/notify.service';
 
 @Component({
   selector: 'admin-page',
@@ -13,6 +16,8 @@ import { SeasonService } from '../../core/season.service';
 export class AdminPageComponent implements OnInit {
   readonly displayedColumns = [
     'name',
+    'startDate',
+    'endDate',
     'created_by',
     'updated_by',
     'enabled',
@@ -24,8 +29,10 @@ export class AdminPageComponent implements OnInit {
   loading = false;
 
   constructor(
+    private dialog: MatDialog,
     public auth: AuthService,
-    private seasonService: SeasonService
+    private seasonService: SeasonService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit() {
@@ -33,7 +40,7 @@ export class AdminPageComponent implements OnInit {
   }
 
   addSeason(user: User) {
-    this.seasonService.createSeason(this.newSeason.value, {
+    this.seasonService.createSeason(this.newSeason.value, new Date(), new Date(), {
       uid: user.uid,
       displayName: user.displayName
     });
@@ -53,5 +60,21 @@ export class AdminPageComponent implements OnInit {
 
   get error() {
     return this.newSeason.hasError('required') ? 'You must enter a value' : '';
+  }
+
+  openSeasonDialog(user: User) {
+    const addSeasonDialog = this.dialog.open(AddSeasonDialogComponent, {width: '400px'});
+    addSeasonDialog.afterClosed().subscribe( data => {
+      if (data) {
+        this.seasonService.createSeason(data.name, data.startDate, data.endDate, {
+          uid: user.uid,
+          displayName: user.displayName
+        })
+        .catch((err) => {
+          console.log(err);
+          this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
+        });;
+      }
+    });
   }
 }

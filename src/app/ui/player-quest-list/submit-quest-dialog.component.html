@@ -5,15 +5,15 @@
 <form [formGroup]="form">
   <div mat-dialog-content>
     <mat-form-field class="content" [floatLabel]="true">
-      <input matInput disabled placeholder="Category" value="{{data.quest.category.name}}" />
+      <input matInput disabled placeholder="Category" value="{{data.quest.quest.category.name}}" />
     </mat-form-field>
     <br />
     <mat-form-field>
-      <input matInput disabled placeholder="Quest Name" value="{{data.quest.name}}" />
+      <input matInput disabled placeholder="Quest Name" value="{{data.quest.quest.name}}" />
     </mat-form-field>
     <br />
     <mat-form-field>
-      <input matInput disabled placeholder="Source" value="{{data.quest.source}}" />
+      <input matInput disabled placeholder="Source" value="{{data.quest.quest.source}}" />
     </mat-form-field>
     <br />
     <mat-form-field>
@@ -21,6 +21,7 @@
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
       <mat-error *ngIf="hasError('completed','required')">Completion date is a required field</mat-error>
+      <mat-error *ngIf="hasError('completed','valid')">Completion date should be within the seasons date range</mat-error>
     </mat-form-field>
     <br />
     <mat-form-field>

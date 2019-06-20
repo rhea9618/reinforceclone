@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl,  Validators} from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl,  Validators, ValidatorFn, AbstractControl} from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 
@@ -14,19 +14,33 @@ export class SubmitQuestDialogComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<SubmitQuestDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: PlayerQuest
+    @Inject(MAT_DIALOG_DATA) public data: {quest: Quest, season: Season}
   ) {}
 
   ngOnInit() {
     this.form = new FormGroup({
-      questId: new FormControl(this.data.id, [ Validators.required ]),
-      completed:  new FormControl(this.currentDate, [ Validators.required ]),
+      questId: new FormControl(this.data.quest.id, [ Validators.required ]),
+      completed:  new FormControl(this.currentDate, [ Validators.required, this.createCompletionDateValidator() ]),
       completionProof: new FormControl(null, [ Validators.pattern('(http|https)://[^ "]+') ])
     });
   }
 
   public hasError(controlName: string, errorName: string) {
     return this.form.controls[controlName].hasError(errorName);
+  }
+
+  createCompletionDateValidator(): ValidatorFn {
+    return  (control: AbstractControl): {[key: string]: boolean} | null => {
+      if (control.value !== undefined) {
+        const completionDate = control.value;
+        const seasonStartDate = this.data.season.startDate.toDate();
+        const seasonEndDate = this.data.season.endDate.toDate();
+        if (seasonStartDate.getTime() >= completionDate.getTime() || seasonEndDate.getTime() <= completionDate.getTime()) {
+          return {'valid': true};
+        }
+      }
+      return null;
+    };
   }
 
   submitQuest() {

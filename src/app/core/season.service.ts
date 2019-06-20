@@ -36,12 +36,14 @@ export class SeasonService {
     return this.afs.doc<Season>(`seasons/${id}`);
   }
 
-  createSeason(name: string, user: Partial<User>) {
+  createSeason(name: string, startDate: Date, endDate: Date, user: Partial<User>) {
     return this.seasonsCollection.add({
       name,
       created: this.timestamp,
       updated: this.timestamp,
       enabled: false,
+      startDate: firestore.Timestamp.fromDate(startDate),
+      endDate: firestore.Timestamp.fromDate(endDate),
       created_by: user,
       updated_by: user
     });
