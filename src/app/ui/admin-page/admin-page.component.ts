@@ -73,7 +73,7 @@ export class AdminPageComponent implements OnInit {
         .catch((err) => {
           console.log(err);
           this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
-        });;
+        });
       }
     });
   }

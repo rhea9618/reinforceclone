@@ -45,5 +45,4 @@ export class AddSeasonDialogComponent implements OnInit {
       return null;
     };
   }
-  
 }
