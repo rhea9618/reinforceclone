@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MsalService} from '@azure/msal-angular';
-import { Observable, from, of } from 'rxjs';
-import { catchError, flatMap, tap } from 'rxjs/operators';
+import { from, of } from 'rxjs';
+import { flatMap, map } from 'rxjs/operators';
+import { AuthService } from 'src/app/core/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,39 +10,14 @@ import { catchError, flatMap, tap } from 'rxjs/operators';
 export class EmailService {
 
   readonly url = 'https://graph.microsoft.com/v1.0/me/sendMail';
-  readonly scopes = ['user.read', 'mail.send'];
+  readonly scopes = ['mail.send'];
 
   constructor(
-    private http: HttpClient,
-    private msalService: MsalService
+    private auth: AuthService,
+    private http: HttpClient
   ) {}
 
-  private loginAndGetToken() {
-    return from(this.msalService.loginPopup(this.scopes)).pipe(
-      tap((result => console.log(result)))
-    );
-  }
-
-  getToken(): Observable<string> {
-    const cache = this.msalService.getCachedTokenInternal(this.scopes);
-    if (cache && cache.token) {
-      return of(cache.token);
-    }
-
-    return from(this.msalService.acquireTokenSilent(this.scopes)).pipe(
-      catchError((error) => {
-        console.log(error);
-        // try to retrieve token thru popup
-        return from(this.msalService.acquireTokenPopup(this.scopes));
-      }),
-      catchError((error) => {
-        console.log(error);
-        // User login must be required
-        return from(this.loginAndGetToken());
-      })
-    );
-  }
-
+  // TODO: Replaced with a mail sending service
   sendEmail(
     emailAddress: string[],
     subject: string,
@@ -65,7 +40,12 @@ export class EmailService {
       saveToSentItems: false
     };
 
-    return this.getToken().pipe(
+    const credential = this.auth.credential;
+    const token$ = credential ?
+      of(credential.accessToken) :
+      from(this.auth.microsoftLogin()).pipe(map(creds => creds.accessToken));
+
+    return token$.pipe(
       flatMap((token: string) => {
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         return this.http.post(this.url, body, { headers });

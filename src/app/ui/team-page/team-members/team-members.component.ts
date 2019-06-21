@@ -78,7 +78,7 @@ export class TeamMembersComponent implements OnInit {
     const teamMembers$ = this.teamsService.getTeamMembers(teamId);
     const teamPoints$ = this.playerPointsService.getTeamPoints(teamId, this.seasonId);
 
-    return combineLatest(teamMembers$, teamPoints$).pipe(
+    return combineLatest([teamMembers$, teamPoints$]).pipe(
       map(([teamMembers, teamPoints]) => {
         return this.joinPointsToMember(teamMembers, teamPoints);
       })

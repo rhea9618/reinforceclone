@@ -65,9 +65,8 @@ export class JoinTeamPageComponent implements OnInit {
       flatMap(() => this.teams.getTeamLeadEmails(team.id)),
       flatMap((leadEmails) => this.emailLeads(user.displayName, leadEmails))
     ).subscribe(() => {
-      this.notify.update(`Now applied to ${team.name}`);
-    }, null, () => {
       this.applyingTeam = false;
+      this.notify.update(`Now applied to ${team.name}`);
     });
   }
 }
