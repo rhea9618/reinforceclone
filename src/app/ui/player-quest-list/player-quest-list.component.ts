@@ -24,6 +24,7 @@ export class PlayerQuestListComponent implements OnInit {
   @Input() isOwner: boolean;
 
   questList$: Observable<PlayerQuest[]>;
+  season: Season;
   displayedColumns = [
     'type',
     'questName',
@@ -37,7 +38,7 @@ export class PlayerQuestListComponent implements OnInit {
     private dialog: MatDialog,
     private notifyService: NotifyService,
     private playerQuestService: PlayerQuestService,
-    private season: SeasonService,
+    private seasonService: SeasonService,
     private addQuestDialog: AddQuestDialogService,
     private confirmationModal: ConfirmationModalService
    ) {}
@@ -51,11 +52,15 @@ export class PlayerQuestListComponent implements OnInit {
       const membership = (this.user.membership ? this.user.membership : this.user) as Membership;
       this.questList$ =
         this.playerQuestService.getMemberQuests(this.auth.seasonId, membership.teamId, this.user.uid);
+      this.seasonService.getEnabledSeason().subscribe( season => {
+        this.season = season;
+      });
     }
   }
 
   public openSubmitQuestDialog(playerQuest: PlayerQuest) {
-    const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent, { data: playerQuest, width: '400px' });
+    const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent,
+      {data: {playerQuest: playerQuest, season: this.season}, width: '600px' });
     submitQuestDialog.afterClosed().subscribe( data => {
       if (data && data.questId) {
         this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
