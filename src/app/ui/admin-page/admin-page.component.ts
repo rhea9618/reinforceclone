@@ -25,7 +25,6 @@ export class AdminPageComponent implements OnInit {
   ];
 
   seasons$: Observable<Season[]>;
-  newSeason = new FormControl('', [ Validators.required ]);
   loading = false;
 
   constructor(
@@ -39,13 +38,6 @@ export class AdminPageComponent implements OnInit {
     this.seasons$ = this.seasonService.getData();
   }
 
-  addSeason(user: User) {
-    this.seasonService.createSeason(this.newSeason.value, new Date(), new Date(), {
-      uid: user.uid,
-      displayName: user.displayName
-    });
-  }
-
   enable(season: Season, user: User) {
     const userInfo = {
       uid: user.uid,
@@ -56,10 +48,6 @@ export class AdminPageComponent implements OnInit {
     this.seasonService.enableSeason(season.id, userInfo).subscribe(() => {
       this.loading = false;
     });
-  }
-
-  get error() {
-    return this.newSeason.hasError('required') ? 'You must enter a value' : '';
   }
 
   openSeasonDialog(user: User) {

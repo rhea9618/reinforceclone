@@ -60,7 +60,7 @@ export class PlayerQuestListComponent implements OnInit {
 
   public openSubmitQuestDialog(playerQuest: PlayerQuest) {
     const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent,
-      {data: {quest: playerQuest, season: this.season}, width: '400px' });
+      {data: {playerQuest: playerQuest, season: this.season}, width: '600px' });
     submitQuestDialog.afterClosed().subscribe( data => {
       if (data && data.questId) {
         this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
