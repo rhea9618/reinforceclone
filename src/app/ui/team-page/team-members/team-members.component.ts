@@ -39,10 +39,6 @@ export class TeamMembersComponent implements OnInit {
     this.ngOnInit();
   }
 
-  public get selectedTeam() {
-    return this._selectedTeam;
-  }
-
   ngOnInit() {
     if (this.currentUser && this._selectedTeam) {
       this.title = this._selectedTeam.isLead ?

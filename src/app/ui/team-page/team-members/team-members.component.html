@@ -7,6 +7,12 @@
         routerLink="/profile" [queryParams]="{uid: member.uid}">
         {{ member.displayName }}
       </a>
+      <ng-template #viewOnly>
+        <span>
+          {{ member.displayName }}
+          <mat-icon *ngIf="member.uid == currentUser.uid" class="icon">grade</mat-icon>
+        </span>
+      </ng-template>
     </td>
 
   </ng-container>
@@ -32,10 +38,3 @@
   <tr mat-header-row *matHeaderRowDef="memberColumns"></tr>
   <tr mat-row *matRowDef="let myRowData; columns: memberColumns"></tr>
 </table>
-
-<ng-template #viewOnly>
-  <span>
-    {{ member.displayName }}
-    <mat-icon *ngIf="member.uid == currentUser.uid" class="icon">grade</mat-icon>
-  </span>
-</ng-template>
