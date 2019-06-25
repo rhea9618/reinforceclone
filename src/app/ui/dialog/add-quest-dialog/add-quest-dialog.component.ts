@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
 import { Observable, of, Subject } from 'rxjs';
 import {
@@ -7,6 +7,7 @@ import {
   distinctUntilChanged,
   filter,
   flatMap,
+  map,
   takeUntil,
   tap
 } from 'rxjs/operators';
@@ -21,17 +22,32 @@ import { QuestCategoriesService, QuestService } from 'src/app/quests';
 })
 export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
+  private textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    if (typeof control.value !== 'string' || !control.dirty) {
+      return null;
+    }
+    const text = (control.value || '').trim();
+    const withinCharLimits = text.length > 2 && text.length <= 50;
+    if (!withinCharLimits) {
+      return { invalidText: true };
+    }
+
+    const containsOnlyValidWords = !!text.match(/^[\w ]*$/);
+    return !containsOnlyValidWords ? { invalidText: true } : null;
+  };
+
   private saving = false;
   private actionLabel = 'Add Quest';
   private categoryList$: Observable<QuestCategory[]>;
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
     category: [''],
-    quest: [{ value: '', disabled: true }, Validators.maxLength(50)],
-    source: [{ value: '', disabled: true }],
+    quest: [{ value: '', disabled: true }, this.textValidator],
+    source: [{ value: '', disabled: true }, this.textValidator],
     required: [true]
   });
   private questSuggestions$: Observable<Quest[]>;
+
 
   constructor(
     @Inject(MAT_DIALOG_DATA) private playerQuest: Partial<PlayerQuest>,
@@ -62,15 +78,15 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       takeUntil(this.onDestroy.asObservable()),
       debounceTime(500),
       distinctUntilChanged(),
+      filter(quest => (typeof quest === 'string')),
       tap((name: string) => {
         const sourceCtrl = this.questForm.get('source');
-        const quest = this.questForm.get('quest').value;
-        if (sourceCtrl.disabled && (typeof quest === 'string')) {
+        if (sourceCtrl.disabled) {
           sourceCtrl.setValue('');
           sourceCtrl.enable();
         }
       }),
-      filter((name: string) => name.length > 2),
+      filter((name: string) => name.length > 2 && !this.questForm.get('quest').invalid),
       flatMap((name: string) => this.getQuestSuggestions(name))
     );
 
@@ -96,15 +112,15 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   }
 
   private resetForm() {
-    this.questForm.get('quest').setValue('');
-    this.questForm.get('source').setValue('');
+    this.questForm.get('quest').setValue('', { onlySelf: true, emitEvent: false });
+    this.questForm.get('source').setValue('', { onlySelf: true, emitEvent: false });
     this.questForm.get('source').enable();
   }
 
   private questSelected(event: MatAutocompleteSelectedEvent) {
     const quest = event.option.value;
     this.playerQuest.quest = quest;
-    this.questForm.get('source').setValue(quest.source);
+    this.questForm.get('source').setValue(quest.source, { onlySelf: true, emitEvent: false });
     this.questForm.get('source').disable();
   }
 
@@ -118,16 +134,23 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   }
 
   private get questError() {
-    const questCtrl = this.questForm.get('quest');
-    if (!questCtrl.errors) {
+    return this.getControlError('Quest', this.questForm.get('quest'));
+  }
+
+  private get sourceError() {
+    return this.getControlError('Source', this.questForm.get('source'));
+  }
+
+  private getControlError(name: string, control: AbstractControl) {
+    if (!control.errors) {
       return '';
     }
 
-    if (questCtrl.errors.maxlength) {
-      return 'Quest must not exceed 50 characters';
+    if (control.errors.invalidText) {
+      return `${name} must be alphanumeric with 3-50 characters`;
     }
-    if (questCtrl.errors.required) {
-      return 'Quest name is required';
+    if (control.errors.required) {
+      return `${name} name is required`;
     }
   }
 
@@ -144,7 +167,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
     // Saving new quest...
     if (this.isNewQuest) {
-      const name = this.questForm.get('quest').value as string;
+      const name = this.questForm.get('quest').value.trim() as string;
       const description = name; // same as name for now until further notice
       const category = this.questForm.get('category').value;
       const source = this.questForm.get('source').value;
@@ -170,6 +193,8 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   }
 
   private getQuestSuggestions(questName: string): Observable<Quest[]> {
+    questName = questName.trim();
+    questName = questName.indexOf(' ') ? questName.split(' ')[0] : questName;
     const category = this.questForm.get('category').value;
     return this.quest.searchQuests(category, questName);
   }
