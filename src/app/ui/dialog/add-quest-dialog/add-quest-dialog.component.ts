@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
 import { Observable, of, Subject } from 'rxjs';
 import {
@@ -27,7 +27,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
     category: [''],
-    quest: [{ value: '', disabled: true }],
+    quest: [{ value: '', disabled: true }, Validators.maxLength(50)],
     source: [{ value: '', disabled: true }],
     required: [true]
   });
@@ -60,15 +60,17 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     // Generate quest suggestions
     this.questSuggestions$ = this.questForm.get('quest').valueChanges.pipe(
       takeUntil(this.onDestroy.asObservable()),
-      filter((name: string) => name.length > 2),
       debounceTime(500),
       distinctUntilChanged(),
       tap((name: string) => {
         const sourceCtrl = this.questForm.get('source');
-        if (sourceCtrl.disabled && this.isNewQuest) {
+        const quest = this.questForm.get('quest').value;
+        if (sourceCtrl.disabled && (typeof quest === 'string')) {
+          sourceCtrl.setValue('');
           sourceCtrl.enable();
         }
       }),
+      filter((name: string) => name.length > 2),
       flatMap((name: string) => this.getQuestSuggestions(name))
     );
 
@@ -115,6 +117,25 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     return (typeof quest === 'string' && quest !== '');
   }
 
+  private get questError() {
+    const questCtrl = this.questForm.get('quest');
+    if (!questCtrl.errors) {
+      return '';
+    }
+
+    if (questCtrl.errors.maxlength) {
+      return 'Quest must not exceed 50 characters';
+    }
+    if (questCtrl.errors.required) {
+      return 'Quest name is required';
+    }
+  }
+
+  private getKeywords(value: string): string[] {
+    return value.toLowerCase().replace(/[^\w ]/g, ' ').split(' ')
+      .filter(word => word ? word.length > 2 : false);
+  }
+
   private async saveQuest() {
     if (this.questForm.invalid) {
       return;
@@ -127,7 +148,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       const description = name; // same as name for now until further notice
       const category = this.questForm.get('category').value;
       const source = this.questForm.get('source').value;
-      const keywords = name.toLowerCase().split(' ');
+      const keywords = this.getKeywords(name);
       const quest = {
         name,
         description,

@@ -113,7 +113,7 @@ export class UserProfileComponent implements OnInit {
 
   private getPlayerMembership() {
     this.auth.user$.pipe(
-      flatMap(user => this.teamsService.getPlayerMembership(user.uid))
+      flatMap((user: User) => user ? this.teamsService.getPlayerMembership(user.uid) : of(null))
     ).subscribe(playerMembership => {
       this.playerMembership = playerMembership;
     });
