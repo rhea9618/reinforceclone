@@ -15,39 +15,39 @@ import {
 import { AuthService } from 'src/app/core/auth.service';
 import { QuestCategoriesService, QuestService } from 'src/app/quests';
 
+// Validator for quest and source fields
+const textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors => {
+  if (typeof control.value !== 'string' || !control.dirty) {
+    return null;
+  }
+
+  const text = (control.value || '').trim();
+  const withinCharLimits = text.length > 2 && text.length <= 50;
+  if (!withinCharLimits) {
+    return { invalidText: true };
+  }
+
+  const hasInvalidChars = !text.match(/^[\w ]*$/);
+  return hasInvalidChars ? { invalidText: true } : null;
+};
+
 @Component({
   selector: 'add-quest-dialog',
   templateUrl: './add-quest-dialog.component.html',
   styleUrls: ['./add-quest-dialog.component.scss']
 })
 export class AddQuestDialogComponent implements OnInit, OnDestroy {
-
-  private textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-    if (typeof control.value !== 'string' || !control.dirty) {
-      return null;
-    }
-    const text = (control.value || '').trim();
-    const withinCharLimits = text.length > 2 && text.length <= 50;
-    if (!withinCharLimits) {
-      return { invalidText: true };
-    }
-
-    const containsOnlyValidWords = !!text.match(/^[\w ]*$/);
-    return !containsOnlyValidWords ? { invalidText: true } : null;
-  };
-
   private saving = false;
   private actionLabel = 'Add Quest';
   private categoryList$: Observable<QuestCategory[]>;
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
     category: [''],
-    quest: [{ value: '', disabled: true }, this.textValidator],
-    source: [{ value: '', disabled: true }, this.textValidator],
+    quest: [{ value: '', disabled: true }, textValidator],
+    source: [{ value: '', disabled: true }, textValidator],
     required: [true]
   });
   private questSuggestions$: Observable<Quest[]>;
-
 
   constructor(
     @Inject(MAT_DIALOG_DATA) private playerQuest: Partial<PlayerQuest>,
