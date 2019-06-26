@@ -14,7 +14,7 @@
     <mat-form-field appearance="outline">
       <mat-label>Quest</mat-label>
       <input matInput [matAutocomplete]="auto" formControlName="quest" required
-        placeholder="Type atleast 3 characters">
+        placeholder="Type words with atleast 3 characters">
       <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
         [displayWith]="questNameDisplay" (optionSelected)="questSelected($event)">
         <mat-option *ngFor="let quest of questSuggestions$ | async" [value]="quest">
@@ -22,12 +22,13 @@
         </mat-option>
       </mat-autocomplete>
       <mat-error *ngIf="questError">{{questError}}</mat-error>
-      <mat-icon matSuffix color="red" *ngIf="isNewQuest">fiber_new</mat-icon>
+      <mat-icon matSuffix color="error" *ngIf="isNewQuest">fiber_new</mat-icon>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Source</mat-label>
       <input matInput formControlName="source" required/>
+      <mat-error *ngIf="sourceError">{{sourceError}}</mat-error>
     </mat-form-field>
 
     <mat-button-toggle-group formControlName="required" required>
