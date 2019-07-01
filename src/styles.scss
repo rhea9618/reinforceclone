@@ -1,8 +1,5 @@
 @import "variables.scss";
 
-// Colors
-$white: #fff !default;
-
 .loading {
   opacity: 0;
   position: fixed;
@@ -43,6 +40,11 @@ hr {
 
 table {
   width: 100%;
+}
+
+.mat-option.mat-active,
+.mat-option:hover:not(.mat-option-disabled) {
+  background-color: $gray;
 }
 
 .error {
