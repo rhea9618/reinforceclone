@@ -40,8 +40,8 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
   readonly noEmit = { emitEvent: false };
 
-  private saving = false;
-  private actionLabel = 'Add Quest';
+  saving = false;
+  actionLabel = 'Add Quest';
   private categoryList$: Observable<QuestCategory[]>;
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
@@ -157,7 +157,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       .filter(word => word ? word.length > 2 : false);
   }
 
-  private async saveQuest() {
+  async saveQuest() {
     if (this.questForm.invalid) {
       return;
     }
