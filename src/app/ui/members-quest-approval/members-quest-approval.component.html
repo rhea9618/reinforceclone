@@ -1,8 +1,20 @@
+<div>
+  <mat-form-field appearance="outline">
+    <mat-label>Team</mat-label>
+    <mat-select name="selectedLeadMembership" [formControl]="leadMembershipId">
+      <mat-option *ngFor="let team of leadMemberships$ | async" [value]="team.teamId">
+        {{team.teamName}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
 <h4>Submitted Quests for your Approval:</h4>
+
 <table mat-table [dataSource]="questsForApproval$ | async">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef> Quest Name </th>
-    <td mat-cell *matCellDef="let quest"> {{quest.questName}} </td>
+    <td mat-cell *matCellDef="let quest"> {{quest.quest.name}} </td>
   </ng-container>
 
   <ng-container matColumnDef="submitted_by">

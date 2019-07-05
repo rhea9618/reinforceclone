@@ -18,10 +18,12 @@ import {
   MatStepperModule,
   MatTableModule,
   MatToolbarModule,
+  MatSelectModule,
   MatTooltipModule
 } from '@angular/material';
 
 import { DialogModule } from './dialog/dialog.module';
+import { QuestsModule } from '../quests/quests.module';
 import { AdminPageComponent } from './admin-page/admin-page.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { HomePageComponent } from './home-page/home-page.component';
@@ -45,6 +47,7 @@ import { SeasonRankPipe } from './season-rank.pipe';
 
 import { PlayerPointsService } from './player-quest/player-points.service';
 import { RejectReasonDialogComponent } from './members-quest-approval/reject-reason-dialog/reject-reason-dialog.component';
+import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.component';
 
 @NgModule({
   imports: [
@@ -68,7 +71,9 @@ import { RejectReasonDialogComponent } from './members-quest-approval/reject-rea
     MatTableModule,
     MatToolbarModule,
     MatTooltipModule,
+    MatSelectModule,
     DialogModule,
+    QuestsModule,
   ],
   declarations: [
     UserLoginComponent,
@@ -91,13 +96,15 @@ import { RejectReasonDialogComponent } from './members-quest-approval/reject-rea
     NicknamePipe,
     SeasonRankPipe,
     ConfirmationModalComponent,
-    RejectReasonDialogComponent
+    RejectReasonDialogComponent,
+    AddSeasonDialogComponent
   ],
   entryComponents: [
     ConfirmationModalComponent,
     QuestApprovalDialogComponent,
     RejectReasonDialogComponent,
-    SubmitQuestDialogComponent
+    SubmitQuestDialogComponent,
+    AddSeasonDialogComponent
   ],
   exports: [
     UserProfileComponent,

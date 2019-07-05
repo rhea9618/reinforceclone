@@ -1,25 +1,28 @@
 <div class="content" *ngIf="auth.user$ | async as user">
-  <form>
-    <h4>Create New Season:</h4>
-    <mat-form-field class="season-name">
-      <input matInput [formControl]="newSeason">
-      <mat-label>Season Name*</mat-label>
-      <mat-error *ngIf="newSeason.invalid">{{error}}</mat-error>
-    </mat-form-field>
-
-    <button mat-stroked-button color="primary" (click)="addSeason(user)">
-      Add Season
-    </button>
-  </form>
-
-  <hr/>
-
-  <h3>Seasons:</h3>
+  <br>
+  <mat-toolbar class="quest-toolbar" color="primary">
+    Seasons
+    <span class="spacer"></span>
+    <a mat-button (click)="openSeasonDialog(user)">
+      <mat-icon class="icon">add_box</mat-icon>
+      Create Season
+    </a>
+  </mat-toolbar>
   <table mat-table [dataSource]="seasons$ | async">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef> Name </th>
       <td mat-cell *matCellDef="let season" class="season"> {{season.name}} </td>
     </ng-container>
+
+    <ng-container matColumnDef="startDate">
+      <th mat-header-cell *matHeaderCellDef> Start Date </th>
+      <td mat-cell *matCellDef="let season" class="season"> {{season.startDate.toDate() | date:SHORT}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="endDate">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let season" class="season"> {{season.endDate.toDate() | date:SHORT}} </td>
+      </ng-container>
 
     <ng-container matColumnDef="created_by">
       <th mat-header-cell *matHeaderCellDef> Created By </th>

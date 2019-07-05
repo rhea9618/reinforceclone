@@ -1,12 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { combineLatest, Observable, of } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 import { TeamsService } from 'src/app/teams/teams.service';
 import { PlayerPointsService } from '../../player-quest/player-points.service';
 import { ConfirmationModalService } from '../../confirmation-modal/confirmation-modal.service';
-import { UserService } from 'src/app/core/user.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 
@@ -18,6 +17,7 @@ import { NotifyService } from 'src/app/core/notify.service';
 export class TeamMembersComponent implements OnInit {
   @Input() currentUser: User;
   @Input() seasonId: string;
+  _selectedTeam: Membership;
 
   members$: Observable<Membership[]>;
   title: string;
@@ -32,13 +32,20 @@ export class TeamMembersComponent implements OnInit {
     private playerPointsService: PlayerPointsService
   ) {}
 
+  @Input()
+  public set selectedTeam(selectedTeam: Membership) {
+    // added this method so that the component would fetch the data every time the selected team is changed
+    this._selectedTeam = selectedTeam;
+    this.ngOnInit();
+  }
+
   ngOnInit() {
-    if (this.currentUser && this.currentUser.membership) {
-      this.title = this.currentUser.membership.isLead ?
+    if (this.currentUser && this._selectedTeam) {
+      this.title = this._selectedTeam.isLead ?
         'Team Members' :
         'Team Leaderboard';
 
-      const teamId = this.currentUser.membership.teamId;
+      const teamId = this._selectedTeam.teamId;
       this.members$ = this.mergeMemberInfo(teamId);
     }
   }
@@ -48,7 +55,7 @@ export class TeamMembersComponent implements OnInit {
   }
 
   kickButtonisVisible(uid: string) {
-    return this.currentUser.membership.isLead && (uid !== this.currentUser.uid);
+    return this._selectedTeam.isLead && (uid !== this.currentUser.uid);
   }
 
   removeTeamMember(user: Membership) {
@@ -56,18 +63,22 @@ export class TeamMembersComponent implements OnInit {
 
     this.confirmationModal.showConfirmation({ message }).subscribe(result => {
       if (result) {
-        this.teamsService.removeTeamMember(user.uid).then(() => {
+        this.teamsService.removeTeamMember(user.uid + user.teamId).then(() => {
           this.emailRemovedPlayer(user.displayName, user.email);
         });
       }
     });
   }
 
+  isAllowedToNavigate(member: Membership, currentUser: User): boolean {
+    return this._selectedTeam.isLead && member.uid !== currentUser.uid && !member.isLead;
+  }
+
   private mergeMemberInfo(teamId: string): Observable<Membership[]> {
     const teamMembers$ = this.teamsService.getTeamMembers(teamId);
     const teamPoints$ = this.playerPointsService.getTeamPoints(teamId, this.seasonId);
 
-    return combineLatest(teamMembers$, teamPoints$).pipe(
+    return combineLatest([teamMembers$, teamPoints$]).pipe(
       map(([teamMembers, teamPoints]) => {
         return this.joinPointsToMember(teamMembers, teamPoints);
       })
@@ -120,5 +131,4 @@ export class TeamMembersComponent implements OnInit {
         this.notify.update('Player Removed from Team', 'info');
       });
   }
-
 }

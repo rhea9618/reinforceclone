@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { combineLatest, Observable, of } from 'rxjs';
-import { catchError, map, switchMap, take } from 'rxjs/operators';
+import { catchError, map, flatMap } from 'rxjs/operators';
 
 import { AuthService } from 'src/app/core/auth.service';
 import { UserService } from 'src/app/core/user.service';
@@ -9,7 +9,6 @@ import { SeasonService } from 'src/app/core/season.service';
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
 import { TeamsService } from 'src/app/teams/teams.service';
-import { environment } from 'src/environments/environment';
 import { PlayerPointsService } from '../player-quest/player-points.service';
 import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dialog.service';
 
@@ -20,11 +19,9 @@ import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dial
 })
 export class UserProfileComponent implements OnInit {
 
-  PLACEHOLDER_SEASON = 'CJbPw8e8U9JkpIWlDnnl';
-
-  debugMode: boolean;
   viewOwnProfile = true;
   otherUser$: Observable<User|UserError>;
+  playerMembership: Membership;
 
   constructor(
     public auth: AuthService,
@@ -39,68 +36,65 @@ export class UserProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // debug mode true if locally run
-    this.debugMode = !environment.production;
-
     // When visiting other player's profile
     this.checkUidParam(this.route.snapshot.queryParams);
     this.route.queryParams.subscribe((params: Params) => this.checkUidParam(params));
   }
 
   private checkUidParam(params: Params) {
-    const playerId = this.route.snapshot.queryParams['uid'];
+    // Need to account for url params having both uid and teamId
+    const playerId = params['uid'];
     if (playerId) {
       this.viewOwnProfile = false;
       this.otherUser$ = this.getPlayerInfo(playerId);
     } else {
       this.viewOwnProfile = true;
+      this.getPlayerMembership();
     }
   }
 
-  private getPlayerInfo(playerId: string): Observable<User|UserError> {
+  private getPlayerInfo(playerId: string): Observable<Membership|UserError> {
     const error = 'Sorry, You are not allowed to view this user\'s profile';
-    const user$ = this.userService.getUser(playerId);
-    const membership$ = this.teamsService.getMembership(playerId);
-    const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.PLACEHOLDER_SEASON); // till we get seasonService handled
+    const membership$ = this.teamsService.getPlayerMembership(playerId);
+    const seasonExp$ = this.playerPointsService.getSeasonExp(playerId, this.auth.seasonId);
 
-    return combineLatest(user$, membership$, seasonExp$).pipe(
-      map(([user, membership, seasonExp]) => ({ ...user, membership, seasonExp })),
-        catchError((err) => {
-          console.log(err);
-          return of({ error });
-        })
+    return combineLatest([membership$, seasonExp$]).pipe(
+      map(([membership, seasonExp]) => ({ ...membership, seasonExp })),
+      catchError((err) => {
+        console.log(err);
+        return of({ error });
+      })
     );
   }
 
-  private sendQuestAddedEmail(quest: PlayerQuest) {
-    const type = quest.required ? 'Required' : 'Additional';
+  private sendQuestAddedEmail(playerQuest: PlayerQuest) {
+    const type = playerQuest.required ? 'Required' : 'Additional';
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
-    const subject = `${subjectPrefix} [${type}] [${quest.category}] Quest Added for ${quest.playerName}]`;
+    const subject = `${subjectPrefix} [${type}] [${playerQuest.quest.category.name}] Quest Added for ${playerQuest.playerName}]`;
     const content =
-      `Hi ${quest.playerName}!<br/>
+      `Hi ${playerQuest.playerName}!<br/>
       <br/>
       Below are the details for your quest. Good luck and may the odds be ever in your favor!<br/>
       <br/>
       Quest Type: ${type}<br/>
-      Category: ${quest.category}<br/>
-      Quest: ${quest.questName}<br/>
-      Source: ${quest.source}<br/>
+      Category: ${playerQuest.quest.category.name}<br/>
+      Quest: ${playerQuest.quest.name}<br/>
+      Source: ${playerQuest.quest.source}<br/>
       <br/>
       REWARDS AND RECOGNITION PH`;
 
-
-    this.emailService.sendEmail([quest.playerEmail], subject, content, 'HTML')
+    this.emailService.sendEmail([playerQuest.playerEmail], subject, content, 'HTML')
       .subscribe(() => this.notifyService.update('Assign quest successful!', 'success'));
   }
 
-  async addQuest(user: User, lead: User) {
-    const seasonId = await this.seasonService.getEnabledSeasonId().toPromise();
+  addQuest(user: Membership, lead: User) {
+    const seasonId = this.auth.seasonId;
     const playerQuest = {
       seasonId,
       playerId: user.uid,
       required: true,
       playerName: user.displayName,
-      teamId: user.membership.teamId,
+      teamId: user.teamId,
       status: QuestStatus.TODO,
       playerEmail: user.email,
       teamLeadEmail: lead.email
@@ -114,6 +108,14 @@ export class UserProfileComponent implements OnInit {
     }, (err) => {
       console.log(err);
       this.notifyService.update('Assign quest failed!', 'error');
+    });
+  }
+
+  private getPlayerMembership() {
+    this.auth.user$.pipe(
+      flatMap((user: User) => user ? this.teamsService.getPlayerMembership(user.uid) : of(null))
+    ).subscribe(playerMembership => {
+      this.playerMembership = playerMembership;
     });
   }
 }

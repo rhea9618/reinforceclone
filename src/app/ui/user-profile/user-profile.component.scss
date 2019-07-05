@@ -22,16 +22,12 @@
 
 .card-body {
   padding: 16px;
-
-  .avatar {
-    width: 50px;
-  }
 }
 
 mat-card-content {
   display: flex;
   justify-content: space-between;
-  
+
   >.player-stats {
     display: flex;
     flex-direction: column;

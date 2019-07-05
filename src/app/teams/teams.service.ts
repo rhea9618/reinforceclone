@@ -16,7 +16,7 @@ export class TeamsService {
   }
 
   addMembership(user: User, team: Team) {
-    return from(this.membersCollection.doc<Membership>(user.uid).set({
+    return from(this.membersCollection.doc<Membership>(user.uid + team.id).set({
       uid: user.uid,
       displayName: user.displayName,
       email: user.email,
@@ -27,14 +27,58 @@ export class TeamsService {
     }));
   }
 
-  addToTeam(uid: string) {
-    return this.membersCollection.doc<Membership>(uid).update({
+  addToTeam(id: string) {
+    return this.membersCollection.doc<Membership>(id).update({
       isApproved: true
     });
   }
 
+  // get a Membership, but priority is a lead Membership.
   getMembership(uid: string): Observable<Membership> {
-    return this.membersCollection.doc<Membership>(uid).valueChanges();
+    const memberships = this.getAllMemberships(uid);
+    return memberships.pipe(
+      map((members) => members.length > 1 ? members.filter(member => member.isLead)[0] : members[0])
+    );
+  }
+
+  /*
+  * Return ALL of the memberships, including approver memberships.
+  */
+  getAllMemberships(uid: string): Observable<Membership[]> {
+    const playerMemberships: AngularFirestoreCollection<Membership>
+      = this.afs.collection('membership', ref => ref.where('uid', '==', uid));
+
+    return playerMemberships.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data()) )
+    );
+  }
+
+  /*
+  * Return ALL of the APPROVED memberships LEAD by the given user
+  */
+  getAllLeadMemberships(uid: string): Observable<Membership[]> {
+    const playerMemberships: AngularFirestoreCollection<Membership>
+      = this.afs.collection('membership', ref => ref.where('uid', '==', uid)
+      .where('isLead', '==' , true).where('isApproved', '==', true));
+
+    return playerMemberships.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data()) )
+    );
+  }
+
+  // Get Membership in which user is a Player of
+  getPlayerMembership(uid: string): Observable<Membership> {
+    const membershipCol: AngularFirestoreCollection<Membership> =
+    this.afs.collection('membership', ref => ref.where('uid', '==', uid)
+    .where('isLead', '==' , false).where('isApproved', '==', true));
+
+    const memberships = membershipCol.snapshotChanges().pipe(
+      map((members) => members.map(item => item.payload.doc.data()) )
+    );
+
+    return memberships.pipe(
+      map((members) => members.length >= 1 ? members[0] : null)
+    );
   }
 
   getTeams(): Observable<Team[]> {
@@ -64,25 +108,13 @@ export class TeamsService {
     );
   }
 
-  getTeamId(uid: string): Observable<string> {
-    return this.getMembership(uid).pipe(
-      map((membership: Membership) => membership ? membership.teamId : null)
-    );
-  }
-
   isLead(uid: string): Observable<boolean> {
     return this.membersCollection.doc<Membership>(uid).valueChanges().pipe(
       map((membership: Membership) => membership ? membership.isLead : false)
     );
   }
 
-  setAsLead(uid: string, isLead: boolean) {
-    this.membersCollection.doc<Membership>(uid).update({
-      isLead: isLead
-    });
-  }
-
-  removeTeamMember(uid: string) {
-    return this.membersCollection.doc<Membership>(uid).delete();
+  removeTeamMember(id: string) {
+    return this.membersCollection.doc<Membership>(id).delete();
   }
 }

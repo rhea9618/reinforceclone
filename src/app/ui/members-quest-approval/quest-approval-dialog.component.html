@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>
-  {{data.questName}}
+  {{data.quest.name}}
   <mat-chip-list>
     <mat-chip color="primary" selected>{{data.required ? 'Required' : 'Additional'}}</mat-chip>
     <mat-chip color="accent" selected>{{data.required ? '10 XP' : '5 XP'}}</mat-chip>
@@ -10,11 +10,11 @@
   <table>
     <tr>
       <td><b>Source:</b></td>
-      <td>{{data.source}}</td>
+      <td>{{data.quest.source}}</td>
     </tr>
     <tr>
       <td><b>Category:</b></td>
-      <td>{{data.category}}</td>
+      <td>{{data.quest.category.name}}</td>
     </tr>
     <tr>
       <td><b>Submitted by:</b></td>
@@ -28,7 +28,7 @@
       <td><b>Date Completed:</b></td>
       <td>{{data.completed | firestoreDate}}</td>
     </tr>
-    <tr>
+    <tr *ngIf="data.completionProof">
       <td><b>Completion Proof Link:</b></td>
       <td>
         <a href="{{data.completionProof}}">{{data.completionProof}}</a>

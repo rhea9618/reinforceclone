@@ -3,14 +3,16 @@
   <ng-container matColumnDef="displayName">
     <th mat-header-cell *matHeaderCellDef> Name </th>
     <td mat-cell *matCellDef="let member">
-      <span *ngIf="!currentUser.membership.isLead || member.uid === currentUser.uid">
-        {{ member.displayName }}
-        <mat-icon *ngIf="member.uid == currentUser.uid" class="icon">grade</mat-icon>
-      </span>
-      <a *ngIf="currentUser.membership.isLead && member.uid !== currentUser.uid"
+      <a *ngIf="isAllowedToNavigate(member, currentUser); else viewOnly"
         routerLink="/profile" [queryParams]="{uid: member.uid}">
         {{ member.displayName }}
       </a>
+      <ng-template #viewOnly>
+        <span>
+          {{ member.displayName }}
+          <mat-icon *ngIf="member.uid == currentUser.uid" class="icon">grade</mat-icon>
+        </span>
+      </ng-template>
     </td>
 
   </ng-container>

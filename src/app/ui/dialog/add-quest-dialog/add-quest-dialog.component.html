@@ -1,29 +1,45 @@
 <h2 mat-dialog-title>{{actionLabel}}</h2>
 <mat-dialog-content>
-  <form>
-    <mat-form-field>
-      <input matInput placeholder="Quest Name" [(ngModel)]="playerQuest.questName" name="questName" />
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-select placeholder="Quest Category" [(ngModel)]="playerQuest.category" name="category">
-        <mat-option *ngFor="let category of categoryList" [value]="category">
-          {{category}}
+  <mat-spinner *ngIf="saving"></mat-spinner>
+  <form [formGroup]="questForm" *ngIf="!saving">
+    <mat-form-field appearance="outline">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="category" required [compareWith]="compareById">
+        <mat-option *ngFor="let category of categoryList$ | async" [value]="category">
+          {{category.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field>
-      <input matInput placeholder="Quest Source" [(ngModel)]="playerQuest.source" name="source" />
+    <mat-form-field appearance="outline">
+      <mat-label>Quest</mat-label>
+      <input matInput [matAutocomplete]="auto" formControlName="quest" required
+        placeholder="Type words with atleast 3 characters">
+      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
+        [displayWith]="questNameDisplay" (optionSelected)="questSelected($event)">
+        <mat-option *ngFor="let quest of questSuggestions$ | async" [value]="quest">
+          {{quest.name}}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="questError">{{questError}}</mat-error>
+      <mat-icon matSuffix color="error" *ngIf="isNewQuest">fiber_new</mat-icon>
     </mat-form-field>
 
-    <mat-button-toggle-group name="questType" aria-label="Quest Type" [(ngModel)]="playerQuest.required">
+    <mat-form-field appearance="outline">
+      <mat-label>Source</mat-label>
+      <input matInput formControlName="source" required/>
+      <mat-error *ngIf="sourceError">{{sourceError}}</mat-error>
+    </mat-form-field>
+
+    <mat-button-toggle-group formControlName="required" required>
       <mat-button-toggle [value]="true">Required</mat-button-toggle>
       <mat-button-toggle [value]="false">Additional</mat-button-toggle>
     </mat-button-toggle-group>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-flat-button mat-dialog-close>Cancel</button>
-  <button mat-flat-button color="primary" [mat-dialog-close]="playerQuest">{{actionLabel}}</button>
+  <button mat-flat-button mat-dialog-close [disabled]="saving">Cancel</button>
+  <button mat-flat-button color="primary" (click)="saveQuest()" [disabled]="saving">
+    {{actionLabel}}
+  </button>
 </mat-dialog-actions>

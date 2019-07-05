@@ -18,7 +18,6 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/functions';
-import { MsalModule } from '@azure/msal-angular';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -49,7 +48,6 @@ import { TeamsModule } from './teams/teams.module';
     MatSidenavModule,
     MatToolbarModule,
     MatTooltipModule,
-    MsalModule.forRoot({ clientID: environment.clientID }),
     NotesModule,
     TeamsModule,
     UiModule,

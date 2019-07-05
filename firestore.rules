@@ -11,8 +11,12 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isUserReadAllowed(userId);
-      allow write: if isOwner(userId);
+      allow read, write: if isOwner(userId);
+    }
+
+    match /questCategories/{id} {
+      allow read: if isSignedIn();
+      allow write: if false;
     }
 
     match /playerQuests/{id} {
@@ -26,15 +30,21 @@ service cloud.firestore {
       allow write: if isTeamLead(incomingData().teamId);
     }
 
-    match /membership/{userId} {
+    match /membership/{id} {
       allow read: if true;
-      allow create: if isOwner(userId) && incomingData().isApproved == false;
+      allow create: if isOwner(incomingData().uid) && incomingData().isApproved == false;
       allow update, delete: if isTeamLead(existingData().teamId);
     }
 
     match /teams/{id} {
       allow read: if isSignedIn();
       allow write: if false;
+    }
+
+    match /quests/{id} {
+      allow read: if true;
+      allow create: if isQuestWriteAllowed();
+      allow update, delete: if false;
     }
 
     /// Utility Functions ///
@@ -66,8 +76,8 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/teams/$(teamId)).data;
     }
 
-    function getMembershipData(uid) {
-      return get(/databases/$(database)/documents/membership/$(uid)).data;
+    function getMembershipData(id) {
+      return get(/databases/$(database)/documents/membership/$(id)).data;
     }
 
     /// Condition Checkers ///
@@ -81,10 +91,11 @@ service cloud.firestore {
     }
 
     function isTeamLead(teamId) {
-      return isTeamLeadFromDoc(teamId, getMembershipData(currentUser().uid));
+      return isTeamLeadFromDoc(teamId, getMembershipData(currentUser().uid + teamId));
     }
 
     // Allow user read for both Owner and Team Lead only
+    // TODO: this currently is not working as expected, please fix
     function isUserReadAllowed(userId) {
       return isOwner(userId) ||
         isTeamLead(getMembershipData(userId).teamId);
@@ -107,6 +118,13 @@ service cloud.firestore {
           incomingData().keys().hasAny(['status', 'submitted', 'completed', 'completionProof']) &&
           incomingData().status == 'pending'
         );
+    }
+
+    // Allow quest write if core tag field is false and uid field matches the id of the current user
+    function isQuestWriteAllowed() {
+      return incomingData().coreTag == false &&
+        incomingData().keys().hasAny(['uid']) &&
+        isOwner(incomingData().uid)
     }
 
     function getAdminData(userId) {

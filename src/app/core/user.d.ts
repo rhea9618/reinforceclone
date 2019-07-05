@@ -11,7 +11,8 @@ interface User {
   isAdmin?: boolean;
   membership?: Membership;
   totalExp?: number;
-  seasonExp?: number
+  seasonExp?: number;
+  additionalInfo?: any;
 }
 
 interface UserError {
