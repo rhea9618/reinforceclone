@@ -27,8 +27,8 @@ export class EmailService {
     ccEmailAddress: string[] = []
   ) {
 
-    if (environment.hasOwnProperty('ccEmail')) {
-      ccEmailAddress.push(environment['ccEmail']);
+    if (environment.ccEmail) {
+      ccEmailAddress.push(environment.ccEmail);
     }
 
     const toRecipients = emailAddress.map((address) => ({emailAddress: {address}}));
