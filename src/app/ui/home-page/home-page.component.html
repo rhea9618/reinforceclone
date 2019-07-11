@@ -1,5 +1,5 @@
 <div class="content">
-  <h3>LeaderBoard Top 20</h3>
+  <h3>reINFORce Top 20</h3>
   <div *ngIf="topUsers$ | async as users; else loading">
     <table mat-table [dataSource]="users">
       <ng-container matColumnDef="index">
@@ -29,7 +29,7 @@
     </table>
 
     <div *ngIf="!users.length" class="loader">
-      Oops! No one has a scored yet!
+      Oops! No one has scored yet!
     </div>
   </div>
 

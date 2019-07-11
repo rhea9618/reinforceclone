@@ -118,7 +118,7 @@ export class AuthService {
     return this.afAuth.auth
       .signInAnonymously()
       .then(credential => {
-        this.notify.update('Welcome to LeaderBoard!!!', 'success');
+        this.notify.update('Welcome!', 'success');
         return this.setUserDoc(credential); // if using firestore
       })
       .catch(error => {
