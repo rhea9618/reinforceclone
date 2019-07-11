@@ -36,7 +36,7 @@
         <mat-toolbar class="quest-toolbar" color="primary">
           My Quests
         </mat-toolbar>
-        <player-quest-list [user]="user" isOwner="true"></player-quest-list>
+        <player-quest-list [membership]="playerMembership" isOwner="true"></player-quest-list>
       </div>
     </div>
 
@@ -81,7 +81,7 @@
                 Add Quest
               </button>
             </mat-toolbar>
-            <player-quest-list [user]="otherUser"></player-quest-list>
+            <player-quest-list [membership]="otherUser"></player-quest-list>
           </div>
         </div>
       </div>
