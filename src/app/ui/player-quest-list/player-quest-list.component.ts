@@ -20,7 +20,7 @@ import { ConfirmationModalService } from '../confirmation-modal/confirmation-mod
 })
 export class PlayerQuestListComponent implements OnInit {
 
-  @Input() user: User;
+  @Input() membership: Membership;
   @Input() isOwner: boolean;
 
   questList$: Observable<PlayerQuest[]>;
@@ -48,10 +48,9 @@ export class PlayerQuestListComponent implements OnInit {
       this.displayedColumns.push('action');
     }
 
-    if (this.user) {
-      const membership = (this.user.membership ? this.user.membership : this.user) as Membership;
+    if (this.membership) {
       this.questList$ =
-        this.playerQuestService.getMemberQuests(this.auth.seasonId, membership.teamId, this.user.uid);
+        this.playerQuestService.getMemberQuests(this.auth.seasonId, this.membership.teamId, this.membership.uid);
       this.seasonService.getEnabledSeason().subscribe( season => {
         this.season = season;
       });

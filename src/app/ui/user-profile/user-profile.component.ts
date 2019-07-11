@@ -20,7 +20,7 @@ import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dial
 export class UserProfileComponent implements OnInit {
 
   viewOwnProfile = true;
-  otherUser$: Observable<User|UserError>;
+  otherUser$: Observable<Membership|UserError>;
   playerMembership: Membership;
 
   constructor(
