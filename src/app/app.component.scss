@@ -36,6 +36,10 @@
   flex: 1 0 auto;
 }
 
+.is-mobile .nickname > span {
+  display: none;
+}
+
 .fix-content-top {
   margin-top: 56px;
 }

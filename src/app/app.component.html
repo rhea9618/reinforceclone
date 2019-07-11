@@ -5,16 +5,16 @@
         <mat-icon>menu</mat-icon>
       </button>
       <span class="spacer"></span>
-      <a mat-button routerLink="/" matTooltip="LeaderBoard">
+      <a mat-button routerLink="/" matTooltip="reINFORce">
         <mat-icon class="icon">school</mat-icon>
-        LeaderBoard
+        reINFORce
       </a>
       <span class="spacer"></span>
       <div *ngIf="auth.user$ | async as user; else login" class="nickname">
         <span matTooltip="{{user.displayName}}">
           {{user.displayName | nickname}}
         </span>
-        <a mat-button (click)="auth.signOut()" matTooltip="Logout">
+        <a mat-button (click)="auth.signOut()" matTooltip="Logout {{user.displayName}}">
           <mat-icon class="icon">exit_to_app</mat-icon>
         </a>
       </div>
