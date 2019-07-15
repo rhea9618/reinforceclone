@@ -20,7 +20,7 @@ import { ConfirmationModalService } from '../confirmation-modal/confirmation-mod
 })
 export class PlayerQuestListComponent implements OnInit {
 
-  @Input() user: User;
+  @Input() membership: Membership;
   @Input() isOwner: boolean;
 
   questList$: Observable<PlayerQuest[]>;
@@ -48,10 +48,9 @@ export class PlayerQuestListComponent implements OnInit {
       this.displayedColumns.push('action');
     }
 
-    if (this.user) {
-      const membership = (this.user.membership ? this.user.membership : this.user) as Membership;
+    if (this.membership) {
       this.questList$ =
-        this.playerQuestService.getMemberQuests(this.auth.seasonId, membership.teamId, this.user.uid);
+        this.playerQuestService.getMemberQuests(this.auth.seasonId, this.membership.teamId, this.membership.uid);
       this.seasonService.getEnabledSeason().subscribe( season => {
         this.season = season;
       });
@@ -60,7 +59,14 @@ export class PlayerQuestListComponent implements OnInit {
 
   public openSubmitQuestDialog(playerQuest: PlayerQuest) {
     const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent,
-      {data: {playerQuest: playerQuest, season: this.season}, width: '600px' });
+      {
+        data: {
+          playerQuest: playerQuest,
+          season: this.season
+        },
+        width: '600px'
+      });
+
     submitQuestDialog.afterClosed().subscribe( data => {
       if (data && data.questId) {
         this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
@@ -69,7 +75,7 @@ export class PlayerQuestListComponent implements OnInit {
           })
           .catch((err) => {
             console.log(err);
-            this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
+            this.notifyService.update('Something went wrong. Please try again later.', 'error');
           });
       }
     });
@@ -87,7 +93,7 @@ export class PlayerQuestListComponent implements OnInit {
   private sendQuestSubmittedEmail(playerQuest: PlayerQuest) {
     const type = playerQuest.required ? 'Required' : 'Additional';
     const xp = playerQuest.required ? '10 XP' : '5 XP';
-    const subjectPrefix = '[Gamification of Learnings and Certifications] [${type}] [${playerQuest.quest.category.name}]';
+    const subjectPrefix = `[Gamification of Learnings and Certifications] [${type}] [${playerQuest.quest.category.name}]`;
     const subject = `${subjectPrefix} Validation of Quest Completion for ${playerQuest.playerName}`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
     const questInfo = this.questInfoEmail(playerQuest);
