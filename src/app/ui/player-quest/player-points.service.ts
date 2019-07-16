@@ -41,7 +41,7 @@ export class PlayerPointsService {
 
   getSeasonTopPlayers(seasonId: string): Observable<PlayerPoints[]> {
     const playerPoints: AngularFirestoreCollection<PlayerPoints> = this.afs.collection('playerPoints', ref =>
-      ref.where('seasonId', '==', seasonId).orderBy('totalPoints', 'desc').orderBy('updated'));
+      ref.where('seasonId', '==', seasonId).orderBy('totalPoints', 'desc').orderBy('updated').limit(20));
 
       return playerPoints.snapshotChanges().pipe(
         map((playerPts) => playerPts.map(item => item.payload.doc.data()))
