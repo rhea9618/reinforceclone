@@ -1,41 +1,39 @@
-<div class="content">
-  <h3>reINFORce Top 20</h3>
-  <div *ngIf="topUsers$ | async as users; else loading">
-    <table mat-table [dataSource]="users">
-      <ng-container matColumnDef="index">
-        <th mat-header-cell *matHeaderCellDef>No.</th>
-        <td mat-cell *matCellDef="let user; let i = index">{{ i+1 }}</td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Player</th>
-        <td mat-cell *matCellDef="let user">{{ user.playerName }}</td>
-      </ng-container>
-      <ng-container matColumnDef="points">
-        <th mat-header-cell *matHeaderCellDef>XP</th>
-        <td mat-cell *matCellDef="let user">{{ user.totalPoints }}</td>
-      </ng-container>
-      <ng-container matColumnDef="rank">
-        <th mat-header-cell *matHeaderCellDef>Season Rank</th>
-        <td mat-cell *matCellDef="let user">{{ user.totalPoints | seasonRank }}</td>
-      </ng-container>
-      <ng-container matColumnDef="info">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let user" class="points-info">
-          <mat-icon matTooltip="Points achieved by {{user.updated | firestoreDate}}">info</mat-icon>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+<h3>reINFORce Top 20</h3>
+<div *ngIf="topUsers$ | async as users; else loading">
+  <table mat-table [dataSource]="users">
+    <ng-container matColumnDef="index">
+      <th mat-header-cell *matHeaderCellDef>No.</th>
+      <td mat-cell *matCellDef="let user; let i = index">{{ i+1 }}</td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Player</th>
+      <td mat-cell *matCellDef="let user">{{ user.playerName }}</td>
+    </ng-container>
+    <ng-container matColumnDef="points">
+      <th mat-header-cell *matHeaderCellDef>XP</th>
+      <td mat-cell *matCellDef="let user">{{ user.totalPoints }}</td>
+    </ng-container>
+    <ng-container matColumnDef="rank">
+      <th mat-header-cell *matHeaderCellDef>Season Rank</th>
+      <td mat-cell *matCellDef="let user">{{ user.totalPoints | seasonRank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="info">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let user" class="points-info">
+        <mat-icon matTooltip="Points achieved by {{user.updated | firestoreDate}}">info</mat-icon>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
 
-    <div *ngIf="!users.length" class="loader">
-      Oops! No one has scored yet!
-    </div>
+  <div *ngIf="!users.length" class="loader">
+    Oops! No one has scored yet!
   </div>
-
-  <ng-template #loading>
-    <div class="loader">
-      <mat-spinner diameter="175"></mat-spinner>
-    </div>
-  </ng-template>
 </div>
+
+<ng-template #loading>
+  <div class="loader">
+    <mat-spinner diameter="175"></mat-spinner>
+  </div>
+</ng-template>
