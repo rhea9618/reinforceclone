@@ -64,6 +64,10 @@ table {
   width: 100%;
 }
 
+h3 {
+  margin-block-start: 0;
+}
+
 .mat-option.mat-active,
 .mat-option:hover:not(.mat-option-disabled) {
   background-color: $gray;

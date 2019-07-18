@@ -1,17 +1,15 @@
-<div class="login">
-  <div *ngIf="!(auth.user$ | async); else alreadyLoggedIn">
-    <h3>Login using your Microsoft Account.</h3>
+<div *ngIf="!(auth.user$ | async); else alreadyLoggedIn">
+  <h3>Login using your Microsoft Account.</h3>
 
-    <button *ngIf="showGoogleLogin && !auth.isLoggingIn" mat-raised-button color="primary" (click)="signInWithGoogle()">
-      <i class="fa fa-google fa-lg"></i> Connect Google
-    </button>
+  <button *ngIf="showGoogleLogin && !auth.isLoggingIn" mat-raised-button color="primary" (click)="signInWithGoogle()">
+    <i class="fa fa-google fa-lg"></i> Connect Google
+  </button>
 
-    <button mat-raised-button color="primary"
-      *ngIf="!auth.isLoggingIn; else loggingIn"
-      (click)="signInWithMicrosoft()">
-      <i class="fa fa-windows fa-lg"></i> Connect Microsoft
-    </button>
-  </div>
+  <button mat-raised-button color="primary"
+    *ngIf="!auth.isLoggingIn; else loggingIn"
+    (click)="signInWithMicrosoft()">
+    <i class="fa fa-windows fa-lg"></i> Connect Microsoft
+  </button>
 </div>
 
 <ng-template #loggingIn>
