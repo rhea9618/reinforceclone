@@ -1,4 +1,4 @@
-<div class="container" *ngIf="auth.user$.value as user">
+<div *ngIf="auth.user$.value as user">
   <mat-form-field appearance="outline">
     <mat-label>Team</mat-label>
     <mat-select [(ngModel)]="selectedTeam" name="selectedTeam" [compareWith]="compareById">

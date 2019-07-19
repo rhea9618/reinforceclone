@@ -172,25 +172,15 @@ export class AuthService {
     return this.credential;
   }
 
-  // Saves user data to firestore after successful login
+  // Update user doc for some additional info
   private setUserDoc(credential: auth.UserCredential) {
     const uid = credential.user.uid;
-    const email = credential.user.email;
     const displayName = credential.user.displayName;
     const isMicrosoft = (credential.credential.providerId === 'microsoft.com');
     const additionalInfo = credential.additionalUserInfo ?
       credential.additionalUserInfo.profile : null;
 
     this.notify.update(`Welcome ${displayName}!`, 'success');
-    this.afs.doc(`users/${uid}`).set(
-      {
-        uid,
-        email,
-        displayName,
-        isMicrosoft,
-        additionalInfo
-      },
-      { merge: true }
-    );
+    this.afs.doc(`users/${uid}`).set({ isMicrosoft, additionalInfo }, { merge: true });
   }
 }
