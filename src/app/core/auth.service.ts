@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { SeasonService } from './season.service';
 import { TeamsService } from '../teams/teams.service';
 import { PlayerPointsService } from '../ui/player-quest/player-points.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class AuthService {
@@ -93,7 +94,7 @@ export class AuthService {
 
   microsoftLogin() {
     const provider = new auth.OAuthProvider('microsoft.com');
-    // provider.addScope('offline_access');
+    environment.msalConfig.consentScopes.forEach((scope) => provider.addScope(scope));
     return this.oAuthLogin(provider);
   }
 
