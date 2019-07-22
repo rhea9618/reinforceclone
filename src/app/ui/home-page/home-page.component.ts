@@ -21,9 +21,8 @@ export class HomePageComponent implements OnInit {
     private season: SeasonService
   ) {}
 
-  ngOnInit() {
-    if (this.auth.seasonId) {
-      this.topUsers$ = this.playerPoints.getSeasonTopPlayers(this.auth.seasonId);
-    }
+  async ngOnInit() {
+    const seasonId = this.auth.seasonId || await this.season.getEnabledSeasonId().toPromise();
+    this.topUsers$ = this.playerPoints.getSeasonTopPlayers(seasonId);
   }
 }
