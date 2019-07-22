@@ -3,6 +3,7 @@ import {
   BrowserTransferStateModule
 } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { RouteReuseStrategy } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -27,6 +28,7 @@ import { UploadsModule } from './uploads/uploads.module';
 import { UiModule } from './ui/ui.module';
 import { NotesModule } from './notes/notes.module';
 import { TeamsModule } from './teams/teams.module';
+import { CacheReuseStrategy } from './core/cache-reuse-strategy';
 
 
 @NgModule({
@@ -56,8 +58,16 @@ import { TeamsModule } from './teams/teams.module';
       enabled: environment.production
     }),
   ],
-  bootstrap: [AppComponent], providers: [
-    { provide: FunctionsRegionToken, useValue: 'us-central1' }
+  bootstrap: [AppComponent],
+  providers: [
+    {
+      provide: FunctionsRegionToken,
+      useValue: 'us-central1'
+    },
+    {
+      provide: RouteReuseStrategy,
+      useClass: CacheReuseStrategy
+    }
   ]
 })
 export class AppModule {}

@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import { PlayerPointsService } from '../player-quest/player-points.service';
-import { SeasonService } from '../../core/season.service';
+import { AuthService } from 'src/app/core/auth.service';
+import { SeasonService } from 'src/app/core/season.service';
 
 @Component({
   selector: 'home-page',
@@ -15,12 +16,13 @@ export class HomePageComponent implements OnInit {
   readonly displayedColumns = ['index', 'name', 'points', 'rank', 'info'];
 
   constructor(
+    private auth: AuthService,
     private playerPoints: PlayerPointsService,
     private season: SeasonService
   ) {}
 
   async ngOnInit() {
-    const seasonId = await this.season.getEnabledSeasonId().toPromise();
+    const seasonId = this.auth.seasonId || await this.season.getEnabledSeasonId().toPromise();
     this.topUsers$ = this.playerPoints.getSeasonTopPlayers(seasonId);
   }
 }
