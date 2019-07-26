@@ -27,7 +27,7 @@ const textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors 
     return { invalidText: true };
   }
 
-  const hasInvalidChars = !text.match(/^[\w].*$/);
+  const hasInvalidChars = !text.match(/^.{3}.*$/);
   return hasInvalidChars ? { invalidText: true } : null;
 };
 
