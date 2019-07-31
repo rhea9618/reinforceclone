@@ -153,7 +153,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
   // creates an array of alphanumeric words
   private getKeywords(value: string): string[] {
-    return value.toLowerCase().replace(/[^\w ]/g, ' ').split(' ')
+    return value.toLowerCase().replace(/[\W][\W][\W]*/g, ' ').split(' ')
       .filter(word => word ? word.length > 2 : false);
   }
 
