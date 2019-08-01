@@ -27,7 +27,7 @@ const textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors 
     return { invalidText: true };
   }
 
-  const hasInvalidChars = !text.match(/^.{3}.*$/);
+  const hasInvalidChars = !text.match(/\w{3,}/);
   return hasInvalidChars ? { invalidText: true } : null;
 };
 
@@ -153,8 +153,21 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
   // creates an array of alphanumeric words
   private getKeywords(value: string): string[] {
-    return value.toLowerCase().replace(/[\W][\W][\W]*/g, ' ').split(' ')
-      .filter(word => word ? word.length > 2 : false);
+    // Split via spaces and special chars (Infor, Ming, Something)
+    const nonAlphaSplit = value.toLowerCase().replace(/[^\w ]/g, ' ').split(' ');
+    // Split via space only (Infor, Ming.le:, Something)
+    const spaceOnlySplit = value.toLowerCase().split(' ');
+    // Split including special characters next to adjacent spaces (Infor, Ming.le, Something)
+    const adjacentSpecSplit = value.toLowerCase().replace(/[\W][\W][\W]*/g, ' ').split(' ');
+    // Entire string (for copy pasters) (Infor Ming.le: Something)
+    const entireStringSplit = value.toLowerCase();
+
+    const keywords = nonAlphaSplit.concat(
+      spaceOnlySplit.concat(adjacentSpecSplit.concat(entireStringSplit))).
+      filter(word => word ? word.length > 2 : false);
+
+    // Remove dupe strings
+    return keywords.filter((str, num) => keywords.indexOf(str) === num);
   }
 
   async saveQuest() {
