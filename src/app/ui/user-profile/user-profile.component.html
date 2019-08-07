@@ -62,6 +62,9 @@
                 <span class="player-info">
                   <mat-icon>email</mat-icon> {{ otherUser.email }}
                 </span>
+                <span class="player-info">
+                  {{ otherUser.seasonExp | seasonRank }}
+                </span>
               </div>
               <div class="player-stats">
                 <span class="exp-pts">{{ otherUser.seasonExp }}</span>
