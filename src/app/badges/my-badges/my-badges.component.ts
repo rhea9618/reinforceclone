@@ -20,6 +20,6 @@ export class MyBadgesComponent implements OnInit {
 
   ngOnInit() {
     const user = this.auth.user$.value;
-    this.myBadges$ = this.badges.getMyBadges(user.uid);
+    this.myBadges$ = this.badges.getUserBadges(user.uid);
   }
 }

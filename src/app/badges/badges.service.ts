@@ -17,7 +17,7 @@ export class BadgesService {
     this.playerBadges = this.afs.collection('playerBadges');
   }
 
-  getMyBadges(uid: string): Observable<PlayerBadge[]> {
+  getUserBadges(uid: string): Observable<PlayerBadge[]> {
     const badges = this.afs.collection<PlayerBadge>('playerBadges', ref =>
       ref.where('playerId', '==', uid));
 
