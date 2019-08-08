@@ -22,12 +22,12 @@ const textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors 
   }
 
   const text = (control.value || '').trim();
-  const withinCharLimits = text.length > 2 && text.length <= 50;
+  const withinCharLimits = text.length > 2 && text.length <= 100;
   if (!withinCharLimits) {
     return { invalidText: true };
   }
 
-  const hasInvalidChars = !text.match(/^[\w ]*$/);
+  const hasInvalidChars = !text.match(/\w{3,}/);
   return hasInvalidChars ? { invalidText: true } : null;
 };
 
