@@ -48,9 +48,11 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     category: [''],
     quest: [{ value: '', disabled: true }, textValidator],
     source: [{ value: '', disabled: true }, textValidator],
+    type: [''],
     required: [true]
   });
   private questSuggestions$: Observable<Quest[]>;
+  private questTypes = [QuestType.ADDITIONAL, QuestType.REQUIRED, QuestType.SPECIAL];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) private playerQuest: Partial<PlayerQuest>,
@@ -74,6 +76,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       this.questForm.get('category').setValue(quest.category, this.noEmit);
       this.questForm.get('source').setValue(quest.source);
       this.questForm.get('required').setValue(this.playerQuest.required);
+      this.questForm.get('type').setValue(this.playerQuest.type);
     }
 
     // Generate quest suggestions
@@ -190,6 +193,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
     this.playerQuest.quest = quest;
     this.playerQuest.required = this.questForm.get('required').value;
+    this.playerQuest.type = this.questForm.get('type').value;
     this.dialogRef.close(this.playerQuest);
   }
 

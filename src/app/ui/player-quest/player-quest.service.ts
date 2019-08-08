@@ -181,7 +181,7 @@ export class PlayerQuestService {
 
         totalQuests += 1;
         // Fixed points where required quest is 10 else 5
-        totalPoints += quest.required ? 10 : 5;
+        totalPoints += this.getPointsFromType(quest);
 
         transaction.set(playerPointsRef, {
           ...initialData,
@@ -193,5 +193,24 @@ export class PlayerQuestService {
     });
 
     return from(trans);
+  }
+
+  getPointsFromType(quest: Partial<PlayerQuest>): number {
+    const type = quest.type;
+    const required = quest.required;
+
+    switch (type) {
+      case QuestType.ADDITIONAL:
+        return PointsByQuestType.ADDITIONAL;
+
+      case QuestType.REQUIRED:
+        return PointsByQuestType.REQUIRED;
+
+      case QuestType.SPECIAL:
+        return PointsByQuestType.SPECIAL;
+
+      default:
+        return required ? 10 : 5;
+    }
   }
 }

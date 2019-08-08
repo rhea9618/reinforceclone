@@ -41,7 +41,7 @@
     <th mat-header-cell *matHeaderCellDef> XP </th>
     <td mat-cell *matCellDef="let playerQuest" class="questXP"
       [ngClass]="{'completedXP': playerQuest.status === 'completed'}">
-      {{ playerQuest.required ? 10 : 5 }} XP
+      {{ playerQuest | questPoints }} XP
     </td>
   </ng-container>
   <ng-container matColumnDef="action">

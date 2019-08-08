@@ -49,6 +49,7 @@ import { SeasonRankPipe } from './season-rank.pipe';
 import { PlayerPointsService } from './player-quest/player-points.service';
 import { RejectReasonDialogComponent } from './members-quest-approval/reject-reason-dialog/reject-reason-dialog.component';
 import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.component';
+import { QuestPointsPipe } from './quest-points.pipe';
 
 @NgModule({
   imports: [
@@ -99,7 +100,8 @@ import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.compone
     SeasonRankPipe,
     ConfirmationModalComponent,
     RejectReasonDialogComponent,
-    AddSeasonDialogComponent
+    AddSeasonDialogComponent,
+    QuestPointsPipe
   ],
   entryComponents: [
     ConfirmationModalComponent,

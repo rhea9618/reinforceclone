@@ -100,7 +100,7 @@ export class MembersQuestApprovalComponent implements OnInit {
 
   private getApprovedEmailBody(playerQuest: PlayerQuest): string {
     const requiredStr = playerQuest.required ? ` [Required] ` : ` [Additional] `;
-    const xp = playerQuest.required ? 10 : 5;
+    const xp = this.playerQuest.getPointsFromType(playerQuest);
     const dashboardUrl = `${environment.firebase.authDomain}`;
     const category = playerQuest.quest.category.name;
 

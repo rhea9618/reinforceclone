@@ -1,8 +1,14 @@
 <h1 mat-dialog-title>
   {{data.quest.name}}
   <mat-chip-list>
-    <mat-chip color="primary" selected>{{data.required ? 'Required' : 'Additional'}}</mat-chip>
-    <mat-chip color="accent" selected>{{data.required ? '10 XP' : '5 XP'}}</mat-chip>
+    <mat-chip color="primary" selected *ngIf="data.type; else oldType">{{ data.type }}</mat-chip>
+    <ng-template #oldType>
+      <mat-chip color="primary" selected>{{ data.required ? 'Required' : 'Additional' }}</mat-chip>
+    </ng-template>
+    <mat-chip color="accent" selected *ngIf="data.type; else oldExp">{{ data | questPoints }} XP</mat-chip>
+    <ng-template #oldExp>
+      <mat-chip color="accent" selected>{{ data.required ? '10 XP' : '5 XP' }}</mat-chip>
+    </ng-template>
   </mat-chip-list>
 </h1>
 <div mat-dialog-content>
