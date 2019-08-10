@@ -60,7 +60,7 @@ export class JoinTeamPageComponent implements OnInit {
 
   applyForTeam(user: User, team: Team) {
     this.applyingTeam = true;
-    this.confirmation.showConfirmation({ message: `Are you sure to join ${team.name}?` }).pipe(
+    this.confirmation.showConfirmation({ message: `Are you sure you want to join ${team.name}?` }).pipe(
       flatMap(() => this.teams.addMembership(user, team)),
       flatMap(() => this.teams.getTeamLeadEmails(team.id)),
       flatMap((leadEmails) => this.emailLeads(user.displayName, leadEmails))

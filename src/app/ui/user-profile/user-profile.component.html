@@ -20,6 +20,9 @@
               <b>Admin</b>
             </span>
             <span class="player-info">
+              <mat-icon>stars</mat-icon> Season Rank: {{ user.seasonExp | seasonRank }}
+            </span>
+            <span class="player-info">
               <mat-icon>email</mat-icon> {{ user.email }}
             </span>
           </div>
@@ -59,6 +62,9 @@
             </mat-card-header>
             <mat-card-content>
               <div>
+                <span class="player-info">
+                  <mat-icon>stars</mat-icon> Season Rank: {{ otherUser.seasonExp | seasonRank }}
+                </span>
                 <span class="player-info">
                   <mat-icon>email</mat-icon> {{ otherUser.email }}
                 </span>
