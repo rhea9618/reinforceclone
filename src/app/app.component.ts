@@ -7,7 +7,8 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import { MatSidenav } from '@angular/material';
+import { MatIconRegistry, MatSidenav } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
 import { SwUpdate } from '@angular/service-worker';
 import { concat, interval, from } from 'rxjs';
 import { first, flatMap } from 'rxjs/operators';
@@ -36,12 +37,19 @@ export class AppComponent implements OnInit, OnDestroy {
     public auth: AuthService,
     private appRef: ApplicationRef,
     private changeDetectorRef: ChangeDetectorRef,
+    private domSanitizer: DomSanitizer,
+    private matIconRegistry: MatIconRegistry,
     private media: MediaMatcher,
     private notify: NotifyService,
     private updates: SwUpdate
   ) {}
 
   ngOnInit() {
+    this.matIconRegistry.addSvgIcon(
+      'app-icon',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/app-icon.svg')
+    );
+
     this.mobileQuery = this.media.matchMedia('(max-width: 600px)');
     this.mobileQueryListener = () => {
       // keep sidnav open when width changes
