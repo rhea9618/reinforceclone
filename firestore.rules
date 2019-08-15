@@ -47,6 +47,16 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /badges/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /playerBadges/{id} {
+      allow read: if isSignedIn();
+      allow write: if isTeamLead(incomingData().teamId) || isAdmin();
+    }
+
     /// Utility Functions ///
 
     // Current DB record of document being requested

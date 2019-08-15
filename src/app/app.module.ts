@@ -20,15 +20,17 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/functions';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
+import { AppComponent } from './app.component';
+import { CacheReuseStrategy } from './core/cache-reuse-strategy';
+// Internal modules
+import { AppRoutingModule } from './app-routing.module';
+import { BadgesModule } from './badges/badges.module';
 import { CoreModule } from './core/core.module';
-import { UploadsModule } from './uploads/uploads.module';
-import { UiModule } from './ui/ui.module';
 import { NotesModule } from './notes/notes.module';
 import { TeamsModule } from './teams/teams.module';
-import { CacheReuseStrategy } from './core/cache-reuse-strategy';
+import { UiModule } from './ui/ui.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 
 @NgModule({
@@ -40,6 +42,7 @@ import { CacheReuseStrategy } from './core/cache-reuse-strategy';
     AngularFireStorageModule,
     AngularFireFunctionsModule,
     AppRoutingModule,
+    BadgesModule,
     BrowserAnimationsModule,
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     BrowserTransferStateModule,
