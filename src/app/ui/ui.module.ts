@@ -117,6 +117,7 @@ import { QuestPointsPipe } from './quest-points.pipe';
   ],
   providers: [
     PlayerPointsService,
+    QuestPointsPipe
   ]
 })
 export class UiModule {}
