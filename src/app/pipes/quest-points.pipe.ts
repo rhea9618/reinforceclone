@@ -3,10 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({ name: 'questPoints'})
 export class QuestPointsPipe implements PipeTransform {
 
-  transform(quest: Partial<PlayerQuest>): number {
-    const type = quest.type;
-    const required = quest.required;
-
+  transform(type: QuestType): number {
     switch (type) {
       case QuestType.ADDITIONAL:
         return 5;
@@ -18,8 +15,7 @@ export class QuestPointsPipe implements PipeTransform {
         return 20;
 
       default:
-        return required ? 10 : 5;
+        return 0;
     }
   }
-
 }

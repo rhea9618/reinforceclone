@@ -8,7 +8,8 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
-import { QuestPointsPipe } from '../quest-points.pipe';
+
+import { QuestPointsPipe } from 'src/app/pipes';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,8 @@ export class PlayerQuestService {
 
   constructor(
     private afs: AngularFirestore,
-    private questPointsPipe: QuestPointsPipe) {
+    private questPointsPipe: QuestPointsPipe
+  ) {
     this.playerQuestsCollection = this.afs.collection('playerQuests');
   }
 
@@ -184,7 +186,7 @@ export class PlayerQuestService {
 
         totalQuests += 1;
         // Fixed points where required quest is 10 else 5
-        totalPoints += this.getPointsFromType(quest);
+        totalPoints += this.questPointsPipe.transform(quest.type);
 
         transaction.set(playerPointsRef, {
           ...initialData,
@@ -196,10 +198,5 @@ export class PlayerQuestService {
     });
 
     return from(trans);
-  }
-
-  getPointsFromType(quest: Partial<PlayerQuest>): number {
-
-    return this.questPointsPipe.transform(quest);
   }
 }

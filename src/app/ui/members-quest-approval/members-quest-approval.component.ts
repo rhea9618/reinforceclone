@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs';
+import { flatMap, startWith } from 'rxjs/operators';
 
 import { EmailService } from 'src/app/core/email.service';
 import { NotifyService } from 'src/app/core/notify.service';
@@ -9,9 +11,9 @@ import { PlayerQuestService } from '../player-quest/player-quest.service';
 import { QuestApprovalDialogComponent } from './quest-approval-dialog.component';
 import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component';
 import { TeamsService } from 'src/app/teams/teams.service';
-import { FormControl } from '@angular/forms';
 import { AuthService } from 'src/app/core/auth.service';
-import { flatMap, startWith } from 'rxjs/operators';
+import { QuestPointsPipe } from 'src/app/pipes';
+import { QuestTypePipe } from 'src/app/pipes';
 
 @Component({
   selector: 'members-quest-approval',
@@ -38,7 +40,10 @@ export class MembersQuestApprovalComponent implements OnInit {
     private notify: NotifyService,
     private playerQuest: PlayerQuestService,
     private auth: AuthService,
-    private teamsService: TeamsService) {}
+    private teamsService: TeamsService,
+    private questPointsPipe: QuestPointsPipe,
+    private questTypePipe: QuestTypePipe
+  ) {}
 
   ngOnInit() {
     if (this.user && this.user.membership)  {
@@ -90,22 +95,22 @@ export class MembersQuestApprovalComponent implements OnInit {
 
   private getEmailSubject(playerQuest: PlayerQuest, approved: boolean): string {
     const approveStr = approved ? '' : 'Rejected';
-    let subject = `[Gamification of Learnings and Certifications]`;
+    const type = this.questTypePipe.transform(playerQuest.type);
+    let subject = `[Gamification of Learnings and Certifications] [${type}] `;
 
-    subject += playerQuest.required ? ` [Required] ` : ` [Additional] `;
     subject += `${playerQuest.quest.category.name} Quest Completion ${approveStr} for ${playerQuest.playerName}`;
 
     return subject;
   }
 
   private getApprovedEmailBody(playerQuest: PlayerQuest): string {
-    const requiredStr = playerQuest.required ? ` [Required] ` : ` [Additional] `;
-    const xp = this.playerQuest.getPointsFromType(playerQuest);
+    const type = this.questTypePipe.transform(playerQuest.type);
+    const xp = this.questPointsPipe.transform(playerQuest.type);
     const dashboardUrl = `${environment.firebase.authDomain}`;
     const category = playerQuest.quest.category.name;
 
     return `
-      Congratulations! You have been awarded ${xp} XP for completing your ${requiredStr} [${category}] quest.<br/>
+      Congratulations! You have been awarded ${xp} XP for completing your [${type}] [${category}] quest.<br/>
       <br/>
       Visit the <a href="${dashboardUrl}">Leaderboard</a> to see your current ranking!<br/>
       <br/>
@@ -114,7 +119,7 @@ export class MembersQuestApprovalComponent implements OnInit {
   }
 
   private getRejectedEmailBody(playerQuest: PlayerQuest, reasonRes = 'None'): string {
-    const requiredStr = playerQuest.required ? ` [Required] ` : ` [Additional] `;
+    const type = this.questTypePipe.transform(playerQuest.type);
 
     return `
       <p>Hi ${playerQuest.playerName}!</p>
@@ -122,7 +127,7 @@ export class MembersQuestApprovalComponent implements OnInit {
       <p>Kindly revisit the details and resend completion for this quest.</p>
 
       <ul style='list-style: none;'>
-        <li>Quest Type: ${requiredStr}</li>
+        <li>Quest Type: ${type}</li>
         <li>Category: ${playerQuest.quest.category.name}</li>
         <li>Quest: ${playerQuest.quest.name}</li>
         <li>Source: ${playerQuest.quest.source}</li>

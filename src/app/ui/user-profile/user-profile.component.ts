@@ -11,6 +11,7 @@ import { NotifyService } from 'src/app/core/notify.service';
 import { TeamsService } from 'src/app/teams/teams.service';
 import { PlayerPointsService } from '../player-quest/player-points.service';
 import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dialog.service';
+import { QuestTypePipe } from 'src/app/pipes';
 
 @Component({
   selector: 'user-profile',
@@ -32,7 +33,8 @@ export class UserProfileComponent implements OnInit {
     private notifyService: NotifyService,
     private teamsService: TeamsService,
     private playerPointsService: PlayerPointsService,
-    private addQuestDialog: AddQuestDialogService
+    private addQuestDialog: AddQuestDialogService,
+    private questTypePipe: QuestTypePipe
   ) {}
 
   ngOnInit() {
@@ -68,7 +70,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   private sendQuestAddedEmail(playerQuest: PlayerQuest) {
-    const type = playerQuest.required ? 'Required' : 'Additional';
+    const type = this.questTypePipe.transform(playerQuest.type);
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
     const subject = `${subjectPrefix} [${type}] [${playerQuest.quest.category.name}] Quest Added for ${playerQuest.playerName}`;
     const content =

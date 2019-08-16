@@ -34,8 +34,8 @@
     <mat-form-field appearance="outline">
       <mat-label>Quest Type</mat-label>
       <mat-select formControlName="type" required>
-        <mat-option *ngFor="let questType of questTypes " [value]="questType">
-          {{ questType }}
+        <mat-option *ngFor="let type of questTypes" [value]="type">
+          {{type | questType}}
         </mat-option>
       </mat-select>
     </mat-form-field>
