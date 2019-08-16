@@ -8,6 +8,7 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
+import { QuestPointsPipe } from '../quest-points.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,9 @@ export class PlayerQuestService {
 
   playerQuestsCollection: AngularFirestoreCollection<PlayerQuest>;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(
+    private afs: AngularFirestore,
+    private questPointsPipe: QuestPointsPipe) {
     this.playerQuestsCollection = this.afs.collection('playerQuests');
   }
 
@@ -196,21 +199,7 @@ export class PlayerQuestService {
   }
 
   getPointsFromType(quest: Partial<PlayerQuest>): number {
-    const type = quest.type;
-    const required = quest.required;
 
-    switch (type) {
-      case QuestType.ADDITIONAL:
-        return PointsByQuestType.ADDITIONAL;
-
-      case QuestType.REQUIRED:
-        return PointsByQuestType.REQUIRED;
-
-      case QuestType.SPECIAL:
-        return PointsByQuestType.SPECIAL;
-
-      default:
-        return required ? 10 : 5;
-    }
+    return this.questPointsPipe.transform(quest);
   }
 }

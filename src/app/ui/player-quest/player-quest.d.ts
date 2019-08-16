@@ -9,13 +9,6 @@ declare const enum QuestType {
   REQUIRED = 'Required',
   SPECIAL = 'Special'
 }
-
-declare const enum PointsByQuestType {
-  ADDITIONAL = 5,
-  REQUIRED = 10,
-  SPECIAL = 20
-}
-
 interface PlayerQuest {
   id?: string;
   seasonId: string;
