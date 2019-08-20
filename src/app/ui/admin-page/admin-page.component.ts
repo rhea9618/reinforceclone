@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-
-import { AuthService } from '../../core/auth.service';
-import { SeasonService } from '../../core/season.service';
 import { MatDialog } from '@angular/material';
+import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
 import { AddSeasonDialogComponent } from './add-season-dialog.component';
+import { AuthService } from 'src/app/core/auth.service';
+import { SeasonService } from 'src/app/core/season.service';
 import { NotifyService } from 'src/app/core/notify.service';
+import { TeamsService } from 'src/app/teams/teams.service';
 
 @Component({
   selector: 'admin-page',
@@ -23,19 +25,23 @@ export class AdminPageComponent implements OnInit {
     'enabled',
     'action',
   ];
+  readonly teamColumns = ['name', 'action'];
 
   seasons$: Observable<Season[]>;
+  teams$: Observable<Team[]>;
   loading = false;
 
   constructor(
-    private dialog: MatDialog,
     public auth: AuthService,
+    private dialog: MatDialog,
+    private notifyService: NotifyService,
     private seasonService: SeasonService,
-    private notifyService: NotifyService
+    private teams: TeamsService
   ) {}
 
   ngOnInit() {
     this.seasons$ = this.seasonService.getData();
+    this.teams$ = this.teams.getTeams();
   }
 
   enable(season: Season, user: User) {
@@ -63,6 +69,16 @@ export class AdminPageComponent implements OnInit {
           this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
         });
       }
+    });
+  }
+
+  addMembership(team: Team, email: string, isLead: boolean) {
+    console.log(team, email, isLead);
+    this.teams.addMembershipViaEmail(email, team, isLead).subscribe(() => {
+      this.notifyService.update(`Successfully added membership for ${email}`, 'success');
+    }, (error) => {
+      console.log(error);
+      this.notifyService.update(`Unable to add membership for ${email}`, 'error');
     });
   }
 }

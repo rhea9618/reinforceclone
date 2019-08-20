@@ -11,7 +11,7 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read, write: if isAdmin() || isOwner(userId);
     }
 
     match /questCategories/{id} {
@@ -32,8 +32,8 @@ service cloud.firestore {
 
     match /membership/{id} {
       allow read: if true;
-      allow create: if isOwner(incomingData().uid) && incomingData().isApproved == false;
-      allow update, delete: if isTeamLead(existingData().teamId);
+      allow create: if isAdmin() || isOwner(incomingData().uid) && incomingData().isApproved == false;
+      allow update, delete: if isAdmin() || isTeamLead(existingData().teamId);
     }
 
     match /teams/{id} {
@@ -142,8 +142,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return getAdminData(currentUser().uid).uid == currentUser().uid &&
-        incomingData().updated_by.uid == currentUser().uid;
+      return getAdminData(currentUser().uid).uid == currentUser().uid;
     }
   }
 }
