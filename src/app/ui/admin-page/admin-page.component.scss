@@ -18,3 +18,16 @@ form {
 .season {
   color: mat-color(mat-palette($mat-indigo));
 }
+
+.member {
+  display: flex;
+  align-items: center;
+
+  > * {
+    flex: 1 1 auto;
+  }
+
+  mat-checkbox {
+    margin: 0 10px;
+  }
+}

@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatCardModule,
+  MatCheckboxModule,
   MatChipsModule,
   MatDatepickerModule,
   MatDialogModule,
@@ -57,6 +58,7 @@ import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.compone
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatChipsModule,
     MatDatepickerModule,
     MatDialogModule,
