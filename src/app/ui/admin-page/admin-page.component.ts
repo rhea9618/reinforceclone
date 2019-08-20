@@ -79,6 +79,6 @@ export class AdminPageComponent implements OnInit {
     }, (error) => {
       console.log(error);
       this.notifyService.update(`Unable to add membership for ${email}`, 'error');
-    })
+    });
   }
 }
