@@ -24,7 +24,8 @@ import {
 } from '@angular/material';
 
 import { DialogModule } from './dialog/dialog.module';
-import { QuestsModule } from '../quests/quests.module';
+import { QuestsModule } from 'src/app/quests/quests.module';
+import { PipesModule } from 'src/app/pipes';
 import { AdminPageComponent } from './admin-page/admin-page.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { HomePageComponent } from './home-page/home-page.component';
@@ -41,11 +42,6 @@ import { TeamPageComponent } from './team-page/team-page.component';
 import { TeamApplicationsComponent } from './team-page/team-applications/team-applications.component';
 import { TeamMembersComponent } from './team-page/team-members/team-members.component';
 import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
-
-import { FirestoreDatePipe } from './firestore-date.pipe';
-import { NicknamePipe } from './nickname.pipe';
-import { SeasonRankPipe } from './season-rank.pipe';
-
 import { PlayerPointsService } from './player-quest/player-points.service';
 import { RejectReasonDialogComponent } from './members-quest-approval/reject-reason-dialog/reject-reason-dialog.component';
 import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.component';
@@ -76,6 +72,7 @@ import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.compone
     MatSelectModule,
     DialogModule,
     QuestsModule,
+    PipesModule,
   ],
   declarations: [
     UserLoginComponent,
@@ -84,7 +81,6 @@ import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.compone
     UserProfileComponent,
     UserFormComponent,
     SsrPageComponent,
-    FirestoreDatePipe,
     AdminPageComponent,
     PlayerQuestComponent,
     MembersQuestApprovalComponent,
@@ -95,11 +91,9 @@ import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.compone
     SubmitQuestDialogComponent,
     TeamApplicationsComponent,
     TeamMembersComponent,
-    NicknamePipe,
-    SeasonRankPipe,
     ConfirmationModalComponent,
     RejectReasonDialogComponent,
-    AddSeasonDialogComponent
+    AddSeasonDialogComponent,
   ],
   entryComponents: [
     ConfirmationModalComponent,
@@ -111,10 +105,9 @@ import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.compone
   exports: [
     UserProfileComponent,
     UserFormComponent,
-    NicknamePipe,
   ],
   providers: [
-    PlayerPointsService,
+    PlayerPointsService
   ]
 })
 export class UiModule {}

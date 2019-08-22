@@ -12,6 +12,8 @@ import { environment } from 'src/environments/environment';
 import { SubmitQuestDialogComponent } from './submit-quest-dialog.component';
 import { AddQuestDialogService } from '../dialog/add-quest-dialog/add-quest-dialog.service';
 import { ConfirmationModalService } from '../confirmation-modal/confirmation-modal.service';
+import { QuestPointsPipe } from 'src/app/pipes';
+import { QuestTypePipe } from 'src/app/pipes';
 
 @Component({
   selector: 'player-quest-list',
@@ -40,7 +42,9 @@ export class PlayerQuestListComponent implements OnInit {
     private playerQuestService: PlayerQuestService,
     private seasonService: SeasonService,
     private addQuestDialog: AddQuestDialogService,
-    private confirmationModal: ConfirmationModalService
+    private confirmationModal: ConfirmationModalService,
+    private questPointsPipe: QuestPointsPipe,
+    private questTypePipe: QuestTypePipe
    ) {}
 
   ngOnInit() {
@@ -82,7 +86,7 @@ export class PlayerQuestListComponent implements OnInit {
   }
 
   private questInfoEmail(playerQuest: PlayerQuest): string {
-    const type = playerQuest.required ? 'Required' : 'Additional';
+    const type = this.questTypePipe.transform(playerQuest.type);
     return `
       Quest Type: ${type}<br/>
       Category: ${playerQuest.quest.category.name}<br/>
@@ -91,8 +95,8 @@ export class PlayerQuestListComponent implements OnInit {
   }
 
   private sendQuestSubmittedEmail(playerQuest: PlayerQuest) {
-    const type = playerQuest.required ? 'Required' : 'Additional';
-    const xp = playerQuest.required ? '10 XP' : '5 XP';
+    const type = this.questTypePipe.transform(playerQuest.type);
+    const xp = this.questPointsPipe.transform(playerQuest.type) +  ' XP';
     const subjectPrefix = `[Gamification of Learnings and Certifications] [${type}] [${playerQuest.quest.category.name}]`;
     const subject = `${subjectPrefix} Validation of Quest Completion for ${playerQuest.playerName}`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
@@ -115,7 +119,7 @@ export class PlayerQuestListComponent implements OnInit {
   }
 
   private sendQuestUpdatedEmail(playerQuest: PlayerQuest) {
-    const type = playerQuest.required ? 'Required' : 'Additional';
+    const type = this.questTypePipe.transform(playerQuest.type);
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
     const subject = `${subjectPrefix} Revisit your [${type}] [${playerQuest.quest.category.name}] Quest Details`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
@@ -148,7 +152,7 @@ export class PlayerQuestListComponent implements OnInit {
   }
 
   private sendQuestDeletedEmail(playerQuest: PlayerQuest) {
-    const type = playerQuest.required ? 'Required' : 'Additional';
+    const type = this.questTypePipe.transform(playerQuest.type);
     const subjectPrefix = '[Gamification of Learnings and Certifications]';
     const subject = `${subjectPrefix} [${type}] [${playerQuest.quest.category.name}] Quest Cancelled`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;

@@ -31,6 +31,7 @@ import { NotesModule } from './notes/notes.module';
 import { TeamsModule } from './teams/teams.module';
 import { UiModule } from './ui/ui.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { PipesModule } from './pipes';
 
 
 @NgModule({
@@ -56,6 +57,7 @@ import { UploadsModule } from './uploads/uploads.module';
     NotesModule,
     TeamsModule,
     UiModule,
+    PipesModule,
     UploadsModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {
       enabled: environment.production
