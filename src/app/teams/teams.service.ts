@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { flatMap, map } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 
+import { UserService } from 'src/app/core/user.service';
 
 @Injectable()
 export class TeamsService {
@@ -10,20 +11,26 @@ export class TeamsService {
   membersCollection: AngularFirestoreCollection<Membership>;
   teamsCollection: AngularFirestoreCollection<Team>;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(private afs: AngularFirestore, private userService: UserService) {
     this.membersCollection = this.afs.collection('membership');
     this.teamsCollection = this.afs.collection('teams');
   }
 
-  addMembership(user: User, team: Team) {
+  addMembershipViaEmail(email: string, team: Team, isLead: boolean) {
+    return this.userService.getUserFromEmail(email).pipe(
+      flatMap((user: User) => this.addMembership(user, team, true, isLead))
+    );
+  }
+
+  addMembership(user: User, team: Team, isApproved = false, isLead = false) {
     return from(this.membersCollection.doc<Membership>(user.uid + team.id).set({
       uid: user.uid,
       displayName: user.displayName,
       email: user.email,
       teamId: team.id,
       teamName: team.name,
-      isApproved: false,
-      isLead: false
+      isApproved,
+      isLead
     }));
   }
 
