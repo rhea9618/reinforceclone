@@ -1,5 +1,5 @@
 interface Counter {
-  pointCount: number;
-  questCount: number;
-  certificationCount: number;
+  points: number;
+  quests: number;
+  certifications: number;
 }

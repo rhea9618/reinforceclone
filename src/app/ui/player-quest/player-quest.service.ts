@@ -192,13 +192,29 @@ export class PlayerQuestService {
           };
         }
 
-        counter = this.getCounter(monthName, monthlyCounter);
+        // get the counter for the month. create a new one if it does not exist yet
+        if (monthlyCounter[monthName]) {
+          counter = monthlyCounter[monthName];
+        } else {
+          counter = {
+            quests: 0,
+            certifications: 0,
+            points: 0
+          };
+        }
 
+        // update overall quest count and points of the player
+        const pointsAcquired = this.questPointsPipe.transform(quest.type);
         totalQuests += 1;
-        counter.questCount += 1;
-        // Fixed points where required quest is 10 else 5
-        totalPoints += this.questPointsPipe.transform(quest.type);
-        counter.pointCount += this.questPointsPipe.transform(quest.type);
+        totalPoints += pointsAcquired;
+
+        // update the counter for the month
+        counter.quests += 1;
+        counter.points += pointsAcquired;
+        if (quest.quest.category.name === 'Certification') {
+          counter.certifications += 1;
+        }
+        monthlyCounter[monthName] = counter;
 
         transaction.set(playerPointsRef, {
           ...initialData,
@@ -211,27 +227,6 @@ export class PlayerQuestService {
     });
 
     return from(trans);
-  }
-
-  /**
-   * This method gets the counter for the provided month.
-   * If the counter does not exist, this methods sets the initial counter for the month and returns it
-   * @param monthName
-   * @param monthlyCounter
-   */
-  getCounter(monthName: string, monthlyCounter: MonthlyCounter): Counter {
-    let counter: Counter;
-    if (monthlyCounter[monthName]) {
-      counter = monthlyCounter[monthName];
-    } else {
-      counter = {
-        questCount: 0,
-        certificationCount: 0,
-        pointCount: 0
-      };
-      monthlyCounter[monthName] = counter;
-    }
-    return counter;
   }
 
 }
