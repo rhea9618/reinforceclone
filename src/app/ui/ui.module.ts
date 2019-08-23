@@ -45,6 +45,7 @@ import { ConfirmationModalComponent } from './confirmation-modal/confirmation-mo
 import { PlayerPointsService } from './player-quest/player-points.service';
 import { RejectReasonDialogComponent } from './members-quest-approval/reject-reason-dialog/reject-reason-dialog.component';
 import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.component';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   imports: [
@@ -107,7 +108,8 @@ import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.compone
     UserFormComponent,
   ],
   providers: [
-    PlayerPointsService
+    PlayerPointsService,
+    DatePipe
   ]
 })
 export class UiModule {}
