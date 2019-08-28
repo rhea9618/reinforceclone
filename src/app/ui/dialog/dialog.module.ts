@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AddQuestDialogComponent } from './add-quest-dialog/add-quest-dialog.component';
 import { AddQuestDialogService } from './add-quest-dialog/add-quest-dialog.service';
+import { PipesModule } from 'src/app/pipes';
 
 import {
   MatAutocompleteModule,
@@ -34,12 +35,11 @@ import {
     MatListModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    PipesModule,
   ],
   declarations: [ AddQuestDialogComponent ],
   entryComponents: [ AddQuestDialogComponent ],
-  providers: [
-    AddQuestDialogService,
-  ]
+  providers: [  AddQuestDialogService ]
 })
 export class DialogModule { }

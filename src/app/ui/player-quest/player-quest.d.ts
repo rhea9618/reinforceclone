@@ -4,6 +4,12 @@ declare const enum QuestStatus {
   COMPLETED = 'completed'
 }
 
+declare const enum QuestType {
+  ADDITIONAL,
+  REQUIRED,
+  SPECIAL
+}
+
 interface PlayerQuest {
   id?: string;
   seasonId: string;
@@ -19,5 +25,5 @@ interface PlayerQuest {
   completed?: firebase.firestore.Timestamp;
   completionProof?: string; // link to screenshot?
   quest: Quest;
-  required: boolean; // true = 10 points granted, else 5 points
+  type: QuestType;
 }

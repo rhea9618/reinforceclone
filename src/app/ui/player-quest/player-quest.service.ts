@@ -8,6 +8,9 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
+import { DatePipe } from '@angular/common';
+
+import { QuestPointsPipe } from 'src/app/pipes';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +19,11 @@ export class PlayerQuestService {
 
   playerQuestsCollection: AngularFirestoreCollection<PlayerQuest>;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(
+    private afs: AngularFirestore,
+    private questPointsPipe: QuestPointsPipe,
+    private datePipe: DatePipe
+  ) {
     this.playerQuestsCollection = this.afs.collection('playerQuests');
   }
 
@@ -158,19 +165,25 @@ export class PlayerQuestService {
           updated
         });
 
+        const monthName = this.datePipe.transform(quest.completed.toDate(), 'MMM').toLowerCase();
         let totalPoints = 0;
         let totalQuests = 0;
+        let monthlyCounter: MonthlyCounter;
+        let counter: Counter;
         let initialData: Partial<PlayerPoints>;
 
         if (playerPoints.exists) {
           totalPoints = Number(playerPoints.data().totalPoints);
           totalQuests = Number(playerPoints.data().totalQuests);
+          monthlyCounter = playerPoints.data().monthlyCounter;
 
           if (playerPoints.data().teamId !== quest.teamId) {
             // Catch for the scenario where they don't match.
             initialData = { teamId: quest.teamId };
           }
+
         } else {
+          monthlyCounter = {};
           initialData = {
             seasonId: quest.seasonId,
             playerId: quest.playerId,
@@ -179,14 +192,35 @@ export class PlayerQuestService {
           };
         }
 
+        // get the counter for the month. create a new one if it does not exist yet
+        if (monthlyCounter[monthName]) {
+          counter = monthlyCounter[monthName];
+        } else {
+          counter = {
+            quests: 0,
+            certifications: 0,
+            points: 0
+          };
+        }
+
+        // update overall quest count and points of the player
+        const pointsAcquired = this.questPointsPipe.transform(quest.type);
         totalQuests += 1;
-        // Fixed points where required quest is 10 else 5
-        totalPoints += quest.required ? 10 : 5;
+        totalPoints += pointsAcquired;
+
+        // update the counter for the month
+        counter.quests += 1;
+        counter.points += pointsAcquired;
+        if (quest.quest.category.name === 'Certification') {
+          counter.certifications += 1;
+        }
+        monthlyCounter[monthName] = counter;
 
         transaction.set(playerPointsRef, {
           ...initialData,
           totalPoints,
           totalQuests,
+          monthlyCounter,
           updated
         }, { merge: true });
       });
@@ -194,4 +228,5 @@ export class PlayerQuestService {
 
     return from(trans);
   }
+
 }
