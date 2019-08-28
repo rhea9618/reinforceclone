@@ -12,5 +12,8 @@ export const environment = {
     clientID: 'e6894d11-cb0a-4e71-b3ef-f10463b5b6dd',
     consentScopes: ['user.read', 'mail.send']
   },
-  ccEmail: 'rewards.recognitionph@infor.com'
+  ccEmail: 'rewards.recognitionph@infor.com',
+  badges: {
+    goodWork: 'good_work'
+  }
 };
