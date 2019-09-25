@@ -13,7 +13,7 @@ import { SeasonService } from 'src/app/core/season.service';
 export class HomePageComponent implements OnInit {
 
   topUsers$: Observable<PlayerPoints[]>;
-  readonly displayedColumns = ['index', 'name', 'points', 'rank', 'info'];
+  readonly displayedColumns = ['index', 'name', 'team', 'points', 'rank', 'info'];
 
   constructor(
     private auth: AuthService,

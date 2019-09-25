@@ -179,7 +179,10 @@ export class PlayerQuestService {
 
           if (playerPoints.data().teamId !== quest.teamId) {
             // Catch for the scenario where they don't match.
-            initialData = { teamId: quest.teamId };
+            initialData = {
+              teamId: quest.teamId,
+              teamName: quest.teamName
+            };
           }
 
         } else {
@@ -188,6 +191,7 @@ export class PlayerQuestService {
             seasonId: quest.seasonId,
             playerId: quest.playerId,
             playerName: quest.playerName,
+            teamName: quest.teamName,
             teamId: quest.teamId
           };
         }
