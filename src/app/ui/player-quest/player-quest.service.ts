@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
 
 import { QuestPointsPipe } from 'src/app/pipes';
 import { BadgesService } from 'src/app/badges/badges.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -252,6 +253,10 @@ export class PlayerQuestService {
       flatMap(() => this.badgeService.awardGoodWorkBadge(quest, eligibleForGoodWorkBadge)),
       concatMap(() => quest.type === QuestType.SPECIAL ?
         this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId) : of(null)
+      ),
+      // award scholar badge
+      concatMap(() => quest.type === QuestType.REQUIRED ?
+        this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar) : of(null)
       )
     );
   }
