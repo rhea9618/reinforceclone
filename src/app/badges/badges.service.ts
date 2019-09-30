@@ -78,12 +78,12 @@ checkForSpeakerBadges(playerId: string, teamId: string, seasonId: string) {
 
     // check if user has a competent speaker badge
     return this.getUserBadge(playerId, badges.competentSpeaker, seasonId).pipe(
-      // award the competent speaker badge if it doesn't exist yet
+      // award competent speaker badge if it doesn't exist yet
       flatMap((badge: PlayerBadge) => badge ? of(badge) : this.awardWithBadgeId(playerId, teamId, seasonId, badges.competentSpeaker)),
       takeWhile((badge: PlayerBadge) => badge.badge.id === badges.competentSpeaker),
       // otherwise, check advanced speaker badge next
       flatMap(() => this.getUserBadge(playerId, badges.advancedSpeaker, seasonId)),
-      // award the advanced speaker badge if it doesn't exist yet
+      // award advanced speaker badge if it doesn't exist yet
       flatMap((badge: PlayerBadge) => badge ? of(badge) : this.awardWithBadgeId(playerId, teamId, seasonId, badges.advancedSpeaker)),
       takeWhile((badge: PlayerBadge) => badge.badge.id === badges.advancedSpeaker),
       // otherwise, check distinguished speaker badge next
