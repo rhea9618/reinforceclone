@@ -17,6 +17,9 @@ export const environment = {
     consentScopes: ['user.read', 'mail.send']
   },
   badges: {
+    competentSpeaker: 'competent_speaker',
+    advancedSpeaker: 'advanced_speaker',
+    distinguishedSpeaker: 'distinguished_speaker',
     goodWork: 'good_work'
   }
 };

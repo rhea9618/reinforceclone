@@ -5,7 +5,7 @@ import {
   AngularFirestoreDocument
 } from '@angular/fire/firestore';
 import { from, Observable, of } from 'rxjs';
-import { map, flatMap } from 'rxjs/operators';
+import { map, flatMap, concatMap } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
 import { DatePipe } from '@angular/common';
@@ -236,7 +236,10 @@ export class PlayerQuestService {
     });
 
     return from(trans).pipe(
-      flatMap(() => this.badgeService.awardGoodWorkBadge(quest, eligibleForGoodWorkBadge))
+      flatMap(() => this.badgeService.awardGoodWorkBadge(quest, eligibleForGoodWorkBadge)),
+      concatMap(() => quest.type === QuestType.SPECIAL ?
+        this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId) : of(null)
+      )
     );
   }
 }
