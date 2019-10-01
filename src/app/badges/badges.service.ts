@@ -38,7 +38,7 @@ export class BadgesService {
 
   getBadge(id: string): Observable<Badge> {
     return this.afs.doc<Badge>(`badges/${id}`).valueChanges().pipe(map((badge: Badge) => ({ id, ...badge })));
-  } 
+  }
 
   async awardBadge(playerId: string, teamId: string, seasonId: string, badge: Badge) {
     const awardedDate = Timestamp.now();
