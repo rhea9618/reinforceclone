@@ -14,6 +14,9 @@ export const environment = {
   },
   ccEmail: 'rewards.recognitionph@infor.com',
   badges: {
+    competentSpeaker: 'competent_speaker',
+    advancedSpeaker: 'advanced_speaker',
+    distinguishedSpeaker: 'distinguished_speaker',
     goodWork: 'good_work'
   }
 };
