@@ -4,13 +4,14 @@ import {
   AngularFirestoreCollection,
   AngularFirestoreDocument
 } from '@angular/fire/firestore';
-import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
+import { map, flatMap, concatMap } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
 import { DatePipe } from '@angular/common';
 
 import { QuestPointsPipe } from 'src/app/pipes';
+import { BadgesService } from 'src/app/badges/badges.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +22,9 @@ export class PlayerQuestService {
 
   constructor(
     private afs: AngularFirestore,
-    private questPointsPipe: QuestPointsPipe,
-    private datePipe: DatePipe
+    private badgeService: BadgesService,
+    private datePipe: DatePipe,
+    private questPointsPipe: QuestPointsPipe
   ) {
     this.playerQuestsCollection = this.afs.collection('playerQuests');
   }
@@ -155,6 +157,7 @@ export class PlayerQuestService {
   approveQuest(quest: Partial<PlayerQuest>) {
     const playerPointsRef = this.getPlayerPoints(quest.seasonId + quest.playerId).ref;
     const questRef = this.getQuest(quest.id).ref;
+    let eligibleForGoodWorkBadge = false;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
       return transaction.get(playerPointsRef).then(playerPoints => {
@@ -179,7 +182,10 @@ export class PlayerQuestService {
 
           if (playerPoints.data().teamId !== quest.teamId) {
             // Catch for the scenario where they don't match.
-            initialData = { teamId: quest.teamId };
+            initialData = {
+              teamId: quest.teamId,
+              teamName: quest.teamName
+            };
           }
 
         } else {
@@ -188,6 +194,7 @@ export class PlayerQuestService {
             seasonId: quest.seasonId,
             playerId: quest.playerId,
             playerName: quest.playerName,
+            teamName: quest.teamName,
             teamId: quest.teamId
           };
         }
@@ -216,6 +223,8 @@ export class PlayerQuestService {
         }
         monthlyCounter[monthName] = counter;
 
+        eligibleForGoodWorkBadge = (counter.points >= 50);
+
         transaction.set(playerPointsRef, {
           ...initialData,
           totalPoints,
@@ -226,7 +235,11 @@ export class PlayerQuestService {
       });
     });
 
-    return from(trans);
+    return from(trans).pipe(
+      flatMap(() => this.badgeService.awardGoodWorkBadge(quest, eligibleForGoodWorkBadge)),
+      concatMap(() => quest.type === QuestType.SPECIAL ?
+        this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId) : of(null)
+      )
+    );
   }
-
 }

@@ -15,6 +15,12 @@ export const environment = {
   msalConfig: {
     clientID: '768b74ca-92bc-4436-9954-1e41f534d255',
     consentScopes: ['user.read', 'mail.send']
+  },
+  badges: {
+    competentSpeaker: 'competent_speaker',
+    advancedSpeaker: 'advanced_speaker',
+    distinguishedSpeaker: 'distinguished_speaker',
+    goodWork: 'good_work'
   }
 };
 

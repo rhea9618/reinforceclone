@@ -3,6 +3,7 @@ interface PlayerPoints {
   playerId: string;
   playerName: string;
   teamId: string;
+  teamName: string;
   totalPoints: number;
   totalQuests: number;
   monthlyCounter: MonthlyCounter;

@@ -55,12 +55,12 @@
             <mat-icon class="icon">group</mat-icon>
             <span>Team</span>
           </a>
-          <!-- <a mat-list-item
+          <a mat-list-item
             [routerLinkActive]="['active-menu']"
             routerLink="/badges"
             (click)="closeSideNav()">
             <mat-icon class="icon">stars</mat-icon>Badges
-          </a> -->
+          </a>
           <a mat-list-item *ngIf="user.isAdmin"
             [routerLinkActive]="['active-menu']"
             routerLink="/admin"

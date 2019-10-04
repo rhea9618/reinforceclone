@@ -99,6 +99,7 @@ export class UserProfileComponent implements OnInit {
       teamId: user.teamId,
       status: QuestStatus.TODO,
       playerEmail: user.email,
+      teamName: user.teamName,
       teamLeadEmail: lead.email
     };
 
