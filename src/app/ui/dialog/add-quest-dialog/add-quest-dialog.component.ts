@@ -156,7 +156,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       .filter(word => word ? word.length > 2 : false);
   }
 
-  private async getQuest(): Promise<Quest>{
+  private async getQuest(): Promise<Quest> {
     let quest = this.questForm.get('quest').value;
     if (typeof quest !== 'string') {
       return quest as Quest;
