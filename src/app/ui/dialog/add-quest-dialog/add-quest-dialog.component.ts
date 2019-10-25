@@ -40,6 +40,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
   readonly noEmit = { emitEvent: false };
 
+  isNewQuest = true;
   saving = false;
   actionLabel = 'Add Quest';
   private categoryList$: Observable<QuestCategory[]>;
@@ -89,6 +90,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
           sourceCtrl.setValue('');
           sourceCtrl.enable();
         }
+        this.isNewQuest = true;
       }),
       filter((name: string) => name.length > 2 && !this.questForm.get('quest').invalid),
       flatMap((name: string) => this.getQuestSuggestions(name))
@@ -120,15 +122,11 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     const quest = event.option.value as Quest;
     this.questForm.get('source').setValue(quest.source);
     this.questForm.get('source').disable();
+    this.isNewQuest = false;
   }
 
   private questNameDisplay(quest: Quest): string {
     return quest ? quest.name : '';
-  }
-
-  private get isNewQuest() {
-    const quest = this.questForm.get('quest').value;
-    return (typeof quest === 'string' && quest.trim() !== '');
   }
 
   private get questError() {
@@ -158,16 +156,17 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       .filter(word => word ? word.length > 2 : false);
   }
 
-  async saveQuest() {
-    if (this.questForm.invalid) {
-      return;
+  private async getQuest(): Promise<Quest>{
+    let quest = this.questForm.get('quest').value;
+    if (typeof quest !== 'string') {
+      return quest as Quest;
     }
-    this.saving = true;
 
-    let quest: Quest;
+    const name = quest as string;
+    // Check if quest already exists from the DB
+    quest = await this.quest.getQuestByName(name).toPromise();
     // Saving new quest...
-    if (this.isNewQuest) {
-      const name = this.questForm.get('quest').value.trim() as string;
+    if (!quest) {
       const description = name; // same as name for now until further notice
       const category = this.questForm.get('category').value as QuestCategory;
       const source = this.questForm.get('source').value as string;
@@ -185,11 +184,17 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
       quest.id = await this.quest.saveQuest(quest);
       console.log(`Saved new quest: ${quest.name}`);
-    } else {
-      quest = this.questForm.get('quest').value;
     }
 
-    this.playerQuest.quest = quest;
+    return quest as Quest;
+  }
+
+  async saveQuest() {
+    if (this.questForm.invalid) {
+      return;
+    }
+    this.saving = true;
+    this.playerQuest.quest = await this.getQuest();
     this.playerQuest.type = this.questForm.get('type').value;
     this.dialogRef.close(this.playerQuest);
   }
