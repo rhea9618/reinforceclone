@@ -33,11 +33,12 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Quest Type</mat-label>
-      <mat-select formControlName="type" required>
+      <mat-select [errorStateMatcher]="typeErrorFieldMatcher" formControlName="type" required>
         <mat-option *ngFor="let type of questTypes" [value]="type">
           {{type | questType}}
         </mat-option>
       </mat-select>
+      <mat-error *ngIf="typeError">{{ typeError }}</mat-error>
     </mat-form-field>
   </form>
 </mat-dialog-content>

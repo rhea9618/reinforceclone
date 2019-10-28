@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
+import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, FormControl, FormGroupDirective } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatAutocompleteSelectedEvent, ErrorStateMatcher } from '@angular/material';
 import { Observable, of, Subject } from 'rxjs';
 import {
   debounceTime,
@@ -14,6 +14,15 @@ import {
 
 import { AuthService } from 'src/app/core/auth.service';
 import { QuestCategoriesService, QuestService } from 'src/app/quests';
+import { PlayerQuestService } from '../../player-quest/player-quest.service';
+
+class TypeErrorFieldMatcher implements ErrorStateMatcher {
+
+  isErrorState(control: FormControl | any, form: FormGroupDirective | null): boolean {
+    // select fields don't ever become dirt, overriding use of this property
+    return control._pendingValue === QuestType.REQUIRED && control.dirty;
+  }
+}
 
 // Validator for quest and source fields
 const textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors => {
@@ -43,13 +52,16 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   isNewQuest = true;
   saving = false;
   actionLabel = 'Add Quest';
+  typeError: string;
+  typeErrorFieldMatcher: TypeErrorFieldMatcher;
+  private typeControl = new FormControl(QuestType.REQUIRED);
   private categoryList$: Observable<QuestCategory[]>;
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
     category: [''],
     quest: [{ value: '', disabled: true }, textValidator],
     source: [{ value: '', disabled: true }, textValidator],
-    type: [ QuestType.REQUIRED ]
+    type: this.typeControl
   });
   private questSuggestions$: Observable<Quest[]>;
   private questTypes = [ QuestType.ADDITIONAL, QuestType.REQUIRED, QuestType.SPECIAL ];
@@ -57,13 +69,15 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(MAT_DIALOG_DATA) private playerQuest: Partial<PlayerQuest>,
     private auth: AuthService,
-    private dialogRef: MatDialogRef<AddQuestDialogComponent, Partial<PlayerQuest>>,
+    private dialogRef: MatDialogRef<AddQuestDialogComponent, any>,
     private formBuilder: FormBuilder,
     private questCategories: QuestCategoriesService,
-    private quest: QuestService
+    private quest: QuestService,
+    private playerQuestService: PlayerQuestService
   ) {}
 
   ngOnInit() {
+    this.typeErrorFieldMatcher = new TypeErrorFieldMatcher();
     this.categoryList$ = this.questCategories.getCategories();
 
     // Updating quest
@@ -165,19 +179,25 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     let typeExists: boolean;
     const type = this.questForm.get('type').value as QuestType;
     const category = this.questForm.get('category').value as QuestCategory;
-    // if required, check if a category exists for this user ady exists
-    if (type === QuestType.REQUIRED) {
-      // is there already a quest of this category for this user?
-      typeExists = await this.quest.hasRequiredQuest(category).toPromise();
-    }
-
-    if (typeExists) {
-      return; // TODO: add a notify
-    }
 
     if (this.questForm.invalid) {
       return;
     }
+
+    // if required, check if a category exists for this user ady exists
+    if (type === QuestType.REQUIRED) {
+      // is there already a quest of this category for this user?
+      typeExists = await this.playerQuestService.hasRequiredQuest(category, this.playerQuest);
+      // select fields don't ever become dirt, overriding use of this property
+      this.typeControl.markAsDirty({onlySelf: typeExists});
+    }
+
+    if (typeExists) {
+      this.typeError = 'Can only select One (1) Required Quest per Category';
+      return;
+    }
+
+    this.saving = true;
 
     const name = quest as string;
     // Check if quest already exists from the DB

@@ -260,4 +260,23 @@ export class PlayerQuestService {
       )
     );
   }
+
+  /**
+   * Method that checks existence of REQUIRED quests under a certain quest category
+   */
+  hasRequiredQuest(questCategory: QuestCategory, playerQuest: Partial<PlayerQuest>): Promise<boolean> {
+    this.playerQuestsCollection =
+      this.afs.collection('playerQuests', ref => ref
+        .where('quest.category.id', '==', questCategory.id)
+        .where('type', '==' , QuestType.REQUIRED)
+        .where('playerId', '==', playerQuest.playerId)
+        .where('teamId', '==', playerQuest.teamId)
+        .where('seasonId', '==', playerQuest.seasonId)
+        .limit(1));
+
+    return this.playerQuestsCollection.snapshotChanges().pipe(
+      take(1),
+      map((quests) => quests.length > 0)
+    ).toPromise();
+  }
 }
