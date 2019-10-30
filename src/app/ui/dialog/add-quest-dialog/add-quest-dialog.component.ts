@@ -54,14 +54,13 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   actionLabel = 'Add Quest';
   typeError: string;
   typeErrorFieldMatcher: TypeErrorFieldMatcher;
-  private typeControl = new FormControl(QuestType.REQUIRED);
   private categoryList$: Observable<QuestCategory[]>;
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
     category: [''],
     quest: [{ value: '', disabled: true }, textValidator],
     source: [{ value: '', disabled: true }, textValidator],
-    type: this.typeControl
+    type: [QuestType.REQUIRED]
   });
   private questSuggestions$: Observable<Quest[]>;
   private questTypes = [ QuestType.ADDITIONAL, QuestType.REQUIRED, QuestType.SPECIAL ];
@@ -69,7 +68,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(MAT_DIALOG_DATA) private playerQuest: Partial<PlayerQuest>,
     private auth: AuthService,
-    private dialogRef: MatDialogRef<AddQuestDialogComponent, any>,
+    private dialogRef: MatDialogRef<AddQuestDialogComponent, Partial<PlayerQuest>>,
     private formBuilder: FormBuilder,
     private questCategories: QuestCategoriesService,
     private quest: QuestService,
@@ -151,6 +150,10 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     return this.getControlError('Source', this.questForm.get('source'));
   }
 
+  protected get requiredTypeError() {
+    return this.getControlError('Source', this.questForm.get('type'));
+  }
+
   private getControlError(name: string, control: AbstractControl): string {
     if (!control.errors) {
       return null;
@@ -161,6 +164,9 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     }
     if (control.errors.required) {
       return `${name} name is required`;
+    }
+    if (control.errors.invalidType) {
+      return 'Can Only Select One (1) Required Quest per Category';
     }
   }
 
@@ -186,14 +192,15 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
     // if required, check if a category exists for this user ady exists
     if (type === QuestType.REQUIRED) {
+      const typeControl = this.questForm.get('type');
       // is there already a quest of this category for this user?
       typeExists = await this.playerQuestService.hasRequiredQuest(category, this.playerQuest);
       // select fields don't ever become dirt, overriding use of this property
-      this.typeControl.markAsDirty({onlySelf: typeExists});
+      typeControl.markAsDirty({onlySelf: typeExists});
+      typeControl.setErrors({'invalidType': true});
     }
 
     if (typeExists) {
-      this.typeError = 'Can only select One (1) Required Quest per Category';
       return;
     }
 
