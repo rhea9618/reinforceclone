@@ -182,36 +182,13 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       return quest as Quest;
     }
 
-    let typeExists: boolean;
-    const type = this.questForm.get('type').value as QuestType;
-    const category = this.questForm.get('category').value as QuestCategory;
-
-    if (this.questForm.invalid) {
-      return;
-    }
-
-    // if required, check if a category exists for this user ady exists
-    if (type === QuestType.REQUIRED) {
-      const typeControl = this.questForm.get('type');
-      // is there already a quest of this category for this user?
-      typeExists = await this.playerQuestService.hasRequiredQuest(category, this.playerQuest);
-      // select fields don't ever become dirt, overriding use of this property
-      typeControl.markAsDirty({onlySelf: typeExists});
-      typeControl.setErrors({'invalidType': true});
-    }
-
-    if (typeExists) {
-      return;
-    }
-
-    this.saving = true;
-
     const name = quest as string;
     // Check if quest already exists from the DB
     quest = await this.quest.getQuestByName(name).toPromise();
     // Saving new quest...
     if (!quest) {
       const description = name; // same as name for now until further notice
+      const category = this.questForm.get('category').value as QuestCategory;
       const source = this.questForm.get('source').value as string;
       const keywords = this.getKeywords(name);
       quest = {
@@ -236,6 +213,10 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     if (this.questForm.invalid) {
       return;
     }
+
+    if (await this.requiredTypeExists()) {
+      return;
+    }
     this.saving = true;
     this.playerQuest.quest = await this.getQuest();
     this.playerQuest.type = this.questForm.get('type').value;
@@ -247,5 +228,23 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     questName = questName.indexOf(' ') ? questName.split(' ')[0] : questName;
     const category = this.questForm.get('category').value;
     return this.quest.searchQuests(category, questName);
+  }
+
+  private async requiredTypeExists(): Promise<boolean> {
+    let typeExists = false;
+    const type = this.questForm.get('type').value as QuestType;
+    const category = this.questForm.get('category').value as QuestCategory;
+
+    // if required, check if a category exists for this user ady exists
+    if (type === QuestType.REQUIRED) {
+      const typeControl = this.questForm.get('type');
+      // is there already a quest of this category for this user?
+      typeExists = await this.playerQuestService.hasRequiredQuest(category, this.playerQuest);
+      // select fields don't ever become dirt, overriding use of this property
+      typeControl.markAsDirty({onlySelf: typeExists});
+      typeControl.setErrors({'invalidType': true});
+    }
+
+    return typeExists;
   }
 }
