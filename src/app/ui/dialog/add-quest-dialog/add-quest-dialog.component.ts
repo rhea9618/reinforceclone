@@ -242,7 +242,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       typeExists = await this.playerQuestService.hasRequiredQuest(category, this.playerQuest);
       // select fields don't ever become dirt, overriding use of this property
       typeControl.markAsDirty({onlySelf: typeExists});
-      typeControl.setErrors({'invalidType': true});
+      typeControl.setErrors({'invalidType': typeExists});
     }
 
     return typeExists;

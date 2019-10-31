@@ -64,20 +64,4 @@ export class QuestService {
 
     return this.questCollection.valueChanges({ idField: 'id' });
   }
-
-  hasRequiredQuest(questCategory: QuestCategory): Observable<boolean> {
-    this.questCollection = this.afs.collection('quests', ref => ref
-      .where('category', '==', questCategory)
-      .where('type', '==' , QuestType.REQUIRED));
-    return this.questCollection.snapshotChanges().pipe(
-      map((quests) => quests.length > 1)
-    );
-  }
-
-  mapQuestData(actions: any[]): Quest[] {
-    return actions.map((a) => {
-      const data = a.payload.doc.data();
-      return <Quest>{ id: a.payload.doc.id, ...data };
-    });
-  }
 }
