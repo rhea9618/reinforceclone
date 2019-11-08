@@ -110,7 +110,7 @@ export class UserProfileComponent implements OnInit {
       }
     }, (err) => {
       console.log(err);
-      this.notifyService.update('Assign quest failed!', 'error');
+      this.notifyService.update(`Assign quest failed! ${err}`, 'error');
     });
   }
 

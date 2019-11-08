@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { of, from, Observable } from 'rxjs';
-import { map, flatMap } from 'rxjs/operators';
+import { map, flatMap, takeWhile } from 'rxjs/operators';
 
 import { AddQuestDialogComponent } from './add-quest-dialog.component';
 import { PlayerQuestService } from '../../player-quest/player-quest.service';
@@ -28,18 +28,12 @@ export class AddQuestDialogService {
    */
   assignQuest(playerQuest: Partial<PlayerQuest>): Observable<PlayerQuest|null> {
     return this.showQuestModal(playerQuest).pipe(
+      takeWhile((quest: PlayerQuest) => !!quest), // ignore cancel clicks
+      flatMap((quest: PlayerQuest) => this.playerQuestService.assertUniqueQuest(quest)),
       flatMap((quest: PlayerQuest) => {
-        // cancel goes here
-        if (!quest) {
-          return of(null);
-        }
-
-        let promise;
-        if (quest.id) {
-          promise = this.playerQuestService.updatePlayerQuest(quest);
-        } else {
-          promise = this.playerQuestService.assignPlayerQuest(quest);
-        }
+        const promise = quest.id ?
+          this.playerQuestService.updatePlayerQuest(quest) :
+          this.playerQuestService.assignPlayerQuest(quest);
 
         return from(promise).pipe(map(() => quest));
       })

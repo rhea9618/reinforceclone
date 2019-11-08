@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
-import { Observable, of, Subject } from 'rxjs';
+import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, FormControl, FormGroupDirective } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatAutocompleteSelectedEvent, ErrorStateMatcher } from '@angular/material';
+import { Observable, Subject } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -14,6 +14,15 @@ import {
 
 import { AuthService } from 'src/app/core/auth.service';
 import { QuestCategoriesService, QuestService } from 'src/app/quests';
+import { PlayerQuestService } from '../../player-quest/player-quest.service';
+
+class TypeErrorFieldMatcher implements ErrorStateMatcher {
+
+  isErrorState(control: FormControl | any, form: FormGroupDirective | null): boolean {
+    // select fields don't ever become dirt, overriding use of this property
+    return control._pendingValue === QuestType.REQUIRED && control.dirty;
+  }
+}
 
 // Validator for quest and source fields
 const textValidator: ValidatorFn = (control: AbstractControl): ValidationErrors => {
@@ -40,15 +49,18 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
   readonly noEmit = { emitEvent: false };
 
+  isNewQuest = true;
   saving = false;
   actionLabel = 'Add Quest';
+  typeError: string;
+  typeErrorFieldMatcher: TypeErrorFieldMatcher;
   private categoryList$: Observable<QuestCategory[]>;
   private onDestroy = new Subject();
   private questForm = this.formBuilder.group({
     category: [''],
     quest: [{ value: '', disabled: true }, textValidator],
     source: [{ value: '', disabled: true }, textValidator],
-    type: [ QuestType.REQUIRED ]
+    type: [QuestType.REQUIRED]
   });
   private questSuggestions$: Observable<Quest[]>;
   private questTypes = [ QuestType.ADDITIONAL, QuestType.REQUIRED, QuestType.SPECIAL ];
@@ -59,10 +71,12 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     private dialogRef: MatDialogRef<AddQuestDialogComponent, Partial<PlayerQuest>>,
     private formBuilder: FormBuilder,
     private questCategories: QuestCategoriesService,
-    private quest: QuestService
+    private quest: QuestService,
+    private playerQuestService: PlayerQuestService
   ) {}
 
   ngOnInit() {
+    this.typeErrorFieldMatcher = new TypeErrorFieldMatcher();
     this.categoryList$ = this.questCategories.getCategories();
 
     // Updating quest
@@ -89,6 +103,7 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
           sourceCtrl.setValue('');
           sourceCtrl.enable();
         }
+        this.isNewQuest = true;
       }),
       filter((name: string) => name.length > 2 && !this.questForm.get('quest').invalid),
       flatMap((name: string) => this.getQuestSuggestions(name))
@@ -120,15 +135,11 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     const quest = event.option.value as Quest;
     this.questForm.get('source').setValue(quest.source);
     this.questForm.get('source').disable();
+    this.isNewQuest = false;
   }
 
   private questNameDisplay(quest: Quest): string {
     return quest ? quest.name : '';
-  }
-
-  private get isNewQuest() {
-    const quest = this.questForm.get('quest').value;
-    return (typeof quest === 'string' && quest.trim() !== '');
   }
 
   private get questError() {
@@ -137,6 +148,10 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
   private get sourceError() {
     return this.getControlError('Source', this.questForm.get('source'));
+  }
+
+  protected get requiredTypeError() {
+    return this.getControlError('Source', this.questForm.get('type'));
   }
 
   private getControlError(name: string, control: AbstractControl): string {
@@ -150,6 +165,9 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     if (control.errors.required) {
       return `${name} name is required`;
     }
+    if (control.errors.invalidType) {
+      return 'Can Only Select One (1) Required Quest per Category';
+    }
   }
 
   // creates an array of alphanumeric words
@@ -158,16 +176,17 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
       .filter(word => word ? word.length > 2 : false);
   }
 
-  async saveQuest() {
-    if (this.questForm.invalid) {
-      return;
+  private async getQuest(): Promise<Quest> {
+    let quest = this.questForm.get('quest').value;
+    if (typeof quest !== 'string') {
+      return quest as Quest;
     }
-    this.saving = true;
 
-    let quest: Quest;
+    const name = quest as string;
+    // Check if quest already exists from the DB
+    quest = await this.quest.getQuestByName(name).toPromise();
     // Saving new quest...
-    if (this.isNewQuest) {
-      const name = this.questForm.get('quest').value.trim() as string;
+    if (!quest) {
       const description = name; // same as name for now until further notice
       const category = this.questForm.get('category').value as QuestCategory;
       const source = this.questForm.get('source').value as string;
@@ -185,11 +204,21 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
 
       quest.id = await this.quest.saveQuest(quest);
       console.log(`Saved new quest: ${quest.name}`);
-    } else {
-      quest = this.questForm.get('quest').value;
     }
 
-    this.playerQuest.quest = quest;
+    return quest as Quest;
+  }
+
+  async saveQuest() {
+    if (this.questForm.invalid) {
+      return;
+    }
+
+    if (await this.requiredTypeExists()) {
+      return;
+    }
+    this.saving = true;
+    this.playerQuest.quest = await this.getQuest();
     this.playerQuest.type = this.questForm.get('type').value;
     this.dialogRef.close(this.playerQuest);
   }
@@ -199,5 +228,23 @@ export class AddQuestDialogComponent implements OnInit, OnDestroy {
     questName = questName.indexOf(' ') ? questName.split(' ')[0] : questName;
     const category = this.questForm.get('category').value;
     return this.quest.searchQuests(category, questName);
+  }
+
+  private async requiredTypeExists(): Promise<boolean> {
+    let typeExists = false;
+    const type = this.questForm.get('type').value as QuestType;
+    const category = this.questForm.get('category').value as QuestCategory;
+
+    // if required, check if a category exists for this user ady exists
+    if (type === QuestType.REQUIRED) {
+      const typeControl = this.questForm.get('type');
+      // is there already a quest of this category for this user?
+      typeExists = await this.playerQuestService.hasRequiredQuest(category, this.playerQuest);
+      // select fields don't ever become dirt, overriding use of this property
+      typeControl.markAsDirty({onlySelf: typeExists});
+      typeControl.setErrors({'invalidType': typeExists});
+    }
+
+    return typeExists;
   }
 }

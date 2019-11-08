@@ -4,14 +4,15 @@ import {
   AngularFirestoreCollection,
   AngularFirestoreDocument
 } from '@angular/fire/firestore';
-import { from, Observable, of } from 'rxjs';
-import { map, flatMap, concatMap } from 'rxjs/operators';
+import { from, Observable, of, throwError } from 'rxjs';
+import { map, flatMap, concatMap, take } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
 import { DatePipe } from '@angular/common';
 
 import { QuestPointsPipe } from 'src/app/pipes';
 import { BadgesService } from 'src/app/badges/badges.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +31,36 @@ export class PlayerQuestService {
   }
 
   /**
-   * Get Quest info from given id
-   * @param  {string}                                id quest id
+   * Get Player Quest info from given id
+   * @param  {string}                                id player quest id
    * @return {AngularFirestoreDocument<PlayerQuest>}    observable quest info
    */
-  getQuest(id: string): AngularFirestoreDocument<PlayerQuest> {
+  getPlayerQuest(id: string): AngularFirestoreDocument<PlayerQuest> {
     return this.afs.doc<PlayerQuest>(`playerQuests/${id}`);
+  }
+
+  /**
+   * Checks if quest has been assigned to player already
+   * and throws an Error if it does. Otherwise, returns the playerQuest
+   * @param  {PlayerQuest}             playerQuest player quest object
+   * @return {Observable<PlayerQuest>}             player quest object
+   */
+  assertUniqueQuest(playerQuest: PlayerQuest): Observable<PlayerQuest | Error> {
+    this.playerQuestsCollection = this.afs.collection('playerQuests', ref => ref
+      .where('playerId', '==', playerQuest.playerId)
+      .where('quest.id', '==', playerQuest.quest.id)
+      .where('seasonId', '==', playerQuest.seasonId)
+      .where('teamId', '==', playerQuest.teamId)
+      .limit(1)
+    );
+
+    return this.playerQuestsCollection.valueChanges().pipe(
+      take(1),
+      flatMap((playerQuests: PlayerQuest[]) => playerQuests.length ?
+        throwError(`Quest: ${playerQuest.quest.name} has already been assigned before.`) :
+        of(playerQuest)
+      )
+    );
   }
 
   /**
@@ -54,7 +79,7 @@ export class PlayerQuestService {
    * @param {Partial<PlayerQuest>} quest quest changes
    */
   updatePlayerQuest(quest: Partial<PlayerQuest>) {
-    return this.getQuest(quest.id).update({
+    return this.getPlayerQuest(quest.id).update({
       ...quest,
       updated: Timestamp.now()
     });
@@ -65,7 +90,7 @@ export class PlayerQuestService {
    * @param {string} quest quest changes
    */
   deletePlayerQuest(questId: string) {
-    return this.getQuest(questId).delete();
+    return this.getPlayerQuest(questId).delete();
   }
 
   /**
@@ -75,18 +100,11 @@ export class PlayerQuestService {
    * @param {string} completionProof link to completion proof
    */
   submitQuest(id: string, completed: Date, completionProof: string) {
-    return this.getQuest(id).update({
+    return this.getPlayerQuest(id).update({
       status: QuestStatus.PENDING_APPROVAL,
       submitted: Timestamp.now(),
       completed: Timestamp.fromDate(completed),
       completionProof
-    });
-  }
-
-  private mapPlayerQuestData(actions: any[]): PlayerQuest[] {
-    return actions.map((a) => {
-      const data = a.payload.doc.data();
-      return <PlayerQuest>{ id: a.payload.doc.id, ...data };
     });
   }
 
@@ -106,9 +124,7 @@ export class PlayerQuestService {
         .orderBy('created', 'desc')
         .limit(20));
 
-    return this.playerQuestsCollection.snapshotChanges().pipe(
-      map((actions) => this.mapPlayerQuestData(actions))
-    );
+    return this.playerQuestsCollection.valueChanges({ idField: 'id' });
   }
 
   /**
@@ -126,9 +142,7 @@ export class PlayerQuestService {
         .orderBy('submitted', 'asc')
         .limit(20));
 
-    return this.playerQuestsCollection.snapshotChanges().pipe(
-      map((actions) => this.mapPlayerQuestData(actions))
-    );
+    return this.playerQuestsCollection.valueChanges({ idField: 'id' });
   }
 
   /**
@@ -136,7 +150,7 @@ export class PlayerQuestService {
    * @param {Partial<PlayerQuest>} quest all quest info
    */
   rejectQuest(quest: Partial<PlayerQuest>) {
-    return from(this.getQuest(quest.id).update({
+    return from(this.getPlayerQuest(quest.id).update({
       status: QuestStatus.TODO
     }));
   }
@@ -156,7 +170,7 @@ export class PlayerQuestService {
    */
   approveQuest(quest: Partial<PlayerQuest>) {
     const playerPointsRef = this.getPlayerPoints(quest.seasonId + quest.playerId).ref;
-    const questRef = this.getQuest(quest.id).ref;
+    const questRef = this.getPlayerQuest(quest.id).ref;
     let eligibleForGoodWorkBadge = false;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
@@ -239,7 +253,30 @@ export class PlayerQuestService {
       flatMap(() => this.badgeService.awardGoodWorkBadge(quest, eligibleForGoodWorkBadge)),
       concatMap(() => quest.type === QuestType.SPECIAL ?
         this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId) : of(null)
+      ),
+      // award scholar badge
+      concatMap(() => quest.type === QuestType.REQUIRED ?
+        this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar) : of(null)
       )
     );
+  }
+
+  /**
+   * Method that checks existence of REQUIRED quests under a certain quest category
+   */
+  hasRequiredQuest(questCategory: QuestCategory, playerQuest: Partial<PlayerQuest>): Promise<boolean> {
+    this.playerQuestsCollection =
+      this.afs.collection('playerQuests', ref => ref
+        .where('quest.category.id', '==', questCategory.id)
+        .where('type', '==' , QuestType.REQUIRED)
+        .where('playerId', '==', playerQuest.playerId)
+        .where('teamId', '==', playerQuest.teamId)
+        .where('seasonId', '==', playerQuest.seasonId)
+        .limit(1));
+
+    return this.playerQuestsCollection.snapshotChanges().pipe(
+      take(1),
+      map((quests) => quests.length > 0)
+    ).toPromise();
   }
 }
