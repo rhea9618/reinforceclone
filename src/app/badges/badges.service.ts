@@ -73,9 +73,19 @@ export class BadgesService {
     );
   }
 
-checkForSpeakerBadges(playerId: string, teamId: string, seasonId: string) {
+  awardOutstandingWorkBadge(quest: Partial<PlayerQuest>): Observable<string> {
     const badges = environment.badges;
+    const currentMonth = (new Date()).getMonth();
 
+    return this.getUserBadge(quest.playerId, badges.oustandingWork, quest.seasonId).pipe(
+      map((badge: PlayerBadge) => !badge || badge.awardedDate.toDate().getMonth() !== currentMonth),
+      flatMap((award: boolean) => award ?
+        this.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, badges.oustandingWork) : of(null))
+    );
+  }
+
+  checkForSpeakerBadges(playerId: string, teamId: string, seasonId: string) {
+    const badges = environment.badges;
     // check if user has a competent speaker badge
     return this.getUserBadge(playerId, badges.competentSpeaker, seasonId).pipe(
       // award competent speaker badge if it doesn't exist yet

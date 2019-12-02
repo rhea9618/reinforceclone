@@ -172,6 +172,7 @@ export class PlayerQuestService {
     const playerPointsRef = this.getPlayerPoints(quest.seasonId + quest.playerId).ref;
     const questRef = this.getPlayerQuest(quest.id).ref;
     let eligibleForGoodWorkBadge = false;
+    let eligibleForOutstandingWorkBadge = false;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
       return transaction.get(playerPointsRef).then(playerPoints => {
@@ -238,6 +239,7 @@ export class PlayerQuestService {
         monthlyCounter[monthName] = counter;
 
         eligibleForGoodWorkBadge = (counter.points >= 50);
+        eligibleForOutstandingWorkBadge = counter.quests > 4;
 
         transaction.set(playerPointsRef, {
           ...initialData,
@@ -257,7 +259,8 @@ export class PlayerQuestService {
       // award scholar badge
       concatMap(() => quest.type === QuestType.REQUIRED ?
         this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar) : of(null)
-      )
+      ),
+      concatMap(() => eligibleForOutstandingWorkBadge ? this.badgeService.awardOutstandingWorkBadge(quest) : of(null)),
     );
   }
 
