@@ -173,6 +173,7 @@ export class PlayerQuestService {
     const questRef = this.getPlayerQuest(quest.id).ref;
     let eligibleForGoodWorkBadge = false;
     let eligibleForOutstandingWorkBadge = false;
+    let eligibleForWellDoneBadge = false;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
       return transaction.get(playerPointsRef).then(playerPoints => {
@@ -235,6 +236,7 @@ export class PlayerQuestService {
         counter.points += pointsAcquired;
         if (quest.quest.category.name === 'Certification') {
           counter.certifications += 1;
+          eligibleForWellDoneBadge = true;
         }
         monthlyCounter[monthName] = counter;
 
@@ -261,6 +263,8 @@ export class PlayerQuestService {
         this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar) : of(null)
       ),
       concatMap(() => eligibleForOutstandingWorkBadge ? this.badgeService.awardOutstandingWorkBadge(quest) : of(null)),
+      concatMap(() => eligibleForWellDoneBadge ? 
+        this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.wellDone)  : of(null))
     );
   }
 
