@@ -4,7 +4,13 @@ import {
   AngularFirestoreCollection,
   AngularFirestoreDocument
 } from '@angular/fire/firestore';
-import { from, Observable, of, throwError } from 'rxjs';
+import {
+  combineLatest,
+  from,
+  Observable,
+  of,
+  throwError
+} from 'rxjs';
 import { map, flatMap, concatMap, take } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
@@ -254,17 +260,27 @@ export class PlayerQuestService {
     });
 
     return from(trans).pipe(
-      flatMap(() => this.badgeService.awardGoodWorkBadge(quest, eligibleForGoodWorkBadge)),
-      concatMap(() => quest.type === QuestType.SPECIAL ?
-        this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId) : of(null)
-      ),
-      // award scholar badge
-      concatMap(() => quest.type === QuestType.REQUIRED ?
-        this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar) : of(null)
-      ),
-      concatMap(() => eligibleForOutstandingWorkBadge ? this.badgeService.awardOutstandingWorkBadge(quest) : of(null)),
-      concatMap(() => eligibleForWellDoneBadge ? 
-        this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.wellDone)  : of(null))
+      flatMap(() => {
+        const badges$ = [];
+
+        if (eligibleForGoodWorkBadge) {
+          badges$.push(this.badgeService.awardGoodWorkBadge(quest));
+        }
+        if (quest.type === QuestType.SPECIAL) {
+          badges$.push(this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId));
+        }
+        if (quest.type === QuestType.REQUIRED) {
+          badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar));
+        }
+        if (eligibleForOutstandingWorkBadge) {
+          badges$.push(this.badgeService.awardOutstandingWorkBadge(quest));
+        }
+        if (eligibleForWellDoneBadge) {
+          badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.wellDone));
+        }
+
+        return combineLatest(...badges$);
+      })
     );
   }
 
