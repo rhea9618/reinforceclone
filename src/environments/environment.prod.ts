@@ -19,6 +19,7 @@ export const environment = {
     distinguishedSpeaker: 'distinguished_speaker',
     goodWork: 'good_work',
     scholar: 'scholar',
+    oustandingWork: 'outstanding_work',
     wellDone: 'well_done'
   }
 };
