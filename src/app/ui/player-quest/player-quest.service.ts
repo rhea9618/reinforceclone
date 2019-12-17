@@ -4,7 +4,13 @@ import {
   AngularFirestoreCollection,
   AngularFirestoreDocument
 } from '@angular/fire/firestore';
-import { from, Observable, of, throwError } from 'rxjs';
+import {
+  combineLatest,
+  from,
+  Observable,
+  of,
+  throwError
+} from 'rxjs';
 import { map, flatMap, concatMap, take } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import Timestamp = firestore.Timestamp;
@@ -172,6 +178,8 @@ export class PlayerQuestService {
     const playerPointsRef = this.getPlayerPoints(quest.seasonId + quest.playerId).ref;
     const questRef = this.getPlayerQuest(quest.id).ref;
     let eligibleForGoodWorkBadge = false;
+    let eligibleForOutstandingWorkBadge = false;
+    let eligibleForWellDoneBadge = false;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
       return transaction.get(playerPointsRef).then(playerPoints => {
@@ -234,10 +242,12 @@ export class PlayerQuestService {
         counter.points += pointsAcquired;
         if (quest.quest.category.name === 'Certification') {
           counter.certifications += 1;
+          eligibleForWellDoneBadge = true;
         }
         monthlyCounter[monthName] = counter;
 
         eligibleForGoodWorkBadge = (counter.points >= 50);
+        eligibleForOutstandingWorkBadge = counter.quests > 4;
 
         transaction.set(playerPointsRef, {
           ...initialData,
@@ -250,14 +260,27 @@ export class PlayerQuestService {
     });
 
     return from(trans).pipe(
-      flatMap(() => this.badgeService.awardGoodWorkBadge(quest, eligibleForGoodWorkBadge)),
-      concatMap(() => quest.type === QuestType.SPECIAL ?
-        this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId) : of(null)
-      ),
-      // award scholar badge
-      concatMap(() => quest.type === QuestType.REQUIRED ?
-        this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar) : of(null)
-      )
+      flatMap(() => {
+        const badges$ = [];
+
+        if (eligibleForGoodWorkBadge) {
+          badges$.push(this.badgeService.awardGoodWorkBadge(quest));
+        }
+        if (quest.type === QuestType.SPECIAL) {
+          badges$.push(this.badgeService.checkForSpeakerBadges(quest.playerId, quest.teamId, quest.seasonId));
+        }
+        if (quest.type === QuestType.REQUIRED) {
+          badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.scholar));
+        }
+        if (eligibleForOutstandingWorkBadge) {
+          badges$.push(this.badgeService.awardOutstandingWorkBadge(quest));
+        }
+        if (eligibleForWellDoneBadge) {
+          badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.wellDone));
+        }
+
+        return combineLatest(...badges$);
+      })
     );
   }
 
