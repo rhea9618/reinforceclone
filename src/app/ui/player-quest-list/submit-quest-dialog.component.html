@@ -8,17 +8,14 @@
       <mat-label>Category</mat-label>
       <input matInput disabled placeholder="Category" value="{{quest.category.name}}" />
     </mat-form-field>
-    <br />
     <mat-form-field appearance="outline">
       <mat-label>Quest Name</mat-label>
       <input matInput disabled placeholder="Quest Name" value="{{quest.name}}" />
     </mat-form-field>
-    <br />
     <mat-form-field appearance="outline">
       <mat-label>Source</mat-label>
       <input matInput disabled placeholder="Source" value="{{quest.source}}" />
     </mat-form-field>
-    <br />
     <mat-form-field appearance="outline">
       <mat-label>Date Completed</mat-label>
       <input matInput [matDatepicker]="picker" required [max]="currentDate" placeholder="Date Completed" formControlName="completed"/>
@@ -27,7 +24,14 @@
       <mat-error *ngIf="hasError('completed','required')">Completion date is a required field</mat-error>
       <mat-error *ngIf="hasError('completed','valid')">Completion date should be within the season's date range ({{ season.startDate.toDate() | date:SHORT }} - {{ season.endDate.toDate() | date:SHORT }})</mat-error>
     </mat-form-field>
-    <br />
+    <mat-form-field appearance="outline" *ngIf="isCertification">
+      <mat-label>Certification Score (%)</mat-label>
+      <input matInput readonly value="{{form.controls.certScore.value}} %" class="score"/>
+      <mat-slider [max]="100" [min]="0" [step]="1"
+        [thumbLabel]="true" color="primary" class="slider"
+        formControlName="certScore">
+      </mat-slider>
+    </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Proof of Completion</mat-label>
       <input matInput placeholder="Proof of Completion" formControlName="completionProof"/>

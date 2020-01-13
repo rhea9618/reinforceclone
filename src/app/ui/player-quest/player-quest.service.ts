@@ -101,16 +101,15 @@ export class PlayerQuestService {
 
   /**
    * Submit quest for team lead approval
-   * @param {string} id              quest id
-   * @param {Date}   completed       date completed
-   * @param {string} completionProof link to completion proof
+   * @param {PlayerQuestSubmission} data Player quest submission info
    */
-  submitQuest(id: string, completed: Date, completionProof: string) {
-    return this.getPlayerQuest(id).update({
+  submitQuest(data: PlayerQuestSubmission) {
+    return this.getPlayerQuest(data.questId).update({
       status: QuestStatus.PENDING_APPROVAL,
       submitted: Timestamp.now(),
-      completed: Timestamp.fromDate(completed),
-      completionProof
+      completed: Timestamp.fromDate(data.completed),
+      completionProof: data.completionProof,
+      certScore: data.certScore
     });
   }
 
@@ -180,6 +179,7 @@ export class PlayerQuestService {
     let eligibleForGoodWorkBadge = false;
     let eligibleForOutstandingWorkBadge = false;
     let eligibleForWellDoneBadge = false;
+    let eligibleForRockstarBadge = false;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
       return transaction.get(playerPointsRef).then(playerPoints => {
@@ -243,6 +243,7 @@ export class PlayerQuestService {
         if (quest.quest.category.name === 'Certification') {
           counter.certifications += 1;
           eligibleForWellDoneBadge = true;
+          eligibleForRockstarBadge = (quest.certScore === 100);
         }
         monthlyCounter[monthName] = counter;
 
@@ -277,6 +278,9 @@ export class PlayerQuestService {
         }
         if (eligibleForWellDoneBadge) {
           badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.wellDone));
+        }
+        if (eligibleForRockstarBadge) {
+          badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.rockStar));
         }
 
         return combineLatest(...badges$);

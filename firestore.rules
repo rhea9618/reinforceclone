@@ -120,12 +120,12 @@ service cloud.firestore {
     // Allow playerQuest write under the ff conditions:
     // Team Lead: allow writes to all fields as long as status != 'completed'
     // Owner: allow write only when status is going to 'pending'
-    //   limited to fields: status, submitted, completed, completionProof
+    //   limited to fields: status, submitted, completed, completionProof, certScore
     function isPlayerQuestWriteAllowed() {
       return (isTeamLead(existingData().teamId) && existingData().status != 'completed') ||
         (
           isOwner(existingData().playerId) &&
-          incomingData().keys().hasAny(['status', 'submitted', 'completed', 'completionProof']) &&
+          incomingData().keys().hasAny(['status', 'submitted', 'completed', 'completionProof', 'certScore']) &&
           incomingData().status == 'pending'
         );
     }

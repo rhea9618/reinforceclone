@@ -24,7 +24,15 @@ interface PlayerQuest {
   updated?: firebase.firestore.Timestamp;
   submitted?: firebase.firestore.Timestamp;
   completed?: firebase.firestore.Timestamp;
-  completionProof?: string; // link to screenshot?
+  completionProof?: string; // url to link to proof
   quest: Quest;
   type: QuestType;
+  certScore?: number;
+}
+
+interface PlayerQuestSubmission {
+  questId: string;
+  completed: Date;
+  completionProof?: string; // url to link to proof
+  certScore?: number;
 }

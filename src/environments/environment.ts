@@ -23,7 +23,8 @@ export const environment = {
     goodWork: 'good_work',
     scholar: 'scholar',
     oustandingWork: 'outstanding_work',
-    wellDone: 'well_done'
+    wellDone: 'well_done',
+    rockStar: 'rock_star'
   }
 };
 

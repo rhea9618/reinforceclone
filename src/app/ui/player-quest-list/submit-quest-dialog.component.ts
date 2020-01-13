@@ -15,7 +15,7 @@ export class SubmitQuestDialogComponent implements OnInit {
   currentDate = new Date();
 
   constructor(
-    private dialogRef: MatDialogRef<SubmitQuestDialogComponent>,
+    private dialogRef: MatDialogRef<SubmitQuestDialogComponent, PlayerQuestSubmission>,
     @Inject(MAT_DIALOG_DATA) public data: {playerQuest: PlayerQuest, season: Season}
   ) {}
 
@@ -25,11 +25,16 @@ export class SubmitQuestDialogComponent implements OnInit {
     this.form = new FormGroup({
       questId: new FormControl(this.data.playerQuest.id, [ Validators.required ]),
       completed:  new FormControl(this.currentDate, [ Validators.required, this.createCompletionDateValidator() ]),
-      completionProof: new FormControl(null, [ Validators.pattern('(http|https)://[^ "]+') ])
+      completionProof: new FormControl(null, [ Validators.pattern('(http|https)://[^ "]+') ]),
+      certScore: new FormControl(0, [ Validators.required ]),
     });
   }
 
-  public hasError(controlName: string, errorName: string) {
+  get isCertification() {
+    return (this.quest.category.name === 'Certification');
+  }
+
+  hasError(controlName: string, errorName: string) {
     return this.form.controls[controlName].hasError(errorName);
   }
 

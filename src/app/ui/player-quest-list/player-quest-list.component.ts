@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import { EMPTY, from, Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
@@ -34,6 +34,8 @@ export class PlayerQuestListComponent implements OnInit {
     'xp',
   ];
 
+  private submitQuestDialog: MatDialogRef<SubmitQuestDialogComponent, PlayerQuestSubmission>;
+
   constructor(
     private auth: AuthService,
     private emailService: EmailService,
@@ -62,7 +64,7 @@ export class PlayerQuestListComponent implements OnInit {
   }
 
   public openSubmitQuestDialog(playerQuest: PlayerQuest) {
-    const submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent,
+    this.submitQuestDialog = this.dialog.open(SubmitQuestDialogComponent,
       {
         data: {
           playerQuest: playerQuest,
@@ -71,11 +73,15 @@ export class PlayerQuestListComponent implements OnInit {
         width: '600px'
       });
 
-    submitQuestDialog.afterClosed().subscribe( data => {
+    this.submitQuestDialog.afterClosed().subscribe((data: PlayerQuestSubmission) => {
       if (data && data.questId) {
-        this.playerQuestService.submitQuest(data.questId, data.completed, data.completionProof)
+        this.playerQuestService.submitQuest(data)
           .then(() => {
-            this.sendQuestSubmittedEmail({...playerQuest, ...data});
+            this.sendQuestSubmittedEmail({
+              ...playerQuest,
+              completionProof: data.completionProof,
+              certScore: data.certScore
+            });
           })
           .catch((err) => {
             console.log(err);
@@ -101,15 +107,16 @@ export class PlayerQuestListComponent implements OnInit {
     const subject = `${subjectPrefix} Validation of Quest Completion for ${playerQuest.playerName}`;
     const dashboardUrl = `${environment.firebase.authDomain}/profile`;
     const questInfo = this.questInfoEmail(playerQuest);
+    const certScore = playerQuest.quest.category.name === 'Certification' ? `Certification Score: ${playerQuest.certScore} %` : '';
     const attachment = playerQuest.completionProof ?
       `<a href="${playerQuest.completionProof}">${playerQuest.completionProof}</a><br/>` : '<br/>';
     const content =
       `Player ${playerQuest.playerName} has completed a quest!<br/>
       <br/>
       ${questInfo}
+      ${certScore}<br/>
       Date Completed: ${playerQuest.completed}<br/>
-      Attachment: ${attachment}
-      <br/>
+      Completion Proof Link: ${attachment}<br/>
       Visit your <a href="${dashboardUrl}">dashboard</a> to award ${playerQuest.playerName} ${xp}<br/>
       <br/>
       REWARDS AND RECOGNITION PH`;

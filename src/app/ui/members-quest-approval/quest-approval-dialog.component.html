@@ -1,40 +1,25 @@
-<h1 mat-dialog-title>
+<span mat-dialog-title>
   {{data.quest.name}}
   <mat-chip-list>
     <mat-chip color="primary" selected>{{ data.type | questType }}</mat-chip>
     <mat-chip color="accent" selected>{{ data.type | questPoints }} XP</mat-chip>
   </mat-chip-list>
-</h1>
+</span>
 <div mat-dialog-content>
-
-  <table>
-    <tr>
-      <td><b>Source:</b></td>
-      <td>{{data.quest.source}}</td>
-    </tr>
-    <tr>
-      <td><b>Category:</b></td>
-      <td>{{data.quest.category.name}}</td>
-    </tr>
-    <tr>
-      <td><b>Submitted by:</b></td>
-      <td>{{data.playerName}}</td>
-    </tr>
-    <tr>
-      <td><b>Date Submitted:</b></td>
-      <td>{{data.submitted | firestoreDate}}</td>
-    </tr>
-    <tr>
-      <td><b>Date Completed:</b></td>
-      <td>{{data.completed | firestoreDate}}</td>
-    </tr>
-    <tr *ngIf="data.completionProof">
-      <td><b>Completion Proof Link:</b></td>
-      <td>
-        <a href="{{data.completionProof}}">{{data.completionProof}}</a>
-      </td>
-    </tr>
-  </table>
+  <span class="mat-h2">Quest Details:</span>
+  <p><span class="mat-body-strong">Source:</span> {{data.quest.source}}</p>
+  <p><span class="mat-body-strong">Category:</span> {{data.quest.category.name}}</p>
+  <p *ngIf="data.quest.category.name === 'Certification'">
+    <span class="mat-body-strong">Certification Score:</span> {{data.certScore}} %
+    <mat-icon>school</mat-icon>
+  </p>
+  <p><span class="mat-body-strong">Submitted by:</span> {{data.playerName}}</p>
+  <p><span class="mat-body-strong">Date Submitted:</span> {{data.submitted | firestoreDate}}</p>
+  <p><span class="mat-body-strong">Date Completed:</span> {{data.completed | firestoreDate}}</p>
+  <p *ngIf="data.completionProof">
+    <span class="mat-body-strong">Completion Proof Link:</span>
+    <a href="{{data.completionProof}}">{{data.completionProof}}</a>
+  </p>
 </div>
 <div mat-dialog-actions>
   <button mat-button [mat-dialog-close]="'approved'" color="primary">Approve</button>

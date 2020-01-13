@@ -3,3 +3,14 @@
   display: flex;
   justify-content: space-between;
 }
+
+p {
+  margin: 0;
+  margin: 5px;
+  display: flex;
+  align-items: center;
+
+  span {
+    margin-right: 10px;
+  }
+}
