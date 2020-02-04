@@ -9,6 +9,8 @@ import { AuthService } from 'src/app/core/auth.service';
 import { SeasonService } from 'src/app/core/season.service';
 import { NotifyService } from 'src/app/core/notify.service';
 import { TeamsService } from 'src/app/teams/teams.service';
+import { AddBadgeDialogComponent } from './add-badge-dialog/add-badge-dialog.component';
+import { BadgesService } from 'src/app/badges/badges.service';
 
 @Component({
   selector: 'admin-page',
@@ -33,6 +35,7 @@ export class AdminPageComponent implements OnInit {
 
   constructor(
     public auth: AuthService,
+    private badgesService: BadgesService,
     private dialog: MatDialog,
     private notifyService: NotifyService,
     private seasonService: SeasonService,
@@ -64,6 +67,28 @@ export class AdminPageComponent implements OnInit {
           uid: user.uid,
           displayName: user.displayName
         })
+        .catch((err) => {
+          console.log(err);
+          this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
+        });
+      }
+    });
+  }
+
+  openBadgeDialog(){
+    const addBadgeDialog = this.dialog.open(AddBadgeDialogComponent, 
+    {
+      width: '400px'
+    });
+    addBadgeDialog.afterClosed().subscribe( data => {
+      if (data) {
+        const badge = <Badge>{
+          description: data.description,
+          name: data.name,
+          url: data.imageUrl,
+          required: data.required
+        };
+        this.badgesService.createBadge(badge, data.badgeId)
         .catch((err) => {
           console.log(err);
           this.notifyService.update(`Something went wrong. Please try again later.`, 'error');

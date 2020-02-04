@@ -81,4 +81,16 @@
     <tr mat-header-row *matHeaderRowDef="teamColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: teamColumns;"></tr>
   </table>
+
+  <hr/>
+
+  <mat-toolbar class="badge-toolbar" color="primary">
+    Badges
+    <span class="spacer"></span>
+    <a mat-button (click)="openBadgeDialog()">
+      <mat-icon class="icon">add_box</mat-icon>
+      Create Badge
+    </a>
+  </mat-toolbar>
+
 </div>

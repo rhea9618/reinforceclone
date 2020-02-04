@@ -48,6 +48,7 @@ import { RejectReasonDialogComponent } from './members-quest-approval/reject-rea
 import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.component';
 import { DatePipe } from '@angular/common';
 import { UploadsModule } from '../uploads/uploads.module';
+import { AddBadgeDialogComponent } from './admin-page/add-badge-dialog/add-badge-dialog.component';
 
 @NgModule({
   imports: [
@@ -99,13 +100,15 @@ import { UploadsModule } from '../uploads/uploads.module';
     ConfirmationModalComponent,
     RejectReasonDialogComponent,
     AddSeasonDialogComponent,
+    AddBadgeDialogComponent
   ],
   entryComponents: [
     ConfirmationModalComponent,
     QuestApprovalDialogComponent,
     RejectReasonDialogComponent,
     SubmitQuestDialogComponent,
-    AddSeasonDialogComponent
+    AddSeasonDialogComponent,
+    AddBadgeDialogComponent
   ],
   exports: [
     UserProfileComponent,

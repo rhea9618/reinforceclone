@@ -3,6 +3,7 @@ interface Badge {
   url: string;
   name: string;
   description: string;
+  required: boolean;
 }
 
 interface PlayerBadge {
