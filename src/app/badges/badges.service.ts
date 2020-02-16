@@ -4,6 +4,7 @@ import { Observable, from, of } from 'rxjs';
 import { first, flatMap, map, takeWhile } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 import { environment } from 'src/environments/environment';
+import { DatePipe } from '@angular/common';
 
 const Timestamp = firestore.Timestamp;
 
@@ -14,7 +15,7 @@ export class BadgesService {
 
   playerBadges: AngularFirestoreCollection<PlayerBadge>;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(private afs: AngularFirestore, private datePipe: DatePipe) {
     this.playerBadges = this.afs.collection('playerBadges');
   }
 
@@ -69,6 +70,16 @@ export class BadgesService {
     return this.getUserBadge(quest.playerId, badges.goodWork, quest.seasonId).pipe(
       map((badge: PlayerBadge) => !badge || badge.awardedDate.toDate().getMonth() !== currentMonth),
       flatMap((award: boolean) => award ? this.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, badges.goodWork) : of(null))
+    );
+  }
+
+  awardYoureOnArollBadge(quest: Partial<PlayerQuest>, currentQuarter: string[]): Observable<string> {
+    const badges = environment.badges;
+
+    return this.getUserBadge(quest.playerId, badges.roll, quest.seasonId).pipe(
+      map((badge: PlayerBadge) => !badge ||
+        !(currentQuarter.indexOf(this.datePipe.transform(badge.awardedDate.toDate(), 'MMM').toLowerCase()) >= 0)),
+      flatMap((award: boolean) => award ? this.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, badges.roll) : of(null))
     );
   }
 

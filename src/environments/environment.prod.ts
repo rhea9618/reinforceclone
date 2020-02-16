@@ -21,6 +21,7 @@ export const environment = {
     scholar: 'scholar',
     oustandingWork: 'outstanding_work',
     wellDone: 'well_done',
-    rockStar: 'rock_star'
+    rockStar: 'rock_star',
+    roll: 'roll'
   }
 };

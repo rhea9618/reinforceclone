@@ -180,6 +180,8 @@ export class PlayerQuestService {
     let eligibleForOutstandingWorkBadge = false;
     let eligibleForWellDoneBadge = false;
     let eligibleForRockstarBadge = false;
+    let eligibleForYoureOnARollBadge = false;
+    let currentQuarter = null;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
       return transaction.get(playerPointsRef).then(playerPoints => {
@@ -244,7 +246,25 @@ export class PlayerQuestService {
           counter.certifications += 1;
           eligibleForWellDoneBadge = true;
           eligibleForRockstarBadge = (quest.certScore === 100);
+
+          let totalWellDoneForQuarter = counter.certifications; // current month
+          const quarter1 = ['may', 'jun', 'jul'];
+          const quarter2 = ['aug', 'sep', 'oct'];
+          const quarter3 = ['nov', 'dec', 'jan'];
+          const quarter4 = ['feb', 'mar', 'apr'];
+
+          currentQuarter = quarter1.indexOf(monthName) >= 0 ? quarter1 : quarter2.indexOf(monthName) >= 0 ? quarter2 :
+          quarter3.indexOf(monthName) >= 0 ? quarter3 : quarter4.indexOf(monthName) >= 0 ? quarter4 : null;
+
+          currentQuarter.forEach((quarterMonth: string) => {
+            if (quarterMonth !== monthName && monthlyCounter[quarterMonth]) {
+              totalWellDoneForQuarter += monthlyCounter[quarterMonth].certifications; // get certification count for other months
+            }
+          });
+
+          eligibleForYoureOnARollBadge = (totalWellDoneForQuarter >= 3);
         }
+
         monthlyCounter[monthName] = counter;
 
         eligibleForGoodWorkBadge = (counter.points >= 50);
@@ -281,6 +301,9 @@ export class PlayerQuestService {
         }
         if (eligibleForRockstarBadge) {
           badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.rockStar));
+        }
+        if (eligibleForYoureOnARollBadge) {
+            badges$.push(this.badgeService.awardYoureOnArollBadge(quest, currentQuarter));
         }
 
         return combineLatest(...badges$);
