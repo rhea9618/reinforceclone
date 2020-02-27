@@ -32,13 +32,19 @@
   justify-content: center;
 
   > label {
-    margin: 5px;
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
     align-items: center;
+    cursor: pointer;
 
-    h5, h6 {
+    h5 {
       margin: 0;
+    }
+
+    span {
+      font-weight: normal;
+      font-size: 0.7em;
     }
   }
 
