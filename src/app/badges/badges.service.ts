@@ -19,8 +19,8 @@ export class BadgesService {
     this.playerBadges = this.afs.collection('playerBadges');
   }
 
-  createBadge(badge: Badge, id: string){
-    return this.afs.collection<Badge>('badges').doc(id).set(badge)
+  createBadge(badge: Badge, id: string) {
+    return this.afs.collection<Badge>('badges').doc(id).set(badge);
   }
 
   getUserBadges(uid: string): Observable<PlayerBadge[]> {
