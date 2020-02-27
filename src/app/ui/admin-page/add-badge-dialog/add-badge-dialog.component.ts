@@ -14,12 +14,12 @@ export class AddBadgeDialogComponent implements OnInit {
 
   ngOnInit() {
     this.badgeForm = new FormGroup({
-      badgeId: new FormControl(null, [ Validators.required ]),
-      description: new FormControl(null, [ Validators.required ]),
-      name: new FormControl(null, [ Validators.required ]),
-      required: new FormControl(true, [ Validators.required ]),
-      imageUrl: new FormControl('https://firebasestorage.googleapis.com/v0/b/leaderboard-79b77.appspot.com/o/Good%20work!.png?alt=media&token=52bbfaef-e617-4697-be6b-5196edea2a3d', [ Validators.required ])
-    })
+      badgeId: new FormControl(null, [Validators.required]),
+      description: new FormControl(null, [Validators.required]),
+      name: new FormControl(null, [Validators.required]),
+      required: new FormControl(true, [Validators.required]),
+      imageUrl: new FormControl('', [Validators.required])
+    });
   }
   public createBadge() {
     if (this.badgeForm.valid) {
@@ -31,4 +31,9 @@ export class AddBadgeDialogComponent implements OnInit {
     return this.badgeForm.controls[controlName].hasError(errorName);
   }
 
+  uploadBadgeImage(url) {
+    this.badgeForm.patchValue({
+      imageUrl: url
+    });
+  }
 }

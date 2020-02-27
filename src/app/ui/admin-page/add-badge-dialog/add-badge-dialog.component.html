@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>Create New Badge</h2>
 <mat-dialog-content>
-  <form [formGroup]="badgeForm">
+  <form [formGroup]="badgeForm" class="form">
     <mat-form-field>
       <input matInput placeholder="Badge ID" formControlName="badgeId" />
       <mat-error *ngIf="hasError('badgeId','required')">Badge ID is a required field</mat-error>
@@ -14,7 +14,8 @@
       <mat-error *ngIf="hasError('name','required')">Name is a required field</mat-error>
     </mat-form-field>
     <mat-checkbox matInput color="primary" formControlName="required">Required</mat-checkbox>
-    <!--upload component-->
+    <badge-upload [uid]="data.user.uid" [directory]="'customBadges'" (uploaded)="uploadBadgeImage($event)">
+    </badge-upload>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>

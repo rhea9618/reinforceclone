@@ -3,5 +3,17 @@
 }
 
 .mat-dialog-content{
-  height: 350px;
+  height: 400px;
+
+  .form{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+
+    badge-upload{
+      margin: 12px 0px;
+      min-height: 150px;
+    }
+  }
 }

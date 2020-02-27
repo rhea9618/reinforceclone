@@ -4,7 +4,7 @@
       <input class="hidden-input" type="file" (change)="startUpload($event.target.files)">
       <mat-icon color="primary" *ngIf="!isHovering; else iconHover">cloud_upload</mat-icon>
       <h5>Drag & drop or click here</h5>
-      <span>to upload your image (max 100 KB)</span>
+      <h6>to upload your image (max 1 MB)</h6>
       <span *ngIf="percentage | async as pct">
         <mat-progress-bar mode="determinate" value="{{pct | number}}">
         </mat-progress-bar>

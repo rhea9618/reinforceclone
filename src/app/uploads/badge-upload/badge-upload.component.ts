@@ -40,7 +40,7 @@ export class BadgeUploadComponent implements OnInit {
   constructor(
     private fireStorage: AngularFireStorage,
     private notifyService: NotifyService
-  ) {}
+  ) { }
 
   private readFile(blob: Blob) {
     const reader = new FileReader();

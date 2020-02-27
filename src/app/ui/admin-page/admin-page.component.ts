@@ -40,7 +40,7 @@ export class AdminPageComponent implements OnInit {
     private notifyService: NotifyService,
     private seasonService: SeasonService,
     private teams: TeamsService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.seasons$ = this.seasonService.getData();
@@ -60,27 +60,30 @@ export class AdminPageComponent implements OnInit {
   }
 
   openSeasonDialog(user: User) {
-    const addSeasonDialog = this.dialog.open(AddSeasonDialogComponent, {width: '400px'});
-    addSeasonDialog.afterClosed().subscribe( data => {
+    const addSeasonDialog = this.dialog.open(AddSeasonDialogComponent, { width: '400px' });
+    addSeasonDialog.afterClosed().subscribe(data => {
       if (data) {
         this.seasonService.createSeason(data.name, data.startDate, data.endDate, {
           uid: user.uid,
           displayName: user.displayName
         })
-        .catch((err) => {
-          console.log(err);
-          this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
-        });
+          .catch((err) => {
+            console.log(err);
+            this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
+          });
       }
     });
   }
 
-  openBadgeDialog(){
-    const addBadgeDialog = this.dialog.open(AddBadgeDialogComponent, 
-    {
-      width: '400px'
-    });
-    addBadgeDialog.afterClosed().subscribe( data => {
+  openBadgeDialog(user) {
+    const addBadgeDialog = this.dialog.open(AddBadgeDialogComponent,
+      {
+        data: {
+          user
+        },
+        width: '400px'
+      });
+    addBadgeDialog.afterClosed().subscribe(data => {
       if (data) {
         const badge = <Badge>{
           description: data.description,
@@ -89,10 +92,11 @@ export class AdminPageComponent implements OnInit {
           required: data.required
         };
         this.badgesService.createBadge(badge, data.badgeId)
-        .catch((err) => {
-          console.log(err);
-          this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
-        });
+          .then(() => this.notifyService.update(`Badge successfully added.`, 'success'))
+          .catch((err) => {
+            console.log(err);
+            this.notifyService.update(`Something went wrong. Please try again later.`, 'error');
+          });
       }
     });
   }
