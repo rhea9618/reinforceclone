@@ -47,6 +47,7 @@ import { PlayerPointsService } from './player-quest/player-points.service';
 import { RejectReasonDialogComponent } from './members-quest-approval/reject-reason-dialog/reject-reason-dialog.component';
 import { AddSeasonDialogComponent } from './admin-page/add-season-dialog.component';
 import { DatePipe } from '@angular/common';
+import { UploadsModule } from '../uploads/uploads.module';
 
 @NgModule({
   imports: [
@@ -76,6 +77,7 @@ import { DatePipe } from '@angular/common';
     DialogModule,
     QuestsModule,
     PipesModule,
+    UploadsModule
   ],
   declarations: [
     UserLoginComponent,

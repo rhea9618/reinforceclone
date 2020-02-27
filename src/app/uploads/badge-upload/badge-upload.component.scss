@@ -1,0 +1,58 @@
+@import "variables.scss";
+
+:host {
+  display: flex;
+}
+
+.dropzone-container {
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  border: 2px dashed $primary;
+
+  &.dropped {
+    border: 2px dashed $green;
+  }
+
+  &.hovering {
+    border: 2px dashed $accent;
+
+    label {
+      color: $accent;
+    }
+  }
+}
+
+.dropzone {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+
+  > label {
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h5, h6 {
+      margin: 0;
+    }
+  }
+
+  .hidden-input {
+    display: none;
+  }
+}
+
+.show-image {
+  position: relative;
+
+  mat-icon {
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+  }
+}

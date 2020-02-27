@@ -1,0 +1,26 @@
+<div class="dropzone-container" [ngClass]="{ 'hovering': isHovering, 'dropped': uploadedURL }">
+  <div class="dropzone" dropZone (hovered)="toggleHover($event)" (dropped)="startUpload($event)">
+    <label *ngIf="!uploadedURL; else showUploadedImage">
+      <input class="hidden-input" type="file" (change)="startUpload($event.target.files)">
+      <mat-icon color="primary" *ngIf="!isHovering; else iconHover">cloud_upload</mat-icon>
+      <h5>Drop & drop or click here</h5>
+      <h6>to upload your image (max 100 KB)</h6>
+      <span *ngIf="percentage | async as pct">
+        <mat-progress-bar mode="determinate" value="{{pct | number}}">
+        </mat-progress-bar>
+        <h6>{{pct | number}} %</h6>
+      </span>
+    </label>
+  </div>
+</div>
+
+<ng-template #iconHover>
+  <mat-icon color="accent">cloud_upload</mat-icon>
+</ng-template>
+
+<ng-template #showUploadedImage>
+  <div class="show-image">
+    <mat-icon class="close" (click)="deleteImage()">close</mat-icon>
+    <img [src]="uploadedURL">
+  </div>
+</ng-template>

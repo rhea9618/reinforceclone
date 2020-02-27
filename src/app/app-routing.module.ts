@@ -7,7 +7,6 @@ import { PlayerQuestComponent } from './ui/player-quest/player-quest.component';
 import { UserLoginComponent } from './ui/user-login/user-login.component';
 import { UserProfileComponent } from './ui/user-profile/user-profile.component';
 import { HomePageComponent } from './ui/home-page/home-page.component';
-import { UploadPageComponent } from './uploads/upload-page/upload-page.component';
 import { JoinTeamPageComponent } from './ui/join-team-page/join-team-page.component';
 import { TeamPageComponent } from './ui/team-page/team-page.component';
 import { MyBadgesComponent } from './badges/my-badges/my-badges.component';

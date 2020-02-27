@@ -1,0 +1,22 @@
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow public read
+    match /{allPaths=**} {
+      allow read;
+    }
+
+    // Allow write files to customBadges under these conditions:
+    // 1) Write only inside user directory
+    // 2) File is less than 1 MB
+    // 3) Uploaded content type matches existing content type (if it exists)
+    // 4) File name is no more than 20 characters
+    match /customBadges/{imageId} {
+      allow create: if request.auth.uid == request.resource.metadata.uid
+        && request.resource.size < 1024 * 1024
+        && request.resource.contentType.matches('image/.*')
+        && imageId.size() < 30;
+
+      allow update, delete: if request.auth.uid == resource.metadata.uid;
+    }
+  }
+}
