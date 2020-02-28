@@ -176,12 +176,14 @@ export class PlayerQuestService {
   approveQuest(quest: Partial<PlayerQuest>) {
     const playerPointsRef = this.getPlayerPoints(quest.seasonId + quest.playerId).ref;
     const questRef = this.getPlayerQuest(quest.id).ref;
+
     let eligibleForGoodWorkBadge = false;
     let eligibleForOutstandingWorkBadge = false;
     let eligibleForWellDoneBadge = false;
     let eligibleForRockstarBadge = false;
     let eligibleForYoureOnARollBadge = false;
     let currentQuarter = null;
+    let eligibleForYoureStarBadge = false;
 
     const trans = this.afs.firestore.runTransaction((transaction) => {
       return transaction.get(playerPointsRef).then(playerPoints => {
@@ -198,6 +200,7 @@ export class PlayerQuestService {
         let monthlyCounter: MonthlyCounter;
         let counter: Counter;
         let initialData: Partial<PlayerPoints>;
+        let youreAStar = !!playerPoints.data().youreAStar;
 
         if (playerPoints.exists) {
           totalPoints = Number(playerPoints.data().totalPoints);
@@ -270,12 +273,18 @@ export class PlayerQuestService {
         eligibleForGoodWorkBadge = (counter.points >= 50);
         eligibleForOutstandingWorkBadge = counter.quests > 4;
 
+        // if the month is April (end of a season), check for you're a star eligibility
+        if (monthName.toLowerCase() === 'apr' && !youreAStar) {
+          youreAStar = eligibleForYoureStarBadge = this.badgeService.isEligibleForYoureStar(monthlyCounter);
+        }
+
         transaction.set(playerPointsRef, {
           ...initialData,
           totalPoints,
           totalQuests,
           monthlyCounter,
-          updated
+          updated,
+          youreAStar
         }, { merge: true });
       });
     });
@@ -305,6 +314,9 @@ export class PlayerQuestService {
         if (eligibleForYoureOnARollBadge) {
             badges$.push(this.badgeService.awardYoureOnArollBadge(quest, currentQuarter));
         }
+        if (eligibleForYoureStarBadge) {
+          badges$.push(this.badgeService.awardWithBadgeId(quest.playerId, quest.teamId, quest.seasonId, environment.badges.youreAStar));
+        }
 
         return combineLatest(...badges$);
       })
@@ -329,4 +341,5 @@ export class PlayerQuestService {
       map((quests) => quests.length > 0)
     ).toPromise();
   }
+
 }

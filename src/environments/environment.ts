@@ -25,7 +25,8 @@ export const environment = {
     oustandingWork: 'outstanding_work',
     wellDone: 'well_done',
     rockStar: 'rock_star',
-    roll: 'roll'
+    roll: 'roll',
+    youreAStar: 'youre_a_star'
   }
 };
 

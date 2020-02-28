@@ -8,4 +8,5 @@ interface PlayerPoints {
   totalQuests: number;
   monthlyCounter: MonthlyCounter;
   updated: firebase.firestore.FieldValue;
+  youreAStar?: boolean;
 }

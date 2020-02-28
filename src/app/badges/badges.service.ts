@@ -115,4 +115,27 @@ export class BadgesService {
       flatMap((badge: PlayerBadge) => badge ? of(badge) : this.awardWithBadgeId(playerId, teamId, seasonId, badges.distinguishedSpeaker)),
     );
   }
+
+  /**
+   * Check from player points data if the player is eligible for the "You're a Star!" badge.
+   * Eligibility is granted if:
+   *     (1) Player does not already have the badge for the current season and
+   *     (2) Player has done at least one quest per month
+   * @param {MonthlyCounter} monthlyCounter contains the quest counter per month.
+   */
+  isEligibleForYoureStar(monthlyCounter: MonthlyCounter): boolean {
+    const months = Object.values(monthlyCounter);
+
+    if (months.length < 12) {
+      return false;
+    }
+
+    for (const monthData of months) {
+      if (!monthData.quests) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
